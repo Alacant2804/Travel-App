@@ -1,0 +1,40 @@
+:root {
+    --primary-text-color: white;
+    --hover-text-color: #007bff;
+    --default-link-color: #333;
+    --header-bg-color: black;
+}
+
+.header {
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    background-color: var(--header-bg-color);
+}
+
+.logo {
+    height: 50px;
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    justify-content: space-between;
+}
+
+.nav-links li {
+    margin-right: 20px; 
+    padding: 0 10px;
+}
+
+.nav-links li a {
+    text-decoration: none;
+    color: var(--primary-text-color);
+    font-weight: bold;
+}
+
+.nav-links li a:hover {
+    color: var(--hover-text-color);
+}
