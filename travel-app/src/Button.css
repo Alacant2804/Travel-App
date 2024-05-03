@@ -1,0 +1,20 @@
+.btn {
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    outline: none;
+    transition: background-color 0.3s, transform 0.2s;
+    color: white; /* Default text color */
+    background-color: #007bff; /* Default background color */
+}
+
+.btn:hover {
+    background-color: #0056b3;
+    transform: scale(1.05); /* Slightly enlarge the button on hover */
+}
+
+.btn:active {
+    transform: scale(0.95); /* Slightly shrink the button when clicked */
+}
