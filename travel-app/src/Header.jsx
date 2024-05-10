@@ -5,7 +5,7 @@ export default function Header() {
     return (
         <header className="header">
             <div className='logo-container'>
-                <h3>Travel Planner</h3>
+                <Link to='/'><h3>Travel Planner</h3></Link>
             </div>
             <nav>
                 <ul className="main-nav-links">
