@@ -2,70 +2,40 @@
     padding: 20px;
     background-color: #f5f5f5;
     min-height: 80vh;
-  }
-  
-  .new-trip-form, .trip-list {
-    background-color: white;
-    border-radius: 8px;
-    padding: 20px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
-  }
-  
-  .new-trip-form h2, .trip-list h2 {
-    margin-top: 0;
-  }
-  
-  .new-trip-form form {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .new-trip-form label {
-    margin-bottom: 10px;
-    font-weight: bold;
-  }
-  
-  .new-trip-form input[type="text"], .new-trip-form input[type="date"], .new-trip-form textarea {
-    width: 100%;
-    padding: 8px;
-    margin-top: 5px;
-    margin-bottom: 10px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-  }
-  
-  .new-trip-form button {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    padding: 10px;
-    cursor: pointer;
-    width: 100px;
-  }
-  
-  .new-trip-form button:hover {
-    background-color: #0056b3;
-  }
-  
-  .trip-list h2 {
-    margin-bottom: 10px;
-  }
-  
-  .trip-card {
-    background-color: #fff;
-    border-radius: 8px;
-    padding: 15px;
-    margin-bottom: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  }
-  
-  .trip-card h3 {
-    margin: 0;
-  }
-  
-  .trip-card p {
-    margin: 5px 0;
-  }
-  
+}
+
+.trips-main {
+  margin: 0 auto;
+  max-width: 800px;
+  text-align: center;
+}
+
+.create-trip-btn {
+  background-color: #f05b0b;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.create-trip-btn:hover {
+  background-color: #e04a00;
+}
+
+.no-trips-message {
+  font-size: 18px;
+  color: #555;
+  margin-top: 20px;
+}
+
+.trips-list {
+  list-style: none;
+  padding-left: 0;
+  margin-top: 20px;
+}
+
+.trips-list li {
+  padding: 10px 0;
+  border-bottom: 1px solid #ddd;
+}

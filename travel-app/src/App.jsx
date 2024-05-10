@@ -4,11 +4,16 @@ import MainPhoto from './MainPhoto.jsx';
 import AboutApp from './AboutApp.jsx';
 import Footer from './Footer.jsx';
 import Trips from './Trips.jsx';
+import TripDetail from './TripDetail.jsx';
 import TravelHacks from './TravelHacks.jsx';
 import Login from './Login.jsx';
 import SignUp from './SignUp.jsx';
+import { useState } from 'react';
+
 
 export default function App() {
+  const [trips, setTrips] = useState([]);
+
   return (
     <BrowserRouter>
       <div className="App">
@@ -20,7 +25,8 @@ export default function App() {
               <AboutApp />
             </>
           } />
-          <Route path="/trips" element={<Trips />} />
+          <Route path="/trips" element={<Trips trips={trips} setTrips={setTrips} />} />
+          <Route path="/trips/:tripId" element={<TripDetail trips={trips} />} />
           <Route path="/travel-hacks" element={<TravelHacks />} />
           <Route path="/login" element={<Login />} />
           <Route path="/sign-up" element={<SignUp />} />
