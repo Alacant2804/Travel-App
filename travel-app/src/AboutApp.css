@@ -1,68 +1,91 @@
 .about-app {
-    background-color: #f4f4f4;
-    padding: 20px;
-    border-radius: 8px;
-    margin: 20px auto;
+    padding: 60px 20px;
+    background-color: #f5f5f5;
     text-align: center;
-    max-width: 1200px; 
 }
 
 .about-header {
-    padding-bottom: 20px;
+    margin-bottom: 40px;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .about-header h2 {
-    color: #333;
-    font-size: 2.5rem;
+    font-size: 2.5em;
+    color: #f05b0b;
+    margin-bottom: 15px;
 }
 
 .about-header p {
-    color: #666;
-    font-size: 1.2rem;
-    margin-bottom: 30px;
+    font-size: 1.2em;
+    color: #333;
+    line-height: 1.5;
 }
 
 .features {
     display: flex;
-    justify-content: space-around;
-    flex-wrap: wrap; 
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 30px;
 }
 
 .feature-card {
-    background: white;
-    padding: 20px;
-    margin: 10px;
-    flex: 1 1 300px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    background-color: #fff;
     border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    width: 280px;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
 }
 
 .feature-icon {
-    font-size: 24px;
-    color: #0056b3;
+    font-size: 2em;
+    color: #f05b0b;
     margin-bottom: 10px;
 }
 
 .feature-card h3 {
-    font-size: 1.5rem;
+    font-size: 1.4em;
+    margin-bottom: 10px;
 }
 
 .feature-card p {
-    font-size: 1rem;
+    font-size: 1em;
     color: #666;
+    line-height: 1.4;
 }
 
 .start-planning-btn {
-    background-color: #0056b3;
-    color: white;
+    margin-top: 40px;
+    padding: 12px 24px;
+    font-size: 1.2em;
+    color: #fff;
+    background-color: #f05b0b;
     border: none;
-    padding: 15px 30px;
-    cursor: pointer;
     border-radius: 5px;
-    font-size: 1.2rem;
-    margin-top: 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
 }
 
 .start-planning-btn:hover {
-    background-color: #004494;
+    background-color: #d94c09;
+}
+
+@media (max-width: 768px) {
+    .features {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .feature-card {
+        width: 80%;
+        margin: 0 auto;
+    }
 }

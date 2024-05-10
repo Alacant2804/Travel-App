@@ -24,7 +24,7 @@ export default function AboutApp() {
                     <p>Stay prepared with up-to-date weather information at your fingertips.</p>
                 </div>
             </div>
-            <button className="start-planning-btn" onClick={() => console.log('Get Started!')}>Start Planning</button>
+            <button className="start-planning-btn">Start Planning</button>
         </section>
     );
 }
