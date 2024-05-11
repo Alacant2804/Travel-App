@@ -6,15 +6,15 @@
     cursor: pointer;
     outline: none;
     transition: background-color 0.3s, transform 0.2s;
-    color: white; /* Default text color */
-    background-color: #007bff; /* Default background color */
+    color: white;
+    background-color: #007bff;
 }
 
 .btn:hover {
     background-color: #0056b3;
-    transform: scale(1.05); /* Slightly enlarge the button on hover */
+    transform: scale(1.05);
 }
 
 .btn:active {
-    transform: scale(0.95); /* Slightly shrink the button when clicked */
+    transform: scale(0.95);
 }

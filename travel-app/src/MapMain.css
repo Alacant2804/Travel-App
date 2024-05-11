@@ -29,7 +29,7 @@
 }
 
 .steps-list {
-    list-style: none; /* Removes default list styling */
+    list-style: none;
     padding: 0;
     margin: 0;
     position: relative;
@@ -40,49 +40,47 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #ffffff; /* White background for each step */
+    background-color: #ffffff; 
     border-radius: 8px;
-    margin-bottom: 20px; /* Space between steps */
+    margin-bottom: 20px;
     padding: 20px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Soft shadow for 3D effect */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     position: relative;
 }
 
 .step-icon {
-    font-size: 2em; /* Larger icons for visibility */
-    color: #007bff; /* Icon color */
-    margin-right: 10px; /* Space between icon and text */
+    font-size: 2em;
+    color: #007bff;
+    margin-right: 10px;
 }
 
 .step-content {
-    flex-grow: 1; /* Allows content to take up available space */
+    flex-grow: 1;
 }
 
 .step h3 {
-    margin: 0 0 5px 0; /* Spacing for headers */
+    margin: 0 0 5px 0;
     font-size: 1.5em;
 }
 
 .step p {
-    margin: 0; /* Remove margin for clean alignment */
-    color: #555; /* Ensures text is easily readable */
+    margin: 0;
+    color: #555;
     font-size: 1em;
-    line-height: 1.5; /* Improves readability */
+    line-height: 1.5;
 }
 
-/* Adding a pseudo-element for a curved arrow or straight line */
 .steps-list::before {
     content: '';
     width: 2px;
-    background-color: #007bff; /* Blue color for the line */
+    background-color: #007bff;
     position: absolute;
-    left: 12px; /* Align with the icons */
+    left: 12px;
     top: 10px;
     bottom: 30px;
-    border-radius: 50px; /* Gives a slight curve to the line, adjust as needed */
+    border-radius: 50px;
 }
 
-/* Hide arrow on the last step */
 .step:last-child .step-arrow {
     display: none;
 }
@@ -90,6 +88,6 @@
 @media (max-width: 768px) {
     .step {
         flex-direction: column;
-        align-items: flex-start; /* Aligns content to the left on smaller screens */
+        align-items: flex-start;
     }
 }

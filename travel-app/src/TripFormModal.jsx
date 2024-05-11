@@ -1,9 +1,7 @@
-// TripFormModal.jsx
 import { useState } from 'react';
 import Modal from 'react-modal';
 import './TripFormModal.css';
 
-// Set the app element for accessibility (replace `#root` if your main element is different)
 Modal.setAppElement('#root');
 
 const customStyles = {
