@@ -1,0 +1,95 @@
+.hr-container {
+    background-color: #f8f9fa; 
+    padding: 20px 0;
+    text-align: center;
+}
+
+.custom-hr {
+    width: 50%;
+    border: 0;
+    height: 2px;
+    background-color: #ccc;
+    margin: 0 auto;
+}
+
+.headerSecond {
+    font-size: 2.5em;
+    display: flex;
+    justify-content: center;
+    color: #2c3e50;
+    background-color: #f8f9fa;
+    padding: 50px;
+}
+
+.map-main {
+    padding: 40px;
+    background-color: #f8f9fa;
+    display: flex;
+    justify-content: center;
+}
+
+.steps-list {
+    list-style: none; /* Removes default list styling */
+    padding: 0;
+    margin: 0;
+    position: relative;
+    max-width: 800px;
+}
+
+.step {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #ffffff; /* White background for each step */
+    border-radius: 8px;
+    margin-bottom: 20px; /* Space between steps */
+    padding: 20px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Soft shadow for 3D effect */
+    position: relative;
+}
+
+.step-icon {
+    font-size: 2em; /* Larger icons for visibility */
+    color: #007bff; /* Icon color */
+    margin-right: 10px; /* Space between icon and text */
+}
+
+.step-content {
+    flex-grow: 1; /* Allows content to take up available space */
+}
+
+.step h3 {
+    margin: 0 0 5px 0; /* Spacing for headers */
+    font-size: 1.5em;
+}
+
+.step p {
+    margin: 0; /* Remove margin for clean alignment */
+    color: #555; /* Ensures text is easily readable */
+    font-size: 1em;
+    line-height: 1.5; /* Improves readability */
+}
+
+/* Adding a pseudo-element for a curved arrow or straight line */
+.steps-list::before {
+    content: '';
+    width: 2px;
+    background-color: #007bff; /* Blue color for the line */
+    position: absolute;
+    left: 12px; /* Align with the icons */
+    top: 10px;
+    bottom: 30px;
+    border-radius: 50px; /* Gives a slight curve to the line, adjust as needed */
+}
+
+/* Hide arrow on the last step */
+.step:last-child .step-arrow {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .step {
+        flex-direction: column;
+        align-items: flex-start; /* Aligns content to the left on smaller screens */
+    }
+}
