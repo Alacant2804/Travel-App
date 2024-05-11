@@ -9,6 +9,7 @@ import TripDetail from './TripDetail.jsx';
 import TravelHacks from './TravelHacks.jsx';
 import Login from './Login.jsx';
 import SignUp from './SignUp.jsx';
+import NotFound from './NotFound.jsx';
 import { useState } from 'react';
 
 
@@ -32,6 +33,7 @@ export default function App() {
           <Route path="/travel-hacks" element={<TravelHacks />} />
           <Route path="/login" element={<Login />} />
           <Route path="/sign-up" element={<SignUp />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
         <Footer />
       </div>
