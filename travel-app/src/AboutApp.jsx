@@ -1,4 +1,5 @@
 import './AboutApp.css';
+import {Link} from 'react-router-dom';
 
 export default function AboutApp() {
     return (
@@ -24,7 +25,7 @@ export default function AboutApp() {
                     <p>Stay prepared with up-to-date weather information at your fingertips.</p>
                 </div>
             </div>
-            <button className="start-planning-btn">Start Planning</button>
+            <Link to='/trips'><button className="start-planning-btn">Start Planning</button></Link>
         </section>
     );
 }
