@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import TripFormModal from './TripFormModal';
 import './Trips.css';
@@ -7,16 +7,30 @@ export default function Trips() {
   const [trips, setTrips] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  // Load trips from localStorage on initial render
+  useEffect(() => {
+    const storedTrips = localStorage.getItem('trips');
+    if (storedTrips) {
+      const parsedTrips = JSON.parse(storedTrips);
+      console.log('Loaded trips from localStorage:', parsedTrips);  // Debug: See what's being loaded
+      setTrips(parsedTrips);
+    }
+  }, []);
+
   const handleCreateTrip = (newTrip) => {
-    const newId = trips.length + 1;
-    setTrips([...trips, { id: newId, ...newTrip }]);
+    const tripWithId = { ...newTrip, id: trips.length + 1 };
+    const newTripsList = [...trips, tripWithId];
+    console.log('New trip added:', newTripsList);
+    setTrips(newTripsList);
+    localStorage.setItem('trips', JSON.stringify(newTripsList));
+    setIsModalOpen(false);
   };
 
   return (
     <div className="trips-page">
       <main className="trips-main">
         <h1>Your Trips</h1>
-        <button onClick={() => setIsModalOpen(true)} className="create-trip-btn">
+        <button className="create-trip-btn" onClick={() => setIsModalOpen(true)}>
           Create Trip
         </button>
 
@@ -26,17 +40,19 @@ export default function Trips() {
           <ul className="trips-list">
             {trips.map((trip) => (
               <li key={trip.id}>
-                <Link to={`/trips/${trip.id}`}>{trip.tripName} - {trip.destination}</Link>
+                <Link to={`/trips/${trip.id}`}>{trip.tripName}</Link>
               </li>
             ))}
           </ul>
         )}
 
-        <TripFormModal
-          isOpen={isModalOpen}
-          onRequestClose={() => setIsModalOpen(false)}
-          onSubmit={handleCreateTrip}
-        />
+        {isModalOpen && (
+          <TripFormModal
+            isOpen={isModalOpen}
+            onRequestClose={() => setIsModalOpen(false)}
+            onSubmit={handleCreateTrip}
+          />
+        )}
       </main>
     </div>
   );

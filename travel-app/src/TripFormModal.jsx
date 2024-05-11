@@ -1,66 +1,63 @@
 import { useState } from 'react';
-import Modal from 'react-modal';
 import './TripFormModal.css';
 
-Modal.setAppElement('#root');
-
-const customStyles = {
-  content: {
-    maxWidth: '400px',
-    margin: 'auto',
-    padding: '20px',
-    borderRadius: '8px',
-    textAlign: 'center',
-  },
-};
-
-export default function TripFormModal({ isOpen, onRequestClose, onSubmit }) {
+export default function TripFormModal({ onRequestClose, onSubmit }) {
   const [tripName, setTripName] = useState('');
   const [destination, setDestination] = useState('');
-  const [date, setDate] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
 
   const handleSubmit = () => {
-    if (tripName && destination && date) {
-      onSubmit({ tripName, destination, date });
+    if (tripName && destination && startDate && endDate) {
+      onSubmit({ tripName, destination, startDate, endDate });
       setTripName('');
       setDestination('');
-      setDate('');
-      onRequestClose();
+      setStartDate('');
+      setEndDate('');
     } else {
       alert('Please fill out all fields.');
     }
   };
 
   return (
-    <Modal
-      isOpen={isOpen}
-      onRequestClose={onRequestClose}
-      style={customStyles}
-      contentLabel="Create a New Trip"
-    >
-      <h2>Create a New Trip</h2>
-      <input
-        type="text"
-        placeholder="Name of the trip"
-        value={tripName}
-        onChange={(e) => setTripName(e.target.value)}
-        required
-      />
-      <input
-        type="text"
-        placeholder="Destination"
-        value={destination}
-        onChange={(e) => setDestination(e.target.value)}
-        required
-      />
-      <input
-        type="date"
-        value={date}
-        onChange={(e) => setDate(e.target.value)}
-        required
-      />
-      <button onClick={handleSubmit} className="modal-btn">Create Trip</button>
-      <button onClick={onRequestClose} className="modal-btn">Cancel</button>
-    </Modal>
+    // Wrapping the modal with an overlay for background click close functionality
+    <div className="modal-overlay" onClick={onRequestClose}>
+      {/* Prevent clicks inside the modal from closing it */}
+      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+        <h2>Create a New Trip</h2>
+        <input
+          type="text"
+          placeholder="Trip Name"
+          value={tripName}
+          onChange={(e) => setTripName(e.target.value)}
+          required
+        />
+        <input
+          type="text"
+          placeholder="Destination"
+          value={destination}
+          onChange={(e) => setDestination(e.target.value)}
+          required
+        />
+        <input
+          type="date"
+          placeholder='Start Date'
+          value={startDate}
+          onChange={(e) => setStartDate(e.target.value)}
+          required
+        />
+        <input
+          type="date"
+          placeholder='End Date'
+          value={endDate}
+          onChange={(e) => setEndDate(e.target.value)}
+          required
+        />
+        <div className="modal-actions">
+          <button onClick={handleSubmit} className="modal-btn">Create Trip</button>
+          <button onClick={onRequestClose} className="modal-btn">Cancel</button>
+        </div>
+      </div>
+    </div>
   );
 }

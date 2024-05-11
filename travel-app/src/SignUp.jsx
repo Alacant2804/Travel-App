@@ -1,8 +1,8 @@
 export default function SignUp() {
     return (
       <div className="trips-page">
-        <h1>Trips</h1>
-        <p>Welcome to the Trips Page. Here you can manage all your travel plans!</p>
+        <h1>Sign up</h1>
+        <p>Working on it</p>
       </div>
     );
   }
