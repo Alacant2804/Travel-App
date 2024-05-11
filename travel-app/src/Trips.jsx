@@ -26,6 +26,10 @@ export default function Trips() {
     setIsModalOpen(false);
   };
 
+  const handleDeleteTrip = () => {
+    
+  }
+
   return (
     <div className="trips-page">
       <main className="trips-main">
@@ -41,6 +45,7 @@ export default function Trips() {
             {trips.map((trip) => (
               <li key={trip.id}>
                 <Link to={`/trips/${trip.id}`}>{trip.tripName}</Link>
+                <button className='close-modal' onClick={handleDeleteTrip}>Delete Trip</button>
               </li>
             ))}
           </ul>
