@@ -26,8 +26,10 @@ export default function Trips() {
     setIsModalOpen(false);
   };
 
-  const handleDeleteTrip = () => {
-    
+  const handleDeleteTrip = (tripId) => {
+    const updatedTrips = trips.filter(trip => trip.id !== tripId);
+    setTrips(updatedTrips);
+    localStorage.setItem('trips', JSON.stringify(updatedTrips));
   }
 
   return (
@@ -43,9 +45,20 @@ export default function Trips() {
         ) : (
           <ul className="trips-list">
             {trips.map((trip) => (
-              <li key={trip.id}>
-                <Link to={`/trips/${trip.id}`}>{trip.tripName}</Link>
-                <button className='close-modal' onClick={handleDeleteTrip}>Delete Trip</button>
+              <li key={trip.id} className="trip-card">
+                <h3>{trip.tripName}</h3>
+                <p><strong>Destination:</strong> {trip.destination}</p>
+                <p><strong>Start Date:</strong> {trip.startDate}</p>
+                <p><strong>End Date:</strong> {trip.endDate}</p>
+                <div className="trip-actions">
+                  <Link to={`/trips/${trip.id}`} className="trip-btn">View</Link>
+                  <button
+                    className="trip-btn delete"
+                    onClick={() => handleDeleteTrip(trip.id)}
+                  >
+                    Delete
+                  </button>
+                </div>
               </li>
             ))}
           </ul>

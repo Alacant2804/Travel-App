@@ -20,43 +20,45 @@ export default function TripFormModal({ onRequestClose, onSubmit }) {
   };
 
   return (
-    // Wrapping the modal with an overlay for background click close functionality
     <div className="modal-overlay" onClick={onRequestClose}>
-      {/* Prevent clicks inside the modal from closing it */}
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <h2>Create a New Trip</h2>
-        <input
-          type="text"
-          placeholder="Trip Name"
-          value={tripName}
-          onChange={(e) => setTripName(e.target.value)}
-          required
-        />
-        <input
-          type="text"
-          placeholder="Destination"
-          value={destination}
-          onChange={(e) => setDestination(e.target.value)}
-          required
-        />
-        <input
-          type="date"
-          placeholder='Start Date'
-          value={startDate}
-          onChange={(e) => setStartDate(e.target.value)}
-          required
-        />
-        <input
-          type="date"
-          placeholder='End Date'
-          value={endDate}
-          onChange={(e) => setEndDate(e.target.value)}
-          required
-        />
-        <div className="modal-actions">
-          <button onClick={handleSubmit} className="modal-btn">Create Trip</button>
-          <button onClick={onRequestClose} className="modal-btn">Cancel</button>
-        </div>
+        <form className="modal-form">
+          <input
+            type="text"
+            placeholder="Trip Name"
+            value={tripName}
+            onChange={(e) => setTripName(e.target.value)}
+            className="form-input"
+            required
+          />
+          <input
+            type="text"
+            placeholder="Destination"
+            value={destination}
+            onChange={(e) => setDestination(e.target.value)}
+            className="form-input"
+            required
+          />
+          <input
+            type="date"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            className="form-input"
+            required
+          />
+          <input
+            type="date"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            className="form-input"
+            required
+          />
+          <div className="modal-actions">
+            <button onClick={onRequestClose} className="modal-btn cancel-btn">Cancel</button>
+            <button onClick={handleSubmit} className="modal-btn submit-btn">Create Trip</button>
+          </div>
+        </form>
       </div>
     </div>
   );
