@@ -3,33 +3,21 @@ import { Link } from 'react-router-dom';
 import TripFormModal from './TripFormModal';
 import './Trips.css';
 
-export default function Trips() {
-  const [trips, setTrips] = useState([]);
+export default function Trips({ trips, setTrips }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Load trips from localStorage on initial render
-  useEffect(() => {
-    const storedTrips = localStorage.getItem('trips');
-    if (storedTrips) {
-      const parsedTrips = JSON.parse(storedTrips);
-      console.log('Loaded trips from localStorage:', parsedTrips);
-      setTrips(parsedTrips);
-    }
-  }, []);
-
   const handleCreateTrip = (newTrip) => {
-    const tripWithId = { ...newTrip, id: trips.length + 1 };
-    const newTripsList = [...trips, tripWithId];
-    console.log('New trip added:', newTripsList);
-    setTrips(newTripsList);
-    localStorage.setItem('trips', JSON.stringify(newTripsList));
+    const newTripWithId = { ...newTrip, id: trips.length + 1 };
+    const newTrips = [...trips, newTripWithId];
+    setTrips(newTrips);
+    localStorage.setItem('trips', JSON.stringify(newTrips));
     setIsModalOpen(false);
-  };
+};
 
   const handleDeleteTrip = (tripId) => {
-    const updatedTrips = trips.filter(trip => trip.id !== tripId);
-    setTrips(updatedTrips);
-    localStorage.setItem('trips', JSON.stringify(updatedTrips));
+      const updatedTrips = trips.filter(trip => trip.id !== tripId);
+      setTrips(updatedTrips);
+      localStorage.setItem('trips', JSON.stringify(updatedTrips));
   };
 
   // Calculate trip duration

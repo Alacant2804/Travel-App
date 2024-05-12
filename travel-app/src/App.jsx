@@ -10,11 +10,18 @@ import TravelHacks from './TravelHacks.jsx';
 import Login from './Login.jsx';
 import SignUp from './SignUp.jsx';
 import NotFound from './NotFound.jsx';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 
 export default function App() {
   const [trips, setTrips] = useState([]);
+
+  useEffect(() => {
+    const storedTrips = localStorage.getItem('trips');
+    if (storedTrips) {
+        setTrips(JSON.parse(storedTrips));
+    }
+  }, []);
 
   return (
     <BrowserRouter>
