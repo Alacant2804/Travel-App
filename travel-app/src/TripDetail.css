@@ -1,0 +1,45 @@
+.trip-detail-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+  }
+  
+  .trip-title {
+    text-align: center;
+    font-size: 2rem;
+    color: #333;
+  }
+  
+  .trip-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+  
+  .destination-details {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .trip-dates {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+  }
+  
+  .places-to-visit {
+    list-style: none;
+    padding: 0;
+    width: 100%;
+    text-align: center;
+  }
+  
+  .places-to-visit li {
+    background-color: #f0f0f0;
+    margin: 5px 0;
+    padding: 10px;
+    border-radius: 5px;
+  }
+  
