@@ -12,7 +12,7 @@ export default function Trips() {
     const storedTrips = localStorage.getItem('trips');
     if (storedTrips) {
       const parsedTrips = JSON.parse(storedTrips);
-      console.log('Loaded trips from localStorage:', parsedTrips);  // Debug: See what's being loaded
+      console.log('Loaded trips from localStorage:', parsedTrips);
       setTrips(parsedTrips);
     }
   }, []);
@@ -30,7 +30,15 @@ export default function Trips() {
     const updatedTrips = trips.filter(trip => trip.id !== tripId);
     setTrips(updatedTrips);
     localStorage.setItem('trips', JSON.stringify(updatedTrips));
-  }
+  };
+
+  // Calculate trip duration
+  const calculateDuration = (startDate, endDate) => {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const durationInMilliseconds = end - start;
+    return Math.ceil(durationInMilliseconds / (1000 * 60 * 60 * 24)); // convert milliseconds to days
+  };
 
   return (
     <div className="trips-page">
@@ -44,29 +52,32 @@ export default function Trips() {
           <p className="no-trips-message">There are no trips yet.</p>
         ) : (
           <ul className="trips-list">
-            {trips.map((trip) => (
-              <li key={trip.id} className="trip-card">
-                <h3>{trip.tripName}</h3>
-                <p><strong>Destination:</strong> {trip.destination}</p>
-                <p><strong>Start Date:</strong> {trip.startDate}</p>
-                <p><strong>End Date:</strong> {trip.endDate}</p>
-                <div className="trip-actions">
-                  <Link to={`/trips/${trip.id}`} className="trip-btn">View</Link>
-                  <button
-                    className="trip-btn delete"
-                    onClick={() => handleDeleteTrip(trip.id)}
-                  >
-                    Delete
-                  </button>
-                </div>
-              </li>
-            ))}
+            {trips.map((trip) => {
+              const duration = calculateDuration(trip.startDate, trip.endDate);
+              return (
+                <li key={trip.id} className="trip-card">
+                  <h3>{trip.tripName}</h3>
+                  <p><strong>Destination:</strong> {trip.destination}</p>
+                  <p><strong>Start Date:</strong> {trip.startDate}</p>
+                  <p><strong>End Date:</strong> {trip.endDate}</p>
+                  <p><strong>Trip Duration:</strong> {duration} days</p>
+                  <div className="trip-actions">
+                    <Link to={`/trips/${trip.id}`} className="trip-btn">View</Link>
+                    <button
+                      className="trip-btn delete"
+                      onClick={() => handleDeleteTrip(trip.id)}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </li>
+              );
+            })}
           </ul>
         )}
 
         {isModalOpen && (
           <TripFormModal
-            isOpen={isModalOpen}
             onRequestClose={() => setIsModalOpen(false)}
             onSubmit={handleCreateTrip}
           />

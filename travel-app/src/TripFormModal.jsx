@@ -8,15 +8,25 @@ export default function TripFormModal({ onRequestClose, onSubmit }) {
   const [endDate, setEndDate] = useState('');
 
   const handleSubmit = () => {
-    if (tripName && destination && startDate && endDate) {
-      onSubmit({ tripName, destination, startDate, endDate });
-      setTripName('');
-      setDestination('');
-      setStartDate('');
-      setEndDate('');
-    } else {
+    if (!tripName || !destination || !startDate || !endDate) {
       alert('Please fill out all fields.');
+      return;
     }
+
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    if (start > end) {
+      alert('The start date cannot be after the end date. Please select valid dates.');
+      return;
+    }
+
+    onSubmit({ tripName, destination, startDate, endDate });
+
+    setTripName('');
+    setDestination('');
+    setStartDate('');
+    setEndDate('');
   };
 
   return (
