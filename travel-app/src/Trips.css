@@ -10,6 +10,10 @@
   text-align: center;
 }
 
+.trips-main > h1 {
+  margin: 30px;
+}
+
 .create-trip-btn {
   background-color: #f05b0b;
   color: white;
@@ -103,6 +107,10 @@
   background-color: #f44336;
 }
 
+.trip-card .trip-btn.delete:hover {
+  background-color: #a60b00;
+}
+
 .trip-card .trip-btn:hover {
-  background-color: #388E3C; /* or change for delete button */
+  background-color: #388E3C;
 }

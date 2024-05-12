@@ -63,12 +63,7 @@ export default function Trips() {
                   <p><strong>Trip Duration:</strong> {duration} days</p>
                   <div className="trip-actions">
                     <Link to={`/trips/${trip.id}`} className="trip-btn">View</Link>
-                    <button
-                      className="trip-btn delete"
-                      onClick={() => handleDeleteTrip(trip.id)}
-                    >
-                      Delete
-                    </button>
+                    <button className="trip-btn delete" onClick={() => handleDeleteTrip(trip.id)}>Delete</button>
                   </div>
                 </li>
               );
