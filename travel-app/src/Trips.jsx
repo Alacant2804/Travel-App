@@ -6,13 +6,17 @@ import './Trips.css';
 export default function Trips({ trips, setTrips }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleCreateTrip = (newTrip) => {
-    const newTripWithId = { ...newTrip, id: trips.length + 1 };
-    const newTrips = [...trips, newTripWithId];
-    setTrips(newTrips);
-    localStorage.setItem('trips', JSON.stringify(newTrips));
-    setIsModalOpen(false);
+const handleCreateTrip = (newTripData) => {
+  const newTrip = {
+    ...newTripData,
+    destinations: [
+      { name: "New Destination", startDate: "2024-01-01", endDate: "2024-01-10", duration: "10 days", places: [] }
+    ]
+  };
+  setTrips([...trips, newTrip]);
+  localStorage.setItem('trips', JSON.stringify([...trips, newTrip]));
 };
+
 
   const handleDeleteTrip = (tripId) => {
       const updatedTrips = trips.filter(trip => trip.id !== tripId);
