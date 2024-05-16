@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-function Destination({ initialData = {}, onSave }) {
+export default function Destination({ initialData = {}, onSave }) {
   const [destination, setDestination] = useState(initialData.name || 'New Destination');
   const [startDate, setStartDate] = useState(initialData.startDate || '');
   const [endDate, setEndDate] = useState(initialData.endDate || '');
@@ -36,7 +36,7 @@ function Destination({ initialData = {}, onSave }) {
           value={endDate}
           onChange={(e) => setEndDate(e.target.value)}
         />
-        <p><strong>Duration:</strong> {/* Compute duration based on dates or display if given */}
+        <p><strong>Duration:</strong>
           {initialData.duration || "Calculate duration"} days
         </p>
       </div>
@@ -57,5 +57,3 @@ function Destination({ initialData = {}, onSave }) {
     </div>
   );
 }
-
-export default Destination;

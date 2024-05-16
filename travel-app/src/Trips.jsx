@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import TripFormModal from './TripFormModal';
 import './Trips.css';
@@ -6,17 +6,22 @@ import './Trips.css';
 export default function Trips({ trips, setTrips }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-const handleCreateTrip = (newTripData) => {
-  const newTrip = {
-    ...newTripData,
-    destinations: [
-      { name: "New Destination", startDate: "2024-01-01", endDate: "2024-01-10", duration: "10 days", places: [] }
-    ]
-  };
-  setTrips([...trips, newTrip]);
-  localStorage.setItem('trips', JSON.stringify([...trips, newTrip]));
-};
-
+  const handleCreateTrip = (newTripData) => {
+    const newTrip = {
+      ...newTripData,
+      destinations: [
+        {
+          name: newTripData.destination || "New Destination",
+          startDate: newTripData.startDate || "2024-01-01",
+          endDate: newTripData.endDate || "2024-01-10",
+          duration: calculateDuration(newTripData.startDate, newTripData.endDate),
+          places: []
+        }
+      ]
+    };
+    setTrips([...trips, newTrip]);
+    localStorage.setItem('trips', JSON.stringify([...trips, newTrip]));
+  };  
 
   const handleDeleteTrip = (tripId) => {
       const updatedTrips = trips.filter(trip => trip.id !== tripId);
@@ -24,7 +29,6 @@ const handleCreateTrip = (newTripData) => {
       localStorage.setItem('trips', JSON.stringify(updatedTrips));
   };
 
-  // Calculate trip duration
   const calculateDuration = (startDate, endDate) => {
     const start = new Date(startDate);
     const end = new Date(endDate);
