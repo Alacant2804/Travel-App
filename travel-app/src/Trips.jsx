@@ -20,10 +20,8 @@ export default function Trips({ trips, setTrips }) {
         }
       ]
     };
-    console.log("Creating new trip:", newTrip);
     const updatedTrips = [...trips, newTrip];
     setTrips(updatedTrips);
-    console.log("Updated trips array:", updatedTrips);
     localStorage.setItem('trips', JSON.stringify(updatedTrips));
   };
 
@@ -40,7 +38,7 @@ export default function Trips({ trips, setTrips }) {
     const start = new Date(startDate);
     const end = new Date(endDate);
     const durationInMilliseconds = end - start;
-    return Math.ceil(durationInMilliseconds / (1000 * 60 * 60 * 24)); // convert milliseconds to days
+    return Math.ceil(durationInMilliseconds / (1000 * 60 * 60 * 24)); //convert to days
   };
 
   return (

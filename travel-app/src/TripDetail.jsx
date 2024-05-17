@@ -6,7 +6,6 @@ import './TripDetail.css';
 export default function TripDetail({ trips }) {
   const { tripId } = useParams();
   const [destinations, setDestinations] = useState([]);
-  console.log("Received tripId:", tripId);
 
   useEffect(() => {
     const trip = trips.find(t => t.id === parseInt(tripId, 10));
