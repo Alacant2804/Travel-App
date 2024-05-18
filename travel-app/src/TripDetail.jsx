@@ -16,7 +16,6 @@ export default function TripDetail({ trips }) {
       console.error("Trip not found or no destinations available!");
     }
   }, [tripId, trips]);
-  
 
   const handleAddDestination = () => {
     const newDestination = {
@@ -37,9 +36,9 @@ export default function TripDetail({ trips }) {
           <Destination key={index} initialData={destination} onSave={(updatedData) => console.log(updatedData)} />
         ))
       ) : (
-        <p>No destinations found for this trip.</p>
+        <p className="no-destinations-message">No destinations found for this trip.</p>
       )}
-      <button onClick={handleAddDestination}>Add New Destination</button>
+      <button className="add-destination-button" onClick={handleAddDestination}>Add New Destination</button>
     </>
   );
 }

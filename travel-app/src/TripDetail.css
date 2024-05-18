@@ -1,60 +1,97 @@
-.trip-title {
-  text-align: center;
-  margin: 30px;
-}
-
 .trip-detail-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 16px;
+  margin: 16px 0;
+  background-color: #f9f9f9;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .trip-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.trip-info input[type="text"],
+.trip-info input[type="date"] {
+  width: 30%;
+  padding: 8px;
+  margin-right: 8px;
   border: 1px solid #ccc;
-  padding: 10px;
-  margin-bottom: 20px;
-  width: 80%;
+  border-radius: 4px;
+  box-sizing: border-box;
 }
 
-input {
-  margin-right: 10px;
-}
-
-button {
-  padding: 5px 10px;
-}
-
-.destination {
-  font-size: 24px;
+.trip-info p {
+  font-size: 16px;
+  color: #333;
 }
 
 .place-add-form {
-  width: 80%;
   display: flex;
   justify-content: space-between;
-  margin-top: 20px;
+  margin-bottom: 16px;
 }
 
 .place-input {
-  flex-grow: 1;
-  margin-right: 10px;
+  flex: 1;
   padding: 8px;
+  margin-right: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
 
 .add-place-button {
   padding: 8px 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.add-place-button:hover {
+  background-color: #0056b3;
 }
 
 .places-to-visit {
-  list-style: none;
+  list-style-type: none;
   padding: 0;
-  width: 80%;
-  margin-top: 10px;
 }
 
 .places-to-visit li {
-  background-color: #f0f0f0;
-  margin: 5px 0;
-  padding: 10px;
-  border-radius: 5px;
+  padding: 8px;
+  border-bottom: 1px solid #ddd;
+}
+
+.places-to-visit li:last-child {
+  border-bottom: none;
+}
+
+.trip-title {
+  text-align: center;
+  font-size: 24px;
+  margin-bottom: 16px;
+}
+
+.add-destination-button {
+  display: block;
+  margin: 16px auto;
+  padding: 8px 16px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.add-destination-button:hover {
+  background-color: #218838;
+}
+
+.no-destinations-message {
+  text-align: center;
+  color: #999;
 }

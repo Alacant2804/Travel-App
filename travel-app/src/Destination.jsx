@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
+import './Destination.css';
 
 export default function Destination({ initialData = {}, onSave }) {
   const [destination, setDestination] = useState(initialData.name || 'New Destination');
@@ -12,7 +13,7 @@ export default function Destination({ initialData = {}, onSave }) {
     if (placeInput) {
       const newPlaces = [...places, placeInput];
       setPlaces(newPlaces);
-      onSave({...initialData, name: destination, startDate, endDate, places: newPlaces});
+      onSave({ ...initialData, name: destination, startDate, endDate, places: newPlaces });
     }
     event.target.reset();
   };
@@ -24,7 +25,7 @@ export default function Destination({ initialData = {}, onSave }) {
           type="text"
           value={destination}
           onChange={(e) => setDestination(e.target.value)}
-          onBlur={() => onSave({...initialData, name: destination, startDate, endDate, places})}
+          onBlur={() => onSave({ ...initialData, name: destination, startDate, endDate, places })}
         />
         <input
           type="date"
