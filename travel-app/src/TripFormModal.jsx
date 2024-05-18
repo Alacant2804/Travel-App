@@ -7,7 +7,8 @@ export default function TripFormModal({ onRequestClose, onSubmit }) {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
 
-  const handleSubmit = () => {
+  const handleSubmit = (event) => {
+    event.preventDefault();
     if (!tripName || !destination || !startDate || !endDate) {
       alert('Please fill out all fields.');
       return;
@@ -27,13 +28,14 @@ export default function TripFormModal({ onRequestClose, onSubmit }) {
     setDestination('');
     setStartDate('');
     setEndDate('');
+    onRequestClose();
   };
 
   return (
     <div className="modal-overlay" onClick={onRequestClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <h2>Create a New Trip</h2>
-        <form className="modal-form">
+        <form className="modal-form" onSubmit={handleSubmit}>
           <input
             type="text"
             placeholder="Trip Name"
@@ -65,8 +67,8 @@ export default function TripFormModal({ onRequestClose, onSubmit }) {
             required
           />
           <div className="modal-actions">
-            <button onClick={onRequestClose} className="modal-btn cancel-btn">Cancel</button>
-            <button onClick={handleSubmit} className="modal-btn submit-btn">Create Trip</button>
+            <button type="button" onClick={onRequestClose} className="modal-btn cancel-btn">Cancel</button>
+            <button type="submit" className="modal-btn submit-btn">Create Trip</button>
           </div>
         </form>
       </div>

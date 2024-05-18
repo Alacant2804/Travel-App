@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 export default function Destination({ initialData = {}, onSave }) {
   const [destination, setDestination] = useState(initialData.name || 'New Destination');
