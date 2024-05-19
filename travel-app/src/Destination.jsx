@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import './Destination.css';
 
 export default function Destination({ initialData = {}, onSave }) {
@@ -13,19 +13,19 @@ export default function Destination({ initialData = {}, onSave }) {
     if (placeInput) {
       const newPlaces = [...places, placeInput];
       setPlaces(newPlaces);
-      onSave({ ...initialData, name: destination, startDate, endDate, places: newPlaces });
+      onSave({...initialData, name: destination, startDate, endDate, places: newPlaces});
     }
     event.target.reset();
   };
 
   return (
-    <div className="trip-detail-container">
-      <div className="trip-info">
+    <div className="destination-card">
+      <div className="destination-info">
         <input
           type="text"
           value={destination}
           onChange={(e) => setDestination(e.target.value)}
-          onBlur={() => onSave({ ...initialData, name: destination, startDate, endDate, places })}
+          onBlur={() => onSave({...initialData, name: destination, startDate, endDate, places})}
         />
         <input
           type="date"

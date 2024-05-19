@@ -1,85 +1,35 @@
-.trip-detail-container {
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 16px;
-  margin: 16px 0;
-  background-color: #f9f9f9;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.trip-info {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-}
-
-.trip-info input[type="text"],
-.trip-info input[type="date"] {
-  width: 30%;
-  padding: 8px;
-  margin-right: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-sizing: border-box;
-}
-
-.trip-info p {
-  font-size: 16px;
-  color: #333;
-}
-
-.place-add-form {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 16px;
-}
-
-.place-input {
-  flex: 1;
-  padding: 8px;
-  margin-right: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-.add-place-button {
-  padding: 8px 16px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.add-place-button:hover {
-  background-color: #0056b3;
-}
-
-.places-to-visit {
-  list-style-type: none;
-  padding: 0;
-}
-
-.places-to-visit li {
-  padding: 8px;
-  border-bottom: 1px solid #ddd;
-}
-
-.places-to-visit li:last-child {
-  border-bottom: none;
+.trip-detail-page {
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
 }
 
 .trip-title {
   text-align: center;
-  font-size: 24px;
-  margin-bottom: 16px;
+  font-size: 2em;
+  margin-bottom: 20px;
+}
+
+.trip-info-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.trip-info-row p {
+  margin: 8px 0;
+  flex: 1;
+  text-align: center;
+}
+
+.destinations {
+  margin-top: 20px;
 }
 
 .add-destination-button {
   display: block;
-  margin: 16px auto;
-  padding: 8px 16px;
+  margin: 20px auto;
+  padding: 10px 20px;
   background-color: #28a745;
   color: white;
   border: none;
