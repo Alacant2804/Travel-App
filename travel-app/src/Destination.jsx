@@ -36,7 +36,7 @@ export default function Destination({ initialData = {}, onSave, calculateDuratio
         <div className="breaker"></div>
         <div className="date-info">
           <p>
-            <strong>Start Date:</strong>
+            <strong>Start Date: </strong>
             <input
               type="date"
               value={startDate}
@@ -45,7 +45,7 @@ export default function Destination({ initialData = {}, onSave, calculateDuratio
             />
           </p>
           <p>
-            <strong>End Date:</strong>
+            <strong>End Date: </strong>
             <input
               type="date"
               value={endDate}
@@ -54,7 +54,7 @@ export default function Destination({ initialData = {}, onSave, calculateDuratio
             />
           </p>
           <p>
-            <strong>Duration:</strong> {duration} days
+            <strong>Duration: </strong> {duration} days
           </p>
         </div>
       </div>

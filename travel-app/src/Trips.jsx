@@ -21,6 +21,7 @@ export default function Trips({ trips, setTrips }) {
         }
       ]
     };
+
     const updatedTrips = [...trips, newTrip];
     setTrips(updatedTrips);
     localStorage.setItem('trips', JSON.stringify(updatedTrips));
