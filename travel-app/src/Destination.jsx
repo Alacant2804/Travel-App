@@ -1,11 +1,15 @@
-import { useState } from 'react';
-import './Destination.css';
+import { useState, useEffect } from 'react';
 
-export default function Destination({ initialData = {}, onSave }) {
+export default function Destination({ initialData = {}, onSave, calculateDuration }) {
   const [destination, setDestination] = useState(initialData.name || 'New Destination');
   const [startDate, setStartDate] = useState(initialData.startDate || '');
   const [endDate, setEndDate] = useState(initialData.endDate || '');
   const [places, setPlaces] = useState(initialData.places || []);
+  const [duration, setDuration] = useState(calculateDuration(startDate, endDate));
+
+  useEffect(() => {
+    setDuration(calculateDuration(startDate, endDate));
+  }, [startDate, endDate, calculateDuration]);
 
   const handleAddPlace = (event) => {
     event.preventDefault();
@@ -13,19 +17,19 @@ export default function Destination({ initialData = {}, onSave }) {
     if (placeInput) {
       const newPlaces = [...places, placeInput];
       setPlaces(newPlaces);
-      onSave({...initialData, name: destination, startDate, endDate, places: newPlaces});
+      onSave({ name: destination, startDate, endDate, places: newPlaces, duration });
     }
     event.target.reset();
   };
 
   return (
-    <div className="destination-card">
-      <div className="destination-info">
+    <div className="trip-detail-container">
+      <div className="trip-info">
         <input
           type="text"
           value={destination}
           onChange={(e) => setDestination(e.target.value)}
-          onBlur={() => onSave({...initialData, name: destination, startDate, endDate, places})}
+          onBlur={() => onSave({ name: destination, startDate, endDate, places, duration })}
         />
         <input
           type="date"
@@ -37,9 +41,7 @@ export default function Destination({ initialData = {}, onSave }) {
           value={endDate}
           onChange={(e) => setEndDate(e.target.value)}
         />
-        <p><strong>Duration:</strong>
-          {initialData.duration || "Calculate duration"} days
-        </p>
+        <p><strong>Duration:</strong> {duration} days</p>
       </div>
       <form onSubmit={handleAddPlace} className="place-add-form">
         <input

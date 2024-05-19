@@ -16,12 +16,21 @@ export default function TripDetail({ trips }) {
     }
   }, [tripId, trips]);
 
+  const calculateDuration = (startDate, endDate) => {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const durationInMilliseconds = end - start;
+    return Math.ceil(durationInMilliseconds / (1000 * 60 * 60 * 24)); // convert milliseconds to days
+  };
+
   const handleAddDestination = () => {
+    const startDate = new Date().toISOString().slice(0, 10);
+    const endDate = new Date().toISOString().slice(0, 10);
     const newDestination = {
       name: "New Destination",
-      startDate: new Date().toISOString().slice(0, 10),
-      endDate: new Date().toISOString().slice(0, 10),
-      duration: "Calculate duration",
+      startDate: startDate,
+      endDate: endDate,
+      duration: calculateDuration(startDate, endDate),
       places: []
     };
     setDestinations(prev => [...prev, newDestination]);
@@ -44,7 +53,17 @@ export default function TripDetail({ trips }) {
       <div className="destinations">
         {destinations.length > 0 ? (
           destinations.map((destination, index) => (
-            <Destination key={index} initialData={destination} onSave={(updatedData) => console.log(updatedData)} />
+            <Destination 
+              key={index} 
+              initialData={destination} 
+              calculateDuration={calculateDuration}
+              onSave={(updatedData) => {
+                const updatedDestinations = destinations.map((dest, idx) => 
+                  idx === index ? { ...updatedData, duration: calculateDuration(updatedData.startDate, updatedData.endDate) } : dest
+                );
+                setDestinations(updatedDestinations);
+              }} 
+            />
           ))
         ) : (
           <p>No destinations found for this trip.</p>

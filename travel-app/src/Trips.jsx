@@ -52,7 +52,6 @@ export default function Trips({ trips, setTrips }) {
         ) : (
           <ul className="trips-list">
             {trips.map((trip) => {
-              const duration = calculateDuration(trip.destinations[0].startDate, trip.destinations[0].endDate);
               return (
                 <li key={trip.id} className="trip-card">
                   <h3>{trip.tripName}</h3>
@@ -60,7 +59,7 @@ export default function Trips({ trips, setTrips }) {
                   <p><strong>City:</strong> {trip.destinations[0].name}</p>
                   <p><strong>Start Date:</strong> {trip.destinations[0].startDate}</p>
                   <p><strong>End Date:</strong> {trip.destinations[0].endDate}</p>
-                  <p><strong>Trip Duration:</strong> {duration} days</p>
+                  <p><strong>Trip Duration:</strong> {calculateDuration(trip.destinations[0].startDate, trip.destinations[0].endDate)} days</p>
                   <div className="trip-actions">
                     <Link to={`/trips/${trip.id}`} className="trip-btn">View</Link>
                     <button className="trip-btn delete" onClick={() => handleDeleteTrip(trip.id)}>Delete</button>
