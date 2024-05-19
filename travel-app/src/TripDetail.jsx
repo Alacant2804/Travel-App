@@ -1,20 +1,33 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import Destination from './Destination';
+import MapComponent from './MapComponent';
 import './TripDetail.css';
 
 export default function TripDetail({ trips }) {
   const { tripId } = useParams();
   const [destinations, setDestinations] = useState([]);
+  const [places, setPlaces] = useState([]);
 
   useEffect(() => {
     const trip = trips.find(t => t.id === parseInt(tripId, 10));
     if (trip && trip.destinations) {
       setDestinations(trip.destinations);
+      const allPlaces = trip.destinations.flatMap(destination => destination.places.map(place => ({
+        ...place,
+        coordinates: getCoordinates(place.name, destination.name, trip.country) // Add logic to get coordinates
+      })));
+      setPlaces(allPlaces);
     } else {
       console.error("Trip not found or no destinations available!");
     }
   }, [tripId, trips]);
+
+  const getCoordinates = (place, city, country) => {
+    // Implement logic to get coordinates based on place, city, and country.
+    // For now, returning dummy coordinates for the example.
+    return [51.505, -0.09];
+  };
 
   const calculateDuration = (startDate, endDate) => {
     const start = new Date(startDate);
@@ -70,6 +83,7 @@ export default function TripDetail({ trips }) {
         )}
       </div>
       <button className="add-destination-button" onClick={handleAddDestination}>Add New Destination</button>
+      <MapComponent places={places} />
     </div>
   );
 }

@@ -1,5 +1,4 @@
-// MapMain.jsx
-import './MapMain.css';
+import './BlockMain.css';
 import { FaMapMarkedAlt, FaRegListAlt, FaRoute } from 'react-icons/fa';
 
 export default function MapMain() {

@@ -16,11 +16,17 @@ export default function Destination({ initialData = {}, onSave, calculateDuratio
     event.preventDefault();
     const placeInput = event.target.elements.placeInput.value.trim();
     if (placeInput) {
-      const newPlaces = [...places, placeInput];
+      const newPlaces = [...places, { name: placeInput, coordinates: getCoordinates(placeInput, destination) }];
       setPlaces(newPlaces);
       onSave({ name: destination, startDate, endDate, places: newPlaces, duration });
     }
     event.target.reset();
+  };
+
+  const getCoordinates = (place, city) => {
+    // Implement logic to get coordinates based on place and city.
+    // For now, returning dummy coordinates for the example.
+    return [51.505, -0.09];
   };
 
   return (
@@ -36,7 +42,7 @@ export default function Destination({ initialData = {}, onSave, calculateDuratio
         <div className="breaker"></div>
         <div className="date-info">
           <p>
-            <strong>Start Date: </strong>
+            <strong>Start Date:</strong>
             <input
               type="date"
               value={startDate}
@@ -45,7 +51,7 @@ export default function Destination({ initialData = {}, onSave, calculateDuratio
             />
           </p>
           <p>
-            <strong>End Date: </strong>
+            <strong>End Date:</strong>
             <input
               type="date"
               value={endDate}
@@ -54,13 +60,13 @@ export default function Destination({ initialData = {}, onSave, calculateDuratio
             />
           </p>
           <p>
-            <strong>Duration: </strong> {duration} days
+            <strong>Duration:</strong> {duration} days
           </p>
         </div>
       </div>
       <ul className="places-to-visit">
         {places.map((place, index) => (
-          <li key={index}>{place}</li>
+          <li key={index}>{place.name}</li>
         ))}
       </ul>
       <form onSubmit={handleAddPlace} className="place-add-form">
