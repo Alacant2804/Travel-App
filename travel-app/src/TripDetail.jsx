@@ -36,7 +36,7 @@ export default function TripDetail({ trips }) {
     <div className="trip-detail-page">
       <h1 className="trip-title">{trip.tripName}</h1>
       <div className="trip-info-row">
-        <p><strong>Destination:</strong> {trip.destinations[0].name}</p>
+        <p><strong>Country:</strong> {trip.country}</p>
         <p><strong>Start Date:</strong> {trip.destinations[0].startDate}</p>
         <p><strong>End Date:</strong> {trip.destinations[0].endDate}</p>
         <p><strong>Duration:</strong> {trip.destinations[0].duration} days</p>

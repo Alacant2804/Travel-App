@@ -3,13 +3,14 @@ import './TripFormModal.css';
 
 export default function TripFormModal({ onRequestClose, onSubmit }) {
   const [tripName, setTripName] = useState('');
-  const [destination, setDestination] = useState('');
+  const [country, setCountry] = useState('');
+  const [city, setCity] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    if (!tripName || !destination || !startDate || !endDate) {
+    if (!tripName || !country || !city || !startDate || !endDate) {
       alert('Please fill out all fields.');
       return;
     }
@@ -22,10 +23,11 @@ export default function TripFormModal({ onRequestClose, onSubmit }) {
       return;
     }
 
-    onSubmit({ tripName, destination, startDate, endDate });
+    onSubmit({ tripName, country, city, startDate, endDate });
 
     setTripName('');
-    setDestination('');
+    setCountry('');
+    setCity('');
     setStartDate('');
     setEndDate('');
     onRequestClose();
@@ -46,9 +48,17 @@ export default function TripFormModal({ onRequestClose, onSubmit }) {
           />
           <input
             type="text"
-            placeholder="Destination"
-            value={destination}
-            onChange={(e) => setDestination(e.target.value)}
+            placeholder="Country"
+            value={country}
+            onChange={(e) => setCountry(e.target.value)}
+            className="form-input"
+            required
+          />
+          <input
+            type="text"
+            placeholder="City"
+            value={city}
+            onChange={(e) => setCity(e.target.value)}
             className="form-input"
             required
           />

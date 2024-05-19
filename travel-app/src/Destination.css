@@ -5,8 +5,8 @@
     margin-bottom: 16px;
     background-color: #fff;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
+  }
+  
 .destination-info {
 display: flex;
 flex-direction: column;
@@ -70,3 +70,4 @@ border-bottom: 1px solid #ddd;
 .places-to-visit li:last-child {
 border-bottom: none;
 }
+  

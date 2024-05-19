@@ -10,9 +10,10 @@ export default function Trips({ trips, setTrips }) {
     const newTrip = {
       id: trips.length + 1,
       tripName: newTripData.tripName,
+      country: newTripData.country,
       destinations: [
         {
-          name: newTripData.destination,
+          name: newTripData.city,
           startDate: newTripData.startDate,
           endDate: newTripData.endDate,
           duration: calculateDuration(newTripData.startDate, newTripData.endDate),
@@ -50,19 +51,23 @@ export default function Trips({ trips, setTrips }) {
           <p className="no-trips-message">There are no trips yet.</p>
         ) : (
           <ul className="trips-list">
-            {trips.map((trip) => (
-              <li key={trip.id} className="trip-card">
-                <h3>{trip.tripName}</h3>
-                <p><strong>Destination:</strong> {trip.destinations[0].name}</p>
-                <p><strong>Start Date:</strong> {trip.destinations[0].startDate}</p>
-                <p><strong>End Date:</strong> {trip.destinations[0].endDate}</p>
-                <p><strong>Trip Duration:</strong> {trip.destinations[0].duration} days</p>
-                <div className="trip-actions">
-                  <Link to={`/trips/${trip.id}`} className="trip-btn">View</Link>
-                  <button className="trip-btn delete" onClick={() => handleDeleteTrip(trip.id)}>Delete</button>
-                </div>
-              </li>
-            ))}
+            {trips.map((trip) => {
+              const duration = calculateDuration(trip.destinations[0].startDate, trip.destinations[0].endDate);
+              return (
+                <li key={trip.id} className="trip-card">
+                  <h3>{trip.tripName}</h3>
+                  <p><strong>Country:</strong> {trip.country}</p>
+                  <p><strong>City:</strong> {trip.destinations[0].name}</p>
+                  <p><strong>Start Date:</strong> {trip.destinations[0].startDate}</p>
+                  <p><strong>End Date:</strong> {trip.destinations[0].endDate}</p>
+                  <p><strong>Trip Duration:</strong> {duration} days</p>
+                  <div className="trip-actions">
+                    <Link to={`/trips/${trip.id}`} className="trip-btn">View</Link>
+                    <button className="trip-btn delete" onClick={() => handleDeleteTrip(trip.id)}>Delete</button>
+                  </div>
+                </li>
+              );
+            })}
           </ul>
         )}
 
