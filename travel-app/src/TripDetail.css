@@ -1,47 +1,43 @@
 .trip-detail-page {
   padding: 20px;
-  max-width: 800px;
-  margin: 0 auto;
+  font-family: Arial, sans-serif;
 }
 
 .trip-title {
-  text-align: center;
   font-size: 2em;
   margin-bottom: 20px;
+  text-align: center;
 }
 
 .trip-info-row {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-around;
   margin-bottom: 20px;
 }
 
 .trip-info-row p {
-  margin: 8px 0;
-  flex: 1;
-  text-align: center;
+  margin: 0;
+  padding: 10px 20px;
+  background-color: #f5f5f5;
+  border-radius: 8px;
 }
 
 .destinations {
-  margin-top: 20px;
+  margin-bottom: 20px;
 }
 
 .add-destination-button {
   display: block;
   margin: 20px auto;
   padding: 10px 20px;
-  background-color: #28a745;
+  font-size: 1em;
+  background-color: #007bff;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
   cursor: pointer;
 }
 
 .add-destination-button:hover {
-  background-color: #218838;
-}
-
-.no-destinations-message {
-  text-align: center;
-  color: #999;
+  background-color: #0056b3;
 }

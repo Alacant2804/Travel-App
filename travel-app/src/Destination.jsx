@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import './Destination.css';
 
 export default function Destination({ initialData = {}, onSave, calculateDuration }) {
   const [destination, setDestination] = useState(initialData.name || 'New Destination');
@@ -27,22 +28,41 @@ export default function Destination({ initialData = {}, onSave, calculateDuratio
       <div className="trip-info">
         <input
           type="text"
+          className="destination-input"
           value={destination}
           onChange={(e) => setDestination(e.target.value)}
           onBlur={() => onSave({ name: destination, startDate, endDate, places, duration })}
         />
-        <input
-          type="date"
-          value={startDate}
-          onChange={(e) => setStartDate(e.target.value)}
-        />
-        <input
-          type="date"
-          value={endDate}
-          onChange={(e) => setEndDate(e.target.value)}
-        />
-        <p><strong>Duration:</strong> {duration} days</p>
+        <div className="breaker"></div>
+        <div className="date-info">
+          <p>
+            <strong>Start Date:</strong>
+            <input
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              onBlur={() => onSave({ name: destination, startDate, endDate, places, duration })}
+            />
+          </p>
+          <p>
+            <strong>End Date:</strong>
+            <input
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              onBlur={() => onSave({ name: destination, startDate, endDate, places, duration })}
+            />
+          </p>
+          <p>
+            <strong>Duration:</strong> {duration} days
+          </p>
+        </div>
       </div>
+      <ul className="places-to-visit">
+        {places.map((place, index) => (
+          <li key={index}>{place}</li>
+        ))}
+      </ul>
       <form onSubmit={handleAddPlace} className="place-add-form">
         <input
           name="placeInput"
@@ -52,11 +72,6 @@ export default function Destination({ initialData = {}, onSave, calculateDuratio
         />
         <button type="submit" className="add-place-button">Add Place</button>
       </form>
-      <ul className="places-to-visit">
-        {places.map((place, index) => (
-          <li key={index}>{place}</li>
-        ))}
-      </ul>
     </div>
   );
 }
