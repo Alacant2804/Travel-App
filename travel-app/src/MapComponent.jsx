@@ -1,4 +1,4 @@
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import './MapComponent.css';
@@ -11,9 +11,20 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png'
 });
 
-export default function MapComponent({ places }) {
+function ChangeMapView({ center }) {
+  const map = useMap();
+  if (center && center.length === 2 && !isNaN(center[0]) && !isNaN(center[1])) {
+    map.setView(center, map.getZoom());
+  } else {
+    console.error("Invalid center coordinates:", center);
+  }
+  return null;
+}
+
+export default function MapComponent({ places, center }) {
   return (
-    <MapContainer center={[51.505, -0.09]} zoom={13} className="map-container">
+    <MapContainer center={center} zoom={13} className="map-container">
+      <ChangeMapView center={center} />
       <TileLayer
         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
