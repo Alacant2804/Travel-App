@@ -8,7 +8,7 @@ export default function Destination({ initialData = {}, onSave, calculateDuratio
   const [places, setPlaces] = useState(initialData.places || []);
   const [duration, setDuration] = useState(calculateDuration(startDate, endDate));
   const [editingIndex, setEditingIndex] = useState(-1);
-  const [editPlaceValue, setEditPlaceValue] = useState('');
+  const [editPlaceValue, setEditPlaceValue] = useState({ name: '', price: 0 });
 
   useEffect(() => {
     setDuration(calculateDuration(startDate, endDate));
@@ -40,7 +40,7 @@ export default function Destination({ initialData = {}, onSave, calculateDuratio
     setPlaces(updatedPlaces);
     onSave({ name: destination, startDate, endDate, places: updatedPlaces, duration });
     setEditingIndex(-1);
-    setEditPlaceValue('');
+    setEditPlaceValue({ name: '', price: 0 });
   };
 
   const handleDeletePlace = (index) => {
@@ -48,6 +48,9 @@ export default function Destination({ initialData = {}, onSave, calculateDuratio
     setPlaces(updatedPlaces);
     onSave({ name: destination, startDate, endDate, places: updatedPlaces, duration });
   };
+
+  const totalPlaces = places.length;
+  const totalPrice = places.reduce((sum, place) => sum + place.price, 0);
 
   return (
     <div className="trip-detail-container">
@@ -115,7 +118,6 @@ export default function Destination({ initialData = {}, onSave, calculateDuratio
         ))}
       </ul>
       <form onSubmit={handleAddPlace} className="place-add-form">
-        <div className='form-input'>
         <input
           name="placeInput"
           type="text"
@@ -130,9 +132,12 @@ export default function Destination({ initialData = {}, onSave, calculateDuratio
           min="0"
           className="place-input"
         />
-        </div>
         <button type="submit" className="add-place-button">Add Place</button>
       </form>
+      <div className="totals">
+        <p className='total-places'><strong>Total Places to Visit:</strong> {totalPlaces}</p>
+        <p className='total-price'><strong>Total Price:</strong> ${totalPrice.toFixed(2)}</p>
+      </div>
     </div>
   );
 }

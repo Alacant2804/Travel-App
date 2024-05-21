@@ -72,6 +72,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    margin-bottom: 30px;
 }
 
 .place-add-form > .form-input {
@@ -99,4 +100,8 @@
     background-color: transparent;
     width: 100%;
     max-width: 100%;
+}
+
+.total-places {
+    margin-bottom: 5px;
 }
