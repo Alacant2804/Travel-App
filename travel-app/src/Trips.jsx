@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import TripFormModal from './TripFormModal';
 import './Trips.css';
@@ -21,7 +21,7 @@ export default function Trips({ trips, setTrips }) {
         }
       ]
     };
-
+    console.log("Creating new trip:", newTrip);
     const updatedTrips = [...trips, newTrip];
     setTrips(updatedTrips);
     localStorage.setItem('trips', JSON.stringify(updatedTrips));
@@ -37,7 +37,7 @@ export default function Trips({ trips, setTrips }) {
     const start = new Date(startDate);
     const end = new Date(endDate);
     const durationInMilliseconds = end - start;
-    return Math.ceil(durationInMilliseconds / (1000 * 60 * 60 * 24)); // convert milliseconds to days
+    return Math.ceil(durationInMilliseconds / (1000 * 60 * 60 * 24)); //convert to days
   };
 
   return (
@@ -53,14 +53,18 @@ export default function Trips({ trips, setTrips }) {
         ) : (
           <ul className="trips-list">
             {trips.map((trip) => {
+              // Ensure trip has destinations before accessing them
+              if (!trip.destinations || trip.destinations.length === 0) {
+                return null; // Skip rendering if no destinations
+              }
               return (
                 <li key={trip.id} className="trip-card">
                   <h3>{trip.tripName}</h3>
                   <p><strong>Country:</strong> {trip.country}</p>
-                  <p><strong>City:</strong> {trip.destinations[0].name}</p>
+                  <p><strong>Destination:</strong> {trip.destinations[0].name}</p>
                   <p><strong>Start Date:</strong> {trip.destinations[0].startDate}</p>
                   <p><strong>End Date:</strong> {trip.destinations[0].endDate}</p>
-                  <p><strong>Trip Duration:</strong> {calculateDuration(trip.destinations[0].startDate, trip.destinations[0].endDate)} days</p>
+                  <p><strong>Trip Duration:</strong> {trip.destinations[0].duration} days</p>
                   <div className="trip-actions">
                     <Link to={`/trips/${trip.id}`} className="trip-btn">View</Link>
                     <button className="trip-btn delete" onClick={() => handleDeleteTrip(trip.id)}>Delete</button>

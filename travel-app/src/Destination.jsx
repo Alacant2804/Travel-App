@@ -17,8 +17,11 @@ export default function Destination({ initialData = {}, onSave, calculateDuratio
   const handleAddPlace = (event) => {
     event.preventDefault();
     const placeInput = event.target.elements.placeInput.value.trim();
+    const priceInput = parseFloat(event.target.elements.priceInput.value.trim());
+    const price = isNaN(priceInput) ? 0 : priceInput;
+
     if (placeInput) {
-      const newPlaces = [...places, placeInput];
+      const newPlaces = [...places, { name: placeInput, price }];
       setPlaces(newPlaces);
       onSave({ name: destination, startDate, endDate, places: newPlaces, duration });
     }
@@ -88,15 +91,22 @@ export default function Destination({ initialData = {}, onSave, calculateDuratio
               <>
                 <input
                   type="text"
-                  value={editPlaceValue}
-                  onChange={(e) => setEditPlaceValue(e.target.value)}
+                  value={editPlaceValue.name}
+                  onChange={(e) => setEditPlaceValue({ ...editPlaceValue, name: e.target.value })}
+                />
+                <input
+                  type="number"
+                  value={editPlaceValue.price}
+                  onChange={(e) => setEditPlaceValue({ ...editPlaceValue, price: parseFloat(e.target.value) })}
+                  step="0.01"
+                  min="0"
                 />
                 <button onClick={handleSaveEditPlace}>Save</button>
                 <button onClick={() => setEditingIndex(-1)}>Cancel</button>
               </>
             ) : (
               <>
-                {place}
+                {place.name} - ${place.price.toFixed(2)}
                 <button onClick={() => handleEditPlace(index)}>Edit</button>
                 <button onClick={() => handleDeletePlace(index)}>Delete</button>
               </>
@@ -105,12 +115,22 @@ export default function Destination({ initialData = {}, onSave, calculateDuratio
         ))}
       </ul>
       <form onSubmit={handleAddPlace} className="place-add-form">
+        <div className='form-input'>
         <input
           name="placeInput"
           type="text"
           placeholder="Add a place to visit"
           className="place-input"
         />
+        <input
+          name="priceInput"
+          type="number"
+          placeholder="Price"
+          step="0.01"
+          min="0"
+          className="place-input"
+        />
+        </div>
         <button type="submit" className="add-place-button">Add Place</button>
       </form>
     </div>

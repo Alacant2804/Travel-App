@@ -74,12 +74,19 @@
     align-items: center;
 }
 
-.place-add-form input[type="text"] {
+.place-add-form > .form-input {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    width: 80%;
+    border: 0;
+}
+
+.place-add-form input {
     margin: 10px 0;
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 8px;
-    width: 100%;
     max-width: 300px;
     box-sizing: border-box;
 }

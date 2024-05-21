@@ -11,6 +11,7 @@ import Login from './Login.jsx';
 import SignUp from './SignUp.jsx';
 import NotFound from './NotFound.jsx';
 import { useState, useEffect } from 'react';
+import 'leaflet/dist/leaflet.css';
 
 
 export default function App() {
