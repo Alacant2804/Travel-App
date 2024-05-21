@@ -9,7 +9,7 @@ export default function TripDetail({ trips }) {
   const { tripId } = useParams();
   const [destinations, setDestinations] = useState([]);
   const [places, setPlaces] = useState([]);
-  const [mapCenter, setMapCenter] = useState(null); // Default to null
+  const [mapCenter, setMapCenter] = useState(null);
 
   useEffect(() => {
     const trip = trips.find(t => t.id === parseInt(tripId, 10));
@@ -57,15 +57,21 @@ export default function TripDetail({ trips }) {
   };
 
   const handleAddDestination = () => {
+    const startDate = new Date().toISOString().slice(0, 10);
+    const endDate = new Date().toISOString().slice(0, 10);
+    const duration = calculateDuration(startDate, endDate);
+  
     const newDestination = {
       name: "New Destination",
-      startDate: new Date().toISOString().slice(0, 10),
-      endDate: new Date().toISOString().slice(0, 10),
-      duration: calculateDuration(new Date().toISOString().slice(0, 10), new Date().toISOString().slice(0, 10)),
+      startDate,
+      endDate,
+      duration,
       places: []
     };
+  
     setDestinations(prev => [...prev, newDestination]);
   };
+  
 
   const calculateDuration = (startDate, endDate) => {
     const start = new Date(startDate);

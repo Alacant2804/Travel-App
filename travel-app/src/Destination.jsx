@@ -7,6 +7,8 @@ export default function Destination({ initialData = {}, onSave, calculateDuratio
   const [endDate, setEndDate] = useState(initialData.endDate || '');
   const [places, setPlaces] = useState(initialData.places || []);
   const [duration, setDuration] = useState(calculateDuration(startDate, endDate));
+  const [editingIndex, setEditingIndex] = useState(-1);
+  const [editPlaceValue, setEditPlaceValue] = useState('');
 
   useEffect(() => {
     setDuration(calculateDuration(startDate, endDate));
@@ -16,17 +18,32 @@ export default function Destination({ initialData = {}, onSave, calculateDuratio
     event.preventDefault();
     const placeInput = event.target.elements.placeInput.value.trim();
     if (placeInput) {
-      const newPlaces = [...places, { name: placeInput, coordinates: getCoordinates(placeInput, destination) }];
+      const newPlaces = [...places, placeInput];
       setPlaces(newPlaces);
       onSave({ name: destination, startDate, endDate, places: newPlaces, duration });
     }
     event.target.reset();
   };
 
-  const getCoordinates = (place, city) => {
-    // Implement logic to get coordinates based on place and city.
-    // For now, returning dummy coordinates for the example.
-    return [51.505, -0.09];
+  const handleEditPlace = (index) => {
+    setEditingIndex(index);
+    setEditPlaceValue(places[index]);
+  };
+
+  const handleSaveEditPlace = () => {
+    const updatedPlaces = places.map((place, idx) =>
+      idx === editingIndex ? editPlaceValue : place
+    );
+    setPlaces(updatedPlaces);
+    onSave({ name: destination, startDate, endDate, places: updatedPlaces, duration });
+    setEditingIndex(-1);
+    setEditPlaceValue('');
+  };
+
+  const handleDeletePlace = (index) => {
+    const updatedPlaces = places.filter((_, idx) => idx !== index);
+    setPlaces(updatedPlaces);
+    onSave({ name: destination, startDate, endDate, places: updatedPlaces, duration });
   };
 
   return (
@@ -66,7 +83,25 @@ export default function Destination({ initialData = {}, onSave, calculateDuratio
       </div>
       <ul className="places-to-visit">
         {places.map((place, index) => (
-          <li key={index}>{place.name}</li>
+          <li key={index}>
+            {editingIndex === index ? (
+              <>
+                <input
+                  type="text"
+                  value={editPlaceValue}
+                  onChange={(e) => setEditPlaceValue(e.target.value)}
+                />
+                <button onClick={handleSaveEditPlace}>Save</button>
+                <button onClick={() => setEditingIndex(-1)}>Cancel</button>
+              </>
+            ) : (
+              <>
+                {place}
+                <button onClick={() => handleEditPlace(index)}>Edit</button>
+                <button onClick={() => handleDeletePlace(index)}>Delete</button>
+              </>
+            )}
+          </li>
         ))}
       </ul>
       <form onSubmit={handleAddPlace} className="place-add-form">
