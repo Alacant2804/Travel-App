@@ -7,9 +7,10 @@ export default function AccommodationModal({ accommodation, onSave, onClose }) {
   const [endDate, setEndDate] = useState(accommodation?.endDate || '');
   const [bookingLink, setBookingLink] = useState(accommodation?.bookingLink || '');
   const [isEditing, setIsEditing] = useState(!accommodation);
+  const [price, setPrice] = useState(accommodation?.price || '');
 
   const handleSave = () => {
-    onSave({ address, startDate, endDate, bookingLink });
+    onSave({ address, startDate, endDate, price, bookingLink });
     onClose();
   };
 
@@ -26,7 +27,10 @@ export default function AccommodationModal({ accommodation, onSave, onClose }) {
             <p><strong>Address:</strong> {address}</p>
             <p><strong>From:</strong> {startDate}</p>
             <p><strong>To:</strong> {endDate}</p>
-            <p><strong>Booking Link:</strong> <a href={bookingLink} target="_blank" rel="noopener noreferrer">{bookingLink}</a></p>
+            {price && (<p><strong>Price:</strong> ${parseFloat(price).toFixed(2)}</p>)}
+            {bookingLink && (
+              <p><strong>Booking Link:</strong> <a href={bookingLink} target="_blank" rel="noopener noreferrer">{bookingLink}</a></p>
+            )}
             <div className="modal-actions">
               <button className="modal-btn close-btn" onClick={onClose}>Close</button>
               <button className="modal-btn edit-btn" onClick={handleEdit}>Edit</button>
@@ -52,6 +56,15 @@ export default function AccommodationModal({ accommodation, onSave, onClose }) {
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
               className="form-input"
+            />
+            <input
+              type="number"
+              placeholder="Price"
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+              className="form-input"
+              step="0.01"
+              min="0"
             />
             <input
               type="url"
