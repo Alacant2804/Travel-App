@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import './Destination.css';
+import AccommodationModal from './AccommodationModal';
+import accommodationIcon from './assets/accommodation-icon.png';
 
 export default function Destination({ initialData = {}, onSave, calculateDuration }) {
   const [destination, setDestination] = useState(initialData.name || 'New Destination');
@@ -9,6 +11,8 @@ export default function Destination({ initialData = {}, onSave, calculateDuratio
   const [duration, setDuration] = useState(calculateDuration(startDate, endDate));
   const [editingIndex, setEditingIndex] = useState(-1);
   const [editPlaceValue, setEditPlaceValue] = useState({ name: '', price: 0 });
+  const [showAccommodationModal, setShowAccommodationModal] = useState(false);
+  const [accommodation, setAccommodation] = useState(initialData.accommodation || null);
 
   useEffect(() => {
     setDuration(calculateDuration(startDate, endDate));
@@ -51,6 +55,15 @@ export default function Destination({ initialData = {}, onSave, calculateDuratio
 
   const totalPlaces = places.length;
   const totalPrice = places.reduce((sum, place) => sum + place.price, 0);
+
+  const handleSaveAccommodation = (accommodationData) => {
+    setAccommodation(accommodationData);
+    setShowAccommodationModal(false);
+  };
+
+  const handleDeleteAccommodation = () => {
+    setAccommodation(null);
+  };
 
   return (
     <div className="trip-detail-container">
@@ -134,9 +147,19 @@ export default function Destination({ initialData = {}, onSave, calculateDuratio
         />
         <button type="submit" className="add-place-button">Add Place</button>
       </form>
-      <div className="totals">
-        <p className='total-places'><strong>Total Places to Visit:</strong> {totalPlaces}</p>
-        <p className='total-price'><strong>Total Price:</strong> ${totalPrice.toFixed(2)}</p>
+      <div className='destination-details'>
+        <div className="totals">
+          <p className='total-places'><strong>Total Places to Visit:</strong> {totalPlaces}</p>
+          <p className='total-price'><strong>Total Price:</strong> ${totalPrice.toFixed(2)}</p>
+        </div>
+        <button className="accommodation-button" data-title="Add Accommodation" onClick={() => setShowAccommodationModal(true)}><img src={accommodationIcon} alt='accommodation' className='accommodation-icon'/></button>
+        {showAccommodationModal && (
+          <AccommodationModal
+            accommodation={accommodation}
+            onSave={handleSaveAccommodation}
+            onClose={() => setShowAccommodationModal(false)}
+          />
+        )}
       </div>
     </div>
   );

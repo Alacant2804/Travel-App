@@ -21,6 +21,13 @@ export default function Footer() {
             <ul className="footer-links">
                     <li><a href="/privacy-policy">Privacy Policy</a></li>
                     <li><a href="/terms-of-service">Terms of Service</a></li>
+                    <li>
+                        <p>
+                            <a target="_blank" href="https://icons8.com/icon/LvE6Gd5rG7Zr/house" rel="noopener noreferrer">
+                                Icons
+                            </a> by <a target="_blank" href="https://icons8.com" rel="noopener noreferrer">Icons8</a>
+                        </p>
+                    </li>
             </ul>
         </footer>
     );
