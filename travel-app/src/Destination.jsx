@@ -152,7 +152,9 @@ export default function Destination({ initialData = {}, onSave, calculateDuratio
           <p className='total-places'><strong>Total Places to Visit:</strong> {totalPlaces}</p>
           <p className='total-price'><strong>Total Price:</strong> ${totalPrice.toFixed(2)}</p>
         </div>
-        <button className="accommodation-button" data-title="Add Accommodation" onClick={() => setShowAccommodationModal(true)}><img src={accommodationIcon} alt='accommodation' className='accommodation-icon'/></button>
+        <button className="accommodation-button" data-title="Add Accommodation" onClick={() => setShowAccommodationModal(true)}>
+          <img src={accommodationIcon} alt='accommodation' className='accommodation-icon'/>
+        </button>
         {showAccommodationModal && (
           <AccommodationModal
             accommodation={accommodation}
