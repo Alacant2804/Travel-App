@@ -22,6 +22,8 @@ function ChangeMapView({ center }) {
 }
 
 export default function MapComponent({ places, center }) {
+  console.log('Coordinates for places:', places.map(place => place.coordinates));
+  
   return (
     <MapContainer center={center} zoom={13} className="map-container">
       <ChangeMapView center={center} />
@@ -30,9 +32,13 @@ export default function MapComponent({ places, center }) {
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       />
       {places.map((place, index) => (
-        <Marker key={index} position={place.coordinates}>
-          <Popup>{place.name}</Popup>
-        </Marker>
+        place.coordinates && (
+          <Marker key={index} position={[place.coordinates.lat, place.coordinates.lon]}>
+            <Popup>
+              {place.name} - ${place.price.toFixed(2)}
+            </Popup>
+          </Marker>
+        )
       ))}
     </MapContainer>
   );

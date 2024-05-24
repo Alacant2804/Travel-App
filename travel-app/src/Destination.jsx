@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import './Destination.css';
 import AccommodationModal from './AccommodationModal';
 import accommodationIcon from './assets/accommodation-icon.png';
+import axios from 'axios';
+
 
 export default function Destination({ initialData = {}, onSave, calculateDuration }) {
   const [destination, setDestination] = useState(initialData.name || 'New Destination');
@@ -18,33 +20,57 @@ export default function Destination({ initialData = {}, onSave, calculateDuratio
     setDuration(calculateDuration(startDate, endDate));
   }, [startDate, endDate, calculateDuration]);
 
-  const handleAddPlace = (event) => {
+  const fetchCoordinates = async (place) => {
+    try {
+      const response = await axios.get('https://nominatim.openstreetmap.org/search', {
+        params: {
+          q: `${place}, ${destination}`,
+          format: 'json',
+          limit: 1
+        }
+      });
+      if (response.data.length > 0) {
+        const { lat, lon } = response.data[0];
+        return { lat: parseFloat(lat), lon: parseFloat(lon) };
+      } else {
+        console.error("No coordinates found for the provided place.");
+        return null;
+      }
+    } catch (error) {
+      console.error("Error fetching coordinates:", error);
+      return null;
+    }
+  };
+
+  const handleAddPlace = async (event) => {
     event.preventDefault();
     const placeInput = event.target.elements.placeInput.value.trim();
-    const priceInput = parseFloat(event.target.elements.priceInput.value.trim());
-    const price = isNaN(priceInput) ? 0 : priceInput;
-
+    const priceInput = event.target.elements.priceInput.value.trim();
     if (placeInput) {
-      const newPlaces = [...places, { name: placeInput, price }];
+      const coordinates = await fetchCoordinates(placeInput);
+      const newPlace = { name: placeInput, price: parseFloat(priceInput) || 0, coordinates };
+      const newPlaces = [...places, newPlace];
       setPlaces(newPlaces);
       onSave({ name: destination, startDate, endDate, places: newPlaces, duration });
+      console.log(coordinates)
     }
     event.target.reset();
+  };
+
+  const handleSaveEditPlace = async () => {
+    const coordinates = await fetchCoordinates(editPlaceValue.name);
+    const updatedPlaces = places.map((place, idx) =>
+      idx === editingIndex ? { ...editPlaceValue, coordinates } : place
+    );
+    setPlaces(updatedPlaces);
+    onSave({ name: destination, startDate, endDate, places: updatedPlaces, duration });
+    setEditingIndex(-1);
+    setEditPlaceValue({ name: '', price: '', coordinates: null });
   };
 
   const handleEditPlace = (index) => {
     setEditingIndex(index);
     setEditPlaceValue(places[index]);
-  };
-
-  const handleSaveEditPlace = () => {
-    const updatedPlaces = places.map((place, idx) =>
-      idx === editingIndex ? editPlaceValue : place
-    );
-    setPlaces(updatedPlaces);
-    onSave({ name: destination, startDate, endDate, places: updatedPlaces, duration });
-    setEditingIndex(-1);
-    setEditPlaceValue({ name: '', price: 0 });
   };
 
   const handleDeletePlace = (index) => {
@@ -59,10 +85,6 @@ export default function Destination({ initialData = {}, onSave, calculateDuratio
   const handleSaveAccommodation = (accommodationData) => {
     setAccommodation(accommodationData);
     setShowAccommodationModal(false);
-  };
-
-  const handleDeleteAccommodation = () => {
-    setAccommodation(null);
   };
 
   return (

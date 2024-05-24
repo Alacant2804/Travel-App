@@ -18,7 +18,7 @@ export default function TripDetail({ trips }) {
       const allPlaces = trip.destinations.flatMap(destination =>
         destination.places.map(place => ({
           ...place,
-          coordinates: getCoordinates(place.name, destination.name, trip.country) // Add logic to get coordinates
+          coordinates: place.coordinates || getCoordinates(place.name, destination.name, trip.country) // Add logic to get coordinates
         }))
       );
       setPlaces(allPlaces);
@@ -30,10 +30,26 @@ export default function TripDetail({ trips }) {
     }
   }, [tripId, trips]);
 
-  const getCoordinates = (place, city, country) => {
-    // Implement logic to get coordinates based on place, city, and country.
-    // For now, returning dummy coordinates for the example.
-    return [51.505, -0.09];
+  const getCoordinates = async (place, city, country) => {
+    try {
+      const response = await axios.get('https://nominatim.openstreetmap.org/search', {
+        params: {
+          q: `${place}, ${city}, ${country}`,
+          format: 'json',
+          limit: 1
+        }
+      });
+      if (response.data.length > 0) {
+        const { lat, lon } = response.data[0];
+        return { lat: parseFloat(lat), lon: parseFloat(lon) };
+      } else {
+        console.error("No coordinates found for the provided location.");
+        return null;
+      }
+    } catch (error) {
+      console.error("Error fetching coordinates:", error);
+      return null;
+    }
   };
 
   const fetchCoordinates = async (country, city) => {
