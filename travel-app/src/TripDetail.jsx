@@ -15,13 +15,19 @@ export default function TripDetail({ trips }) {
     const trip = trips.find(t => t.id === parseInt(tripId, 10));
     if (trip && trip.destinations) {
       setDestinations(trip.destinations);
-      const allPlaces = trip.destinations.flatMap(destination =>
-        destination.places.map(place => ({
-          ...place,
-          coordinates: place.coordinates || getCoordinates(place.name, destination.name, trip.country) // Add logic to get coordinates
-        }))
-      );
-      setPlaces(allPlaces);
+      
+      // Fetch all coordinates for places
+      const fetchAllCoordinates = async () => {
+        const allPlaces = await Promise.all(trip.destinations.flatMap(async (destination) => {
+          return Promise.all(destination.places.map(async (place) => {
+            const coordinates = await getCoordinates(place.name, destination.name, trip.country);
+            return { ...place, coordinates };
+          }));
+        }));
+        setPlaces(allPlaces.flat());
+      };
+
+      fetchAllCoordinates();
 
       // Fetch coordinates for the country and city
       fetchCoordinates(trip.country, trip.destinations[0].name);
@@ -87,7 +93,6 @@ export default function TripDetail({ trips }) {
   
     setDestinations(prev => [...prev, newDestination]);
   };
-  
 
   const calculateDuration = (startDate, endDate) => {
     const start = new Date(startDate);
@@ -117,11 +122,19 @@ export default function TripDetail({ trips }) {
               key={index} 
               initialData={destination} 
               calculateDuration={calculateDuration}
-              onSave={(updatedData) => {
+              onSave={async (updatedData) => {
                 const updatedDestinations = destinations.map((dest, idx) => 
                   idx === index ? { ...updatedData, duration: calculateDuration(updatedData.startDate, updatedData.endDate) } : dest
                 );
                 setDestinations(updatedDestinations);
+
+                const updatedPlaces = await Promise.all(updatedDestinations.flatMap(async destination => {
+                  return Promise.all(destination.places.map(async (place) => {
+                    const coordinates = await getCoordinates(place.name, destination.name, trip.country);
+                    return { ...place, coordinates };
+                  }));
+                }));
+                setPlaces(updatedPlaces.flat());
               }} 
             />
           ))
@@ -130,7 +143,7 @@ export default function TripDetail({ trips }) {
         )}
       </div>
       <button className="add-destination-button" onClick={handleAddDestination}>Add New Destination</button>
-      {mapCenter && <MapComponent places={places} center={mapCenter} />}    
+      {mapCenter && <MapComponent places={places} center={mapCenter} />}
     </div>
   );
 }
