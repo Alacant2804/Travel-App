@@ -53,9 +53,8 @@ export default function Trips({ trips, setTrips }) {
         ) : (
           <ul className="trips-list">
             {trips.map((trip) => {
-              // Ensure trip has destinations before accessing them
               if (!trip.destinations || trip.destinations.length === 0) {
-                return null; // Skip rendering if no destinations
+                return null;
               }
               return (
                 <li key={trip.id} className="trip-card">

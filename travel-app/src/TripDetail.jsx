@@ -4,6 +4,7 @@ import Destination from './Destination';
 import MapComponent from './MapComponent';
 import axios from 'axios';
 import './TripDetail.css';
+import {Link} from 'react-router-dom';
 
 export default function TripDetail({ trips }) {
   const { tripId } = useParams();
@@ -108,6 +109,7 @@ export default function TripDetail({ trips }) {
 
   return (
     <div className="trip-detail-page">
+      <Link to='/trips'><button className='back-button'>Go Back</button></Link>
       <h1 className="trip-title">{trip.tripName}</h1>
       <div className="trip-info-row">
         <p><strong>Country:</strong> {trip.country}</p>
