@@ -1,1 +1,69 @@
-Welcome to the Travel Planner app! This application helps users organize and plan their trips, including itinerary, travel tips, and destination insights. It provides a seamless interface for adding trips, destinations, and personalized travel notes.
+# 🗺️ Travel App
+
+## 📚 Table of Contents
+
+- [Introduction](#introduction)
+- [Features](#features)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Components](#components)
+  - [App](#app)
+  - [Trips](#trips)
+  - [TripDetail](#tripdetail)
+  - [Destination](#destination)
+  - [AccommodationModal](#accommodationmodal)
+  - [MapComponent](#mapcomponent)
+- [Technologies Used](#technologies-used)
+- [License](#license)
+
+## 🌟 Introduction
+
+🌍 **Travel App** is a web application that helps users plan their trips. Users can create trips, add destinations, places to visit, and accommodation details. The app also integrates a map to visualize the trip details.
+
+## ✨ Features
+
+**Key Features:**
+- 📝 Create and edit trips
+- 📍 Add destinations with start and end dates
+- 🗺️ Add places to visit within each destination
+- 🏨 Add and edit accommodation details
+- 🌐 Display trip details on an interactive map
+
+## ⚙️ Installation
+
+1. Clone the repository:
+
+```bash
+   git clone https://github.com/yourusername/travel-app.git
+   cd travel-app
+```
+
+Install dependencies:
+```bash
+npm install
+```
+Start the development server:
+```bash
+npm run dev
+```
+
+🚀 Usage
+
+Open the application in your browser
+
+Create a new trip by clicking on the "Create Trip" button.
+
+Add destinations and places to visit within each destination.
+
+Add accommodation details for each destination.
+
+View the trip details on the interactive map.
+
+🛠️ Technologies Used
+
+⚛️ React
+🛣️ React Router
+🗺️ Leaflet
+🌐 Axios
+⚡ Vite
+🎨 CSS
