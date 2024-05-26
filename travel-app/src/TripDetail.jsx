@@ -1,13 +1,62 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import Destination from './Destination';
 import MapComponent from './MapComponent';
 import axios from 'axios';
 import './TripDetail.css';
-import { Link } from 'react-router-dom';
 import budgetIcon from './assets/budget.png';
 import carIcon from './assets/car.png';
 import planeIcon from './assets/plane.png';
+
+const getAndSetCoordinates = async (query, setState = null) => {
+  try {
+    const response = await axios.get('https://nominatim.openstreetmap.org/search', {
+      params: {
+        q: query,
+        format: 'json',
+        limit: 1
+      }
+    });
+    if (response.data.length > 0) {
+      const { lat, lon } = response.data[0];
+      const coordinates = { lat: parseFloat(lat), lon: parseFloat(lon) };
+      
+      if (setState) {
+        setState([coordinates.lat, coordinates.lon]);
+      }
+      
+      return coordinates;
+    } else {
+      console.error("No coordinates found for the provided location.");
+      return null;
+    }
+  } catch (error) {
+    console.error("Error fetching coordinates:", error);
+    return null;
+  }
+};
+
+const fetchPlacesAndAccommodationsCoordinates = async (destinations, tripCountry) => {
+  const allPlaces = await Promise.all(destinations.flatMap(async (destination) => {
+    const placeResults = await Promise.all(destination.places.map(async (place) => {
+      const coordinates = await getAndSetCoordinates(`${place.name}, ${destination.name}, ${tripCountry}`);
+      return { ...place, coordinates };
+    }));
+
+    const accommodationCoordinates = destination.accommodation ? await getAndSetCoordinates(`${destination.accommodation.address}, ${destination.name}, ${tripCountry}`) : null;
+    return [
+      ...placeResults,
+      ...(destination.accommodation ? [{ ...destination.accommodation, coordinates: accommodationCoordinates }] : [])
+    ];
+  }));
+  return allPlaces.flat();
+};
+
+const fetchAllCoordinates = async (trip, setPlaces) => {
+  const allPlaces = await fetchPlacesAndAccommodationsCoordinates(trip.destinations, trip.country);
+  setPlaces(allPlaces);
+};
 
 export default function TripDetail({ trips }) {
   const { tripId } = useParams();
@@ -15,83 +64,26 @@ export default function TripDetail({ trips }) {
   const [places, setPlaces] = useState([]);
   const [mapCenter, setMapCenter] = useState(null);
 
+  // Find the trip once and store it in a variable
+  const trip = trips.find(t => t.id === parseInt(tripId, 10));
+
   useEffect(() => {
-    const trip = trips.find(t => t.id === parseInt(tripId, 10));
     if (trip && trip.destinations) {
       setDestinations(trip.destinations);
-      
-      // Fetch all coordinates for places
-      const fetchAllCoordinates = async () => {
-        const allPlaces = await Promise.all(trip.destinations.flatMap(async (destination) => {
-          const placeResults = await Promise.all(destination.places.map(async (place) => {
-            const coordinates = await getCoordinates(place.name, destination.name, trip.country);
-            return { ...place, coordinates };
-          }));
-          const accommodationCoordinates = destination.accommodation ? await getCoordinates(destination.accommodation.address, destination.name, trip.country) : null;
-          return [
-            ...placeResults,
-            ...(destination.accommodation ? [{ ...destination.accommodation, coordinates: accommodationCoordinates }] : [])
-          ];
-        }));
-        setPlaces(allPlaces.flat());
-      };
 
-      fetchAllCoordinates();
+      fetchAllCoordinates(trip, setPlaces);
 
-      // Fetch coordinates for the country and city
-      fetchCoordinates(trip.country, trip.destinations[0].name);
+      getAndSetCoordinates(`${trip.destinations[0].name}, ${trip.country}`, setMapCenter);
     } else {
       console.error("Trip not found or no destinations available!");
     }
-  }, [tripId, trips]);
-
-  const getCoordinates = async (place, city, country) => {
-    try {
-      const response = await axios.get('https://nominatim.openstreetmap.org/search', {
-        params: {
-          q: `${place}, ${city}, ${country}`,
-          format: 'json',
-          limit: 1
-        }
-      });
-      if (response.data.length > 0) {
-        const { lat, lon } = response.data[0];
-        return { lat: parseFloat(lat), lon: parseFloat(lon) };
-      } else {
-        console.error("No coordinates found for the provided location.");
-        return null;
-      }
-    } catch (error) {
-      console.error("Error fetching coordinates:", error);
-      return null;
-    }
-  };
-
-  const fetchCoordinates = async (country, city) => {
-    try {
-      const response = await axios.get('https://nominatim.openstreetmap.org/search', {
-        params: {
-          q: `${city}, ${country}`,
-          format: 'json',
-          limit: 1
-        }
-      });
-      if (response.data.length > 0) {
-        const { lat, lon } = response.data[0];
-        setMapCenter([parseFloat(lat), parseFloat(lon)]);
-      } else {
-        console.error("No coordinates found for the provided location.");
-      }
-    } catch (error) {
-      console.error("Error fetching coordinates:", error);
-    }
-  };
+  }, [trip, tripId, trips]);
 
   const handleAddDestination = () => {
     const startDate = new Date().toISOString().slice(0, 10);
     const endDate = new Date().toISOString().slice(0, 10);
     const duration = calculateDuration(startDate, endDate);
-  
+
     const newDestination = {
       name: "New Destination",
       startDate,
@@ -99,7 +91,7 @@ export default function TripDetail({ trips }) {
       duration,
       places: []
     };
-  
+
     setDestinations(prev => [...prev, newDestination]);
   };
 
@@ -110,7 +102,6 @@ export default function TripDetail({ trips }) {
     return Math.ceil(durationInMilliseconds / (1000 * 60 * 60 * 24));
   };
 
-  const trip = trips.find(t => t.id === parseInt(tripId, 10));
   if (!trip) {
     return <p>Trip not found!</p>;
   }
@@ -145,18 +136,8 @@ export default function TripDetail({ trips }) {
                 );
                 setDestinations(updatedDestinations);
 
-                const updatedPlaces = await Promise.all(updatedDestinations.flatMap(async destination => {
-                  const placeResults = await Promise.all(destination.places.map(async (place) => {
-                    const coordinates = await getCoordinates(place.name, destination.name, trip.country);
-                    return { ...place, coordinates };
-                  }));
-                  const accommodationCoordinates = destination.accommodation ? await getCoordinates(destination.accommodation.address, destination.name, trip.country) : null;
-                  return [
-                    ...placeResults,
-                    ...(destination.accommodation ? [{ ...destination.accommodation, coordinates: accommodationCoordinates }] : [])
-                  ];
-                }));
-                setPlaces(updatedPlaces.flat());
+                const updatedPlaces = await fetchPlacesAndAccommodationsCoordinates(updatedDestinations, trip.country);
+                setPlaces(updatedPlaces);
               }} 
             />
           ))

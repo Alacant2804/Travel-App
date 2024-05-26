@@ -10,11 +10,13 @@ export default function TripFormModal({ onRequestClose, onSubmit, trip }) {
 
   useEffect(() => {
     if (trip) {
-      setTripName(trip.tripName);
-      setCountry(trip.country);
-      setCity(trip.destinations[0]?.name);
-      setStartDate(trip.destinations[0]?.startDate);
-      setEndDate(trip.destinations[0]?.endDate);
+      const { tripName, country, destinations } = trip;
+      const { name, startDate, endDate } = destinations[0] || {};
+      setTripName(tripName);
+      setCountry(country);
+      setCity(name || '');
+      setStartDate(startDate || '');
+      setEndDate(endDate || '');
     }
   }, [trip]);
 
