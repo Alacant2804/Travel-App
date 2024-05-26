@@ -1,12 +1,22 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './TripFormModal.css';
 
-export default function TripFormModal({ onRequestClose, onSubmit }) {
+export default function TripFormModal({ onRequestClose, onSubmit, trip }) {
   const [tripName, setTripName] = useState('');
   const [country, setCountry] = useState('');
   const [city, setCity] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+
+  useEffect(() => {
+    if (trip) {
+      setTripName(trip.tripName);
+      setCountry(trip.country);
+      setCity(trip.destinations[0]?.name);
+      setStartDate(trip.destinations[0]?.startDate);
+      setEndDate(trip.destinations[0]?.endDate);
+    }
+  }, [trip]);
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -23,7 +33,7 @@ export default function TripFormModal({ onRequestClose, onSubmit }) {
       return;
     }
 
-    onSubmit({ tripName, country, city, startDate, endDate });
+    onSubmit({ id: trip?.id, tripName, country, city, startDate, endDate });
 
     setTripName('');
     setCountry('');
@@ -36,7 +46,7 @@ export default function TripFormModal({ onRequestClose, onSubmit }) {
   return (
     <div className="modal-overlay" onClick={onRequestClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <h2>Create a New Trip</h2>
+        <h2>{trip ? 'Edit Trip' : 'Create a New Trip'}</h2>
         <form className="modal-form" onSubmit={handleSubmit}>
           <input
             type="text"
@@ -78,7 +88,7 @@ export default function TripFormModal({ onRequestClose, onSubmit }) {
           />
           <div className="modal-actions">
             <button type="button" onClick={onRequestClose} className="modal-btn cancel-btn">Cancel</button>
-            <button type="submit" className="modal-btn submit-btn">Create Trip</button>
+            <button type="submit" className="modal-btn submit-btn">{trip ? 'Save Changes' : 'Create Trip'}</button>
           </div>
         </form>
       </div>
