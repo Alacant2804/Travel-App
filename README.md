@@ -45,7 +45,7 @@ npm install
 npm run dev
 ```
 
-🚀 Usage
+## 🚀 Usage
 
 Open the application in your browser
 
@@ -57,7 +57,7 @@ Add accommodation details for each destination.
 
 View the trip details on the interactive map.
 
-🛠️ Technologies Used
+## 🛠️ Technologies Used
 
 ⚛️ React
 🛣️ React Router
