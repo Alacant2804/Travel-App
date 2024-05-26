@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './AccommodationModal.css';
+import axios from 'axios';
 
 export default function AccommodationModal({ accommodation, onSave, onClose }) {
   const [address, setAddress] = useState(accommodation?.address || '');
@@ -7,10 +8,43 @@ export default function AccommodationModal({ accommodation, onSave, onClose }) {
   const [endDate, setEndDate] = useState(accommodation?.endDate || '');
   const [bookingLink, setBookingLink] = useState(accommodation?.bookingLink || '');
   const [isEditing, setIsEditing] = useState(!accommodation);
-  const [price, setPrice] = useState(accommodation?.price || '');
+  const [price, setPrice] = useState(accommodation?.price || 0);
 
-  const handleSave = () => {
-    onSave({ address, startDate, endDate, price, bookingLink });
+  useEffect(() => {
+    if (accommodation) {
+      setAddress(accommodation.address);
+      setStartDate(accommodation.startDate);
+      setEndDate(accommodation.endDate);
+      setBookingLink(accommodation.bookingLink);
+      setPrice(accommodation.price || 0);
+    }
+  }, [accommodation]);
+
+  const fetchCoordinates = async (address) => {
+    try {
+      const response = await axios.get('https://nominatim.openstreetmap.org/search', {
+        params: {
+          q: address,
+          format: 'json',
+          limit: 1
+        }
+      });
+      if (response.data.length > 0) {
+        const { lat, lon } = response.data[0];
+        return { lat: parseFloat(lat), lon: parseFloat(lon) };
+      } else {
+        console.error("No coordinates found for the provided address.");
+        return null;
+      }
+    } catch (error) {
+      console.error("Error fetching coordinates:", error);
+      return null;
+    }
+  };
+
+  const handleSave = async () => {
+    const coordinates = await fetchCoordinates(address);
+    onSave({ address, startDate, endDate, bookingLink, price, coordinates });
     onClose();
   };
 
@@ -27,7 +61,7 @@ export default function AccommodationModal({ accommodation, onSave, onClose }) {
             <p><strong>Address:</strong> {address}</p>
             <p><strong>From:</strong> {startDate}</p>
             <p><strong>To:</strong> {endDate}</p>
-            {price && (<p><strong>Price:</strong> ${parseFloat(price).toFixed(2)}</p>)}
+            <p><strong>Price:</strong> ${price.toFixed(2)}</p>
             {bookingLink && (
               <p><strong>Booking Link:</strong> <a href={bookingLink} target="_blank" rel="noopener noreferrer">{bookingLink}</a></p>
             )}
@@ -61,7 +95,7 @@ export default function AccommodationModal({ accommodation, onSave, onClose }) {
               type="number"
               placeholder="Price"
               value={price}
-              onChange={(e) => setPrice(e.target.value)}
+              onChange={(e) => setPrice(parseFloat(e.target.value))}
               className="form-input"
               step="0.01"
               min="0"

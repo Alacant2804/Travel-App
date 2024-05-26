@@ -2,6 +2,7 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import './MapComponent.css';
+import homeIconUrl from './assets/home.png';
 
 // Fix default icon issue
 delete L.Icon.Default.prototype._getIconUrl;
@@ -9,6 +10,13 @@ L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon-2x.png',
   iconUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png',
   shadowUrl: 'https://unpkg.com/leaflet@1.7.1/dist/images/marker-shadow.png'
+});
+
+const homeIcon = new L.Icon({
+  iconUrl: homeIconUrl,
+  iconSize: [25, 25],
+  iconAnchor: [12, 24],
+  popupAnchor: [0, -24],
 });
 
 function ChangeMapView({ center }) {
@@ -22,8 +30,6 @@ function ChangeMapView({ center }) {
 }
 
 export default function MapComponent({ places, center }) {
-  console.log('Coordinates for places:', places.map(place => place.coordinates));
-  
   return (
     <MapContainer center={center} zoom={13} className="map-container">
       <ChangeMapView center={center} />
@@ -39,6 +45,13 @@ export default function MapComponent({ places, center }) {
             </Popup>
           </Marker>
         )
+      ))}
+      {places.filter(place => place.accommodation && place.accommodation.coordinates).map((place, index) => (
+        <Marker key={`home-${index}`} position={[place.accommodation.coordinates.lat, place.accommodation.coordinates.lon]} icon={homeIcon}>
+          <Popup>
+            Accommodation: {place.accommodation.address}
+          </Popup>
+        </Marker>
       ))}
     </MapContainer>
   );

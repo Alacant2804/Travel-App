@@ -4,6 +4,27 @@ import AccommodationModal from './AccommodationModal';
 import accommodationIcon from './assets/accommodation-icon.png';
 import axios from 'axios';
 
+const fetchCoordinates = async (place, destination) => {
+  try {
+    const response = await axios.get('https://nominatim.openstreetmap.org/search', {
+      params: {
+        q: `${place}, ${destination}`,
+        format: 'json',
+        limit: 1
+      }
+    });
+    if (response.data.length > 0) {
+      const { lat, lon } = response.data[0];
+      return { lat: parseFloat(lat), lon: parseFloat(lon) };
+    } else {
+      console.error("No coordinates found for the provided place.");
+      return null;
+    }
+  } catch (error) {
+    console.error("Error fetching coordinates:", error);
+    return null;
+  }
+};
 
 export default function Destination({ initialData = {}, onSave, calculateDuration }) {
   const [destination, setDestination] = useState(initialData.name || 'New Destination');
@@ -20,52 +41,29 @@ export default function Destination({ initialData = {}, onSave, calculateDuratio
     setDuration(calculateDuration(startDate, endDate));
   }, [startDate, endDate, calculateDuration]);
 
-  const fetchCoordinates = async (place) => {
-    try {
-      const response = await axios.get('https://nominatim.openstreetmap.org/search', {
-        params: {
-          q: `${place}, ${destination}`,
-          format: 'json',
-          limit: 1
-        }
-      });
-      if (response.data.length > 0) {
-        const { lat, lon } = response.data[0];
-        return { lat: parseFloat(lat), lon: parseFloat(lon) };
-      } else {
-        console.error("No coordinates found for the provided place.");
-        return null;
-      }
-    } catch (error) {
-      console.error("Error fetching coordinates:", error);
-      return null;
-    }
-  };
-
   const handleAddPlace = async (event) => {
     event.preventDefault();
     const placeInput = event.target.elements.placeInput.value.trim();
     const priceInput = event.target.elements.priceInput.value.trim();
     if (placeInput) {
-      const coordinates = await fetchCoordinates(placeInput);
+      const coordinates = await fetchCoordinates(placeInput, destination);
       const newPlace = { name: placeInput, price: parseFloat(priceInput) || 0, coordinates };
       const newPlaces = [...places, newPlace];
       setPlaces(newPlaces);
-      onSave({ name: destination, startDate, endDate, places: newPlaces, duration });
-      console.log(coordinates)
+      onSave({ name: destination, startDate, endDate, places: newPlaces, duration, accommodation });
     }
     event.target.reset();
   };
 
   const handleSaveEditPlace = async () => {
-    const coordinates = await fetchCoordinates(editPlaceValue.name);
+    const coordinates = await fetchCoordinates(editPlaceValue.name, destination);
     const updatedPlaces = places.map((place, idx) =>
       idx === editingIndex ? { ...editPlaceValue, coordinates } : place
     );
     setPlaces(updatedPlaces);
-    onSave({ name: destination, startDate, endDate, places: updatedPlaces, duration });
+    onSave({ name: destination, startDate, endDate, places: updatedPlaces, duration, accommodation });
     setEditingIndex(-1);
-    setEditPlaceValue({ name: '', price: '', coordinates: null });
+    setEditPlaceValue({ name: '', price: 0, coordinates: null });
   };
 
   const handleEditPlace = (index) => {
@@ -76,7 +74,7 @@ export default function Destination({ initialData = {}, onSave, calculateDuratio
   const handleDeletePlace = (index) => {
     const updatedPlaces = places.filter((_, idx) => idx !== index);
     setPlaces(updatedPlaces);
-    onSave({ name: destination, startDate, endDate, places: updatedPlaces, duration });
+    onSave({ name: destination, startDate, endDate, places: updatedPlaces, duration, accommodation });
   };
 
   const totalPlaces = places.length;
@@ -85,6 +83,7 @@ export default function Destination({ initialData = {}, onSave, calculateDuratio
   const handleSaveAccommodation = (accommodationData) => {
     setAccommodation(accommodationData);
     setShowAccommodationModal(false);
+    onSave({ name: destination, startDate, endDate, places, duration, accommodation: accommodationData });
   };
 
   return (
@@ -95,7 +94,7 @@ export default function Destination({ initialData = {}, onSave, calculateDuratio
           className="destination-input"
           value={destination}
           onChange={(e) => setDestination(e.target.value)}
-          onBlur={() => onSave({ name: destination, startDate, endDate, places, duration })}
+          onBlur={() => onSave({ name: destination, startDate, endDate, places, duration, accommodation })}
         />
         <div className="breaker"></div>
         <div className="date-info">
@@ -105,7 +104,7 @@ export default function Destination({ initialData = {}, onSave, calculateDuratio
               type="date"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
-              onBlur={() => onSave({ name: destination, startDate, endDate, places, duration })}
+              onBlur={() => onSave({ name: destination, startDate, endDate, places, duration, accommodation })}
             />
           </p>
           <p>
@@ -114,7 +113,7 @@ export default function Destination({ initialData = {}, onSave, calculateDuratio
               type="date"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
-              onBlur={() => onSave({ name: destination, startDate, endDate, places, duration })}
+              onBlur={() => onSave({ name: destination, startDate, endDate, places, duration, accommodation })}
             />
           </p>
           <p>

@@ -4,7 +4,10 @@ import Destination from './Destination';
 import MapComponent from './MapComponent';
 import axios from 'axios';
 import './TripDetail.css';
-import {Link} from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import budgetIcon from './assets/budget.png';
+import carIcon from './assets/car.png';
+import planeIcon from './assets/plane.png';
 
 export default function TripDetail({ trips }) {
   const { tripId } = useParams();
@@ -20,10 +23,15 @@ export default function TripDetail({ trips }) {
       // Fetch all coordinates for places
       const fetchAllCoordinates = async () => {
         const allPlaces = await Promise.all(trip.destinations.flatMap(async (destination) => {
-          return Promise.all(destination.places.map(async (place) => {
+          const placeResults = await Promise.all(destination.places.map(async (place) => {
             const coordinates = await getCoordinates(place.name, destination.name, trip.country);
             return { ...place, coordinates };
           }));
+          const accommodationCoordinates = destination.accommodation ? await getCoordinates(destination.accommodation.address, destination.name, trip.country) : null;
+          return [
+            ...placeResults,
+            ...(destination.accommodation ? [{ ...destination.accommodation, coordinates: accommodationCoordinates }] : [])
+          ];
         }));
         setPlaces(allPlaces.flat());
       };
@@ -109,7 +117,14 @@ export default function TripDetail({ trips }) {
 
   return (
     <div className="trip-detail-page">
-      <Link to='/trips'><button className='back-button'>Go Back</button></Link>
+      <div className='button-section'>
+        <Link to='/trips'><button className='back-button'>Go Back</button></Link>
+        <div className='trip-icons'>
+          <button className="button-icon"><img src={budgetIcon} alt="Budget" className="budget-icon" /></button>
+          <button className="button-icon"><img src={carIcon} alt="Car" className="icon" /></button>
+          <button className="button-icon"><img src={planeIcon} alt="Plane" className="icon" /></button>
+        </div>
+      </div>
       <h1 className="trip-title">{trip.tripName}</h1>
       <div className="trip-info-row">
         <p><strong>Country:</strong> {trip.country}</p>
@@ -131,10 +146,15 @@ export default function TripDetail({ trips }) {
                 setDestinations(updatedDestinations);
 
                 const updatedPlaces = await Promise.all(updatedDestinations.flatMap(async destination => {
-                  return Promise.all(destination.places.map(async (place) => {
+                  const placeResults = await Promise.all(destination.places.map(async (place) => {
                     const coordinates = await getCoordinates(place.name, destination.name, trip.country);
                     return { ...place, coordinates };
                   }));
+                  const accommodationCoordinates = destination.accommodation ? await getCoordinates(destination.accommodation.address, destination.name, trip.country) : null;
+                  return [
+                    ...placeResults,
+                    ...(destination.accommodation ? [{ ...destination.accommodation, coordinates: accommodationCoordinates }] : [])
+                  ];
                 }));
                 setPlaces(updatedPlaces.flat());
               }} 
