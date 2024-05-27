@@ -1,63 +1,8 @@
 import { useState, useContext } from 'react';
 import { AuthContext } from './AuthContext';
-import styled from 'styled-components';
+import './Login.css'; // Import your custom CSS file for styling
 
-const LoginContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
-  background-color: #f2f2f2;
-`;
-
-const Form = styled.form`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 2rem;
-  background-color: #fff;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-`;
-
-const Input = styled.input`
-  width: 100%;
-  padding: 0.75rem;
-  margin: 0.5rem 0;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 1rem;
-
-  &:focus {
-    border-color: #007bff;
-    outline: none;
-    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-  }
-`;
-
-const Button = styled.button`
-  width: 100%;
-  padding: 0.75rem;
-  margin-top: 1rem;
-  background-color: #007bff;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  font-size: 1rem;
-  cursor: pointer;
-
-  &:hover {
-    background-color: #0056b3;
-  }
-`;
-
-const Title = styled.h2`
-  margin-bottom: 1rem;
-  color: #333;
-`;
-
-const Login = () => {
+export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const { login } = useContext(AuthContext);
@@ -73,15 +18,16 @@ const Login = () => {
   };
 
   return (
-    <LoginContainer>
-      <Form onSubmit={handleSubmit}>
-        <Title>Login</Title>
-        <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" required />
-        <Input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" required />
-        <Button type="submit">Log In</Button>
-      </Form>
-    </LoginContainer>
+    <div className="login-container">
+      <div className="login-box">
+        <h2 className="login-heading">Log In</h2>
+        <form onSubmit={handleSubmit} className="login-form">
+          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" required className="login-input" />
+          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" required className="login-input" />
+          <button type="submit" className="login-button">Log In</button>
+        </form>
+        <p className="signup-link">Don't have an account? <a href="/signup">Sign up</a></p>
+      </div>
+    </div>
   );
-};
-
-export default Login;
+}
