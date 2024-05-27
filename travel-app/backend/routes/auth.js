@@ -5,30 +5,58 @@ import User from '../models/User.js';
 
 const router = express.Router();
 
-router.post('/register', async (req, res) => {
+// Register a new user
+router.post('/sign-up', async (req, res) => {
   const { username, email, password } = req.body;
+  console.log('Received registration request:', req.body);
+  
   try {
-    const user = new User({ username, email, password });
+    // Check if the user already exists
+    let user = await User.findOne({ email });
+    if (user) {
+      console.log('User already exists:', email);
+      return res.status(400).json({ message: 'User already exists' });
+    }
+
+    // Create a new user instance
+    user = new User({
+      username,
+      email,
+      password
+    });
+
+    // Hash the password before saving
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(password, salt);
+    console.log('User password hashed successfully');
+
+    // Save the user to the database
     await user.save();
-    res.status(201).send({ message: 'User registered successfully' });
+    console.log('User saved to the database');
+
+    // Create and send a JWT token
+    const payload = {
+      user: {
+        id: user.id
+      }
+    };
+
+    jwt.sign(
+      payload,
+      process.env.JWT_SECRET,
+      { expiresIn: '1h' },
+      (err, token) => {
+        if (err) {
+          console.error('Error signing JWT:', err);
+          throw err;
+        }
+        console.log('User registered successfully, JWT token generated');
+        res.status(201).json({ token });
+      }
+    );
   } catch (error) {
-    res.status(400).send(error.message);
-  }
-});
-
-router.post('/login', async (req, res) => {
-  const { email, password } = req.body;
-  try {
-    const user = await User.findOne({ email });
-    if (!user) return res.status(400).send({ message: 'Invalid credentials' });
-
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).send({ message: 'Invalid credentials' });
-
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-    res.send({ token });
-  } catch (error) {
-    res.status(500).send(error.message);
+    console.error('Error registering user:', error.message);
+    res.status(500).send('Server error');
   }
 });
 
