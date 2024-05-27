@@ -1,12 +1,13 @@
-const express = require('express');
+import express from 'express';
+import auth from '../middleware/auth.js';
+import Trip from '../models/Trip.js';
+
 const router = express.Router();
-const auth = require('../middleware/auth');
-const Trip = require('../models/Trip');
 
 // Get all trips for a user
 router.get('/', auth, async (req, res) => {
   try {
-    const trips = await Trip.find({ user: req.user });
+    const trips = await Trip.find({ userId: req.user });
     res.json(trips);
   } catch (err) {
     res.status(500).send('Server Error');
@@ -15,14 +16,13 @@ router.get('/', auth, async (req, res) => {
 
 // Add a new trip
 router.post('/', auth, async (req, res) => {
-  const { tripName, destination, startDate, endDate } = req.body;
+  const { tripName, country, destinations } = req.body;
   try {
     const newTrip = new Trip({
       tripName,
-      destination,
-      startDate,
-      endDate,
-      user: req.user
+      country,
+      destinations,
+      userId: req.user,
     });
 
     const trip = await newTrip.save();
@@ -42,7 +42,7 @@ router.delete('/:id', auth, async (req, res) => {
     }
 
     // Check user
-    if (trip.user.toString() !== req.user) {
+    if (trip.userId.toString() !== req.user) {
       return res.status(401).json({ msg: 'User not authorized' });
     }
 
@@ -53,4 +53,4 @@ router.delete('/:id', auth, async (req, res) => {
   }
 });
 
-module.exports = router;
+export default router;
