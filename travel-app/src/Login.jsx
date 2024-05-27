@@ -1,4 +1,5 @@
 import { useState, useContext } from 'react';
+import { Link } from 'react-router-dom';
 import { AuthContext } from './AuthContext';
 import './Login.css'; // Import your custom CSS file for styling
 
@@ -26,7 +27,7 @@ export default function Login() {
           <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" required className="login-input" />
           <button type="submit" className="login-button">Log In</button>
         </form>
-        <p className="signup-link">Don't have an account? <a href="/signup">Sign up</a></p>
+        <p className="signup-link">Don't have an account? <Link to="/sign-up">Sign up</Link></p>
       </div>
     </div>
   );

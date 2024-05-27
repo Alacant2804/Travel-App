@@ -34,7 +34,7 @@
   
   .login-button {
     padding: 10px;
-    background-color: #007bff;
+    background-color: #f05b0b;
     color: #fff;
     border: none;
     border-radius: 5px;
@@ -43,7 +43,7 @@
   }
   
   .login-button:hover {
-    background-color: #0056b3;
+    background-color: #d94c09;
   }
   
   .signup-link {
@@ -52,7 +52,7 @@
   }
   
   .signup-link a {
-    color: #007bff;
+    color: #f05b0b;
     text-decoration: none;
   }
   
