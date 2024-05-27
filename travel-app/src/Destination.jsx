@@ -1,35 +1,11 @@
 import { useState, useEffect } from 'react';
 import './Destination.css';
 import AccommodationModal from './AccommodationModal';
-import axios from 'axios';
 import accommodationIcon from './assets/accommodation-icon.png';
 import deleteIcon from './assets/delete-icon.png';
 import editIcon from './assets/edit-icon.png';
 
-
-const fetchCoordinates = async (place, destination) => {
-  try {
-    const response = await axios.get('https://nominatim.openstreetmap.org/search', {
-      params: {
-        q: `${place}, ${destination}`,
-        format: 'json',
-        limit: 1
-      }
-    });
-    if (response.data.length > 0) {
-      const { lat, lon } = response.data[0];
-      return { lat: parseFloat(lat), lon: parseFloat(lon) };
-    } else {
-      console.error("No coordinates found for the provided place.");
-      return null;
-    }
-  } catch (error) {
-    console.error("Error fetching coordinates:", error);
-    return null;
-  }
-};
-
-export default function Destination({ initialData = {}, onSave, calculateDuration }) {
+export default function Destination({ initialData = {}, onSave, calculateDuration, onAddPlace, onEditPlace, onDeletePlace }) {
   const [destination, setDestination] = useState(initialData.name || 'New Destination');
   const [startDate, setStartDate] = useState(initialData.startDate || '');
   const [endDate, setEndDate] = useState(initialData.endDate || '');
@@ -44,29 +20,28 @@ export default function Destination({ initialData = {}, onSave, calculateDuratio
     setDuration(calculateDuration(startDate, endDate));
   }, [startDate, endDate, calculateDuration]);
 
-  const handleAddPlace = async (event) => {
+  useEffect(() => {
+    console.log('Current places after update: ', places);
+  }, [places]);
+
+  const handleAddPlace = (event) => {
     event.preventDefault();
     const placeInput = event.target.elements.placeInput.value.trim();
     const priceInput = event.target.elements.priceInput.value.trim();
     if (placeInput) {
-      const coordinates = await fetchCoordinates(placeInput, destination);
-      const newPlace = { name: placeInput, price: parseFloat(priceInput) || 0, coordinates };
-      const newPlaces = [...places, newPlace];
-      setPlaces(newPlaces);
-      onSave({ name: destination, startDate, endDate, places: newPlaces, duration, accommodation });
+      onAddPlace(placeInput, priceInput);
+      setPlaces(prev => [...prev, { name: placeInput, price: parseFloat(priceInput) || 0 }]);
     }
     event.target.reset();
   };
 
-  const handleSaveEditPlace = async () => {
-    const coordinates = await fetchCoordinates(editPlaceValue.name, destination);
-    const updatedPlaces = places.map((place, idx) =>
-      idx === editingIndex ? { ...editPlaceValue, coordinates } : place
-    );
-    setPlaces(updatedPlaces);
-    onSave({ name: destination, startDate, endDate, places: updatedPlaces, duration, accommodation });
+  const handleSaveEditPlace = () => {
+    onEditPlace(editingIndex, editPlaceValue.name, editPlaceValue.price);
+    setPlaces(places.map((place, idx) =>
+      idx === editingIndex ? { ...editPlaceValue } : place
+    ));
     setEditingIndex(-1);
-    setEditPlaceValue({ name: '', price: 0, coordinates: null });
+    setEditPlaceValue({ name: '', price: 0 });
   };
 
   const handleEditPlace = (index) => {
@@ -75,19 +50,18 @@ export default function Destination({ initialData = {}, onSave, calculateDuratio
   };
 
   const handleDeletePlace = (index) => {
-    const updatedPlaces = places.filter((_, idx) => idx !== index);
-    setPlaces(updatedPlaces);
-    onSave({ name: destination, startDate, endDate, places: updatedPlaces, duration, accommodation });
-  };
-
-  const totalPlaces = places.length;
-  const totalPrice = places.reduce((sum, place) => sum + place.price, 0);
+    onDeletePlace(index);
+    setPlaces(places.filter((_, idx) => idx !== index));
+  };  
 
   const handleSaveAccommodation = (accommodationData) => {
     setAccommodation(accommodationData);
     setShowAccommodationModal(false);
     onSave({ name: destination, startDate, endDate, places, duration, accommodation: accommodationData });
   };
+
+  const totalPlaces = places.length;
+  const totalPrice = places.reduce((sum, place) => sum + place.price, 0);
 
   return (
     <div className="trip-detail-container">

@@ -115,6 +115,41 @@ export default function TripDetail({ trips }) {
     [destinations, trip.country]
   );
 
+  const handleAddPlace = async (destinationIndex, placeName, placePrice) => {
+    const coordinates = await getAndSetCoordinates(`${placeName}, ${destinations[destinationIndex].name}, ${trip.country}`);
+    const newPlace = { name: placeName, price: parseFloat(placePrice) || 0, coordinates };
+    const updatedDestinations = destinations.map((dest, idx) =>
+      idx === destinationIndex ? { ...dest, places: [...dest.places, newPlace] } : dest
+    );
+    setDestinations(updatedDestinations);
+    setPlaces(await fetchPlacesAndAccommodationsCoordinates(updatedDestinations, trip.country));
+  };
+
+  const handleEditPlace = async (destinationIndex, placeIndex, placeName, placePrice) => {
+    const coordinates = await getAndSetCoordinates(`${placeName}, ${destinations[destinationIndex].name}, ${trip.country}`);
+    const updatedDestinations = destinations.map((dest, idx) =>
+      idx === destinationIndex
+        ? {
+            ...dest,
+            places: dest.places.map((place, pIdx) =>
+              pIdx === placeIndex ? { name: placeName, price: parseFloat(placePrice) || 0, coordinates } : place
+            )
+          }
+        : dest
+    );
+    setDestinations(updatedDestinations);
+    setPlaces(await fetchPlacesAndAccommodationsCoordinates(updatedDestinations, trip.country));
+  };
+
+  const handleDeletePlace = async (destinationIndex, placeIndex) => {
+    const updatedDestinations = destinations.map((dest, idx) =>
+      idx === destinationIndex ? { ...dest, places: dest.places.filter((_, pIdx) => pIdx !== placeIndex) } : dest
+    );
+    setDestinations(updatedDestinations);
+    const updatedPlaces = await fetchPlacesAndAccommodationsCoordinates(updatedDestinations, trip.country);
+    setPlaces(updatedPlaces);
+  };  
+
   if (!trip) {
     return <p>Trip not found!</p>;
   }
@@ -139,11 +174,14 @@ export default function TripDetail({ trips }) {
       <div className="destinations"> {/* Destination component */}
         {destinations.map((destination, index) => (
           <Destination
-          key={index}
-          initialData={destination}
-          calculateDuration={calculateDuration}
-          onSave={(updatedData) => handleSaveDestination(updatedData, index)}
-        />
+            key={index}
+            initialData={destination}
+            calculateDuration={calculateDuration}
+            onSave={(updatedData) => handleSaveDestination(updatedData, index)}
+            onAddPlace={(placeName, placePrice) => handleAddPlace(index, placeName, placePrice)}
+            onEditPlace={(placeIndex, placeName, placePrice) => handleEditPlace(index, placeIndex, placeName, placePrice)}
+            onDeletePlace={(placeIndex) => handleDeletePlace(index, placeIndex)}
+          />
         ))}
       </div>
       <button className="add-destination-button" onClick={handleAddDestination}>Add New Destination</button>
