@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react';
 import './Destination.css';
 import AccommodationModal from './AccommodationModal';
-import accommodationIcon from './assets/accommodation-icon.png';
 import axios from 'axios';
+import accommodationIcon from './assets/accommodation-icon.png';
+import deleteIcon from './assets/delete-icon.png';
+import editIcon from './assets/edit-icon.png';
+
 
 const fetchCoordinates = async (place, destination) => {
   try {
@@ -125,11 +128,12 @@ export default function Destination({ initialData = {}, onSave, calculateDuratio
         {places.map((place, index) => (
           <li key={index}>
             {editingIndex === index ? (
-              <>
+              <div className="edit-mode">
                 <input
                   type="text"
                   value={editPlaceValue.name}
                   onChange={(e) => setEditPlaceValue({ ...editPlaceValue, name: e.target.value })}
+                  className="place-input"
                 />
                 <input
                   type="number"
@@ -137,35 +141,44 @@ export default function Destination({ initialData = {}, onSave, calculateDuratio
                   onChange={(e) => setEditPlaceValue({ ...editPlaceValue, price: parseFloat(e.target.value) })}
                   step="0.01"
                   min="0"
+                  className="place-input"
                 />
-                <button onClick={handleSaveEditPlace}>Save</button>
-                <button onClick={() => setEditingIndex(-1)}>Cancel</button>
-              </>
+                <button onClick={handleSaveEditPlace} className="add-place-button">Save</button>
+                <button onClick={() => setEditingIndex(-1)} className="add-place-button">Cancel</button>
+              </div>
             ) : (
-              <>
+              <div className="places-list">
                 {place.name} - ${place.price.toFixed(2)}
-                <button onClick={() => handleEditPlace(index)}>Edit</button>
-                <button onClick={() => handleDeletePlace(index)}>Delete</button>
-              </>
+                <div className="action-buttons">
+                  <button className="button-icon" onClick={() => handleEditPlace(index)}>
+                    <img src={editIcon} alt="edit" className="edit-icon" />
+                  </button>
+                  <button className="button-icon" onClick={() => handleDeletePlace(index)}>
+                    <img src={deleteIcon} alt="delete" className="delete-icon" />
+                  </button>
+                </div>
+              </div>
             )}
           </li>
         ))}
       </ul>
       <form onSubmit={handleAddPlace} className="place-add-form">
-        <input
-          name="placeInput"
-          type="text"
-          placeholder="Add a place to visit"
-          className="place-input"
-        />
-        <input
-          name="priceInput"
-          type="number"
-          placeholder="Price"
-          step="0.01"
-          min="0"
-          className="place-input"
-        />
+        <div className="place-input-fields">
+          <input
+            name="placeInput"
+            type="text"
+            placeholder="Add a place to visit"
+            className="place-input"
+          />
+          <input
+            name="priceInput"
+            type="number"
+            placeholder="Price"
+            step="0.01"
+            min="0"
+            className="place-input"
+          />
+        </div>
         <button type="submit" className="add-place-button">Add Place</button>
       </form>
       <div className='destination-details'>

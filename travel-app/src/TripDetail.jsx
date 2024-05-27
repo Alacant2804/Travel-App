@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import Destination from './Destination';
@@ -70,9 +70,7 @@ export default function TripDetail({ trips }) {
   useEffect(() => {
     if (trip && trip.destinations) {
       setDestinations(trip.destinations);
-
       fetchAllCoordinates(trip, setPlaces);
-
       getAndSetCoordinates(`${trip.destinations[0].name}, ${trip.country}`, setMapCenter);
     } else {
       console.error("Trip not found or no destinations available!");
@@ -102,6 +100,21 @@ export default function TripDetail({ trips }) {
     return Math.ceil(durationInMilliseconds / (1000 * 60 * 60 * 24));
   };
 
+  const handleSaveDestination = useCallback(
+    async (updatedData, index) => {
+      const updatedDestinations = destinations.map((dest, idx) =>
+        idx === index
+          ? { ...updatedData, duration: calculateDuration(updatedData.startDate, updatedData.endDate) }
+          : dest
+      );
+      setDestinations(updatedDestinations);
+
+      const updatedPlaces = await fetchPlacesAndAccommodationsCoordinates(updatedDestinations, trip.country);
+      setPlaces(updatedPlaces);
+    },
+    [destinations, trip.country]
+  );
+
   if (!trip) {
     return <p>Trip not found!</p>;
   }
@@ -116,34 +129,22 @@ export default function TripDetail({ trips }) {
           <button className="button-icon"><img src={planeIcon} alt="Plane" className="icon" /></button>
         </div>
       </div>
-      <h1 className="trip-title">{trip.tripName}</h1>
+      <h1 className="trip-title">{trip.tripName}</h1> {/* Trip details */}
       <div className="trip-info-row">
         <p><strong>Country:</strong> {trip.country}</p>
         <p><strong>Start Date:</strong> {trip.destinations[0].startDate}</p>
         <p><strong>End Date:</strong> {trip.destinations[0].endDate}</p>
         <p><strong>Duration:</strong> {trip.destinations[0].duration} days</p>
       </div>
-      <div className="destinations">
-        {destinations.length > 0 ? (
-          destinations.map((destination, index) => (
-            <Destination 
-              key={index} 
-              initialData={destination} 
-              calculateDuration={calculateDuration}
-              onSave={async (updatedData) => {
-                const updatedDestinations = destinations.map((dest, idx) => 
-                  idx === index ? { ...updatedData, duration: calculateDuration(updatedData.startDate, updatedData.endDate) } : dest
-                );
-                setDestinations(updatedDestinations);
-
-                const updatedPlaces = await fetchPlacesAndAccommodationsCoordinates(updatedDestinations, trip.country);
-                setPlaces(updatedPlaces);
-              }} 
-            />
-          ))
-        ) : (
-          <p>No destinations found for this trip.</p>
-        )}
+      <div className="destinations"> {/* Destination component */}
+        {destinations.map((destination, index) => (
+          <Destination
+          key={index}
+          initialData={destination}
+          calculateDuration={calculateDuration}
+          onSave={(updatedData) => handleSaveDestination(updatedData, index)}
+        />
+        ))}
       </div>
       <button className="add-destination-button" onClick={handleAddDestination}>Add New Destination</button>
       {mapCenter && <MapComponent places={places} center={mapCenter} />}

@@ -50,7 +50,68 @@
     padding: 10px;
     background-color: #f9f9f9;
     border-radius: 8px;
-    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.places-list {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 5px;
+}
+
+.button-icon {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+}
+
+.button-icon img {
+    width: 32px;
+    height: 32px;
+}
+
+.edit-mode {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.edit-mode input, .edit-mode button {
+    margin: 0 10px;
+}
+
+.place-add-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.place-input-fields {
+    display: flex;
+    justify-content: space-between;
+    width: 80%;
+    gap: 1rem;
+}
+
+.place-input {
+    flex: 1;
+    margin: 10px 0;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    max-width: 300px;
+    box-sizing: border-box;
 }
 
 .add-place-button {
@@ -75,15 +136,15 @@
     margin-bottom: 30px;
 }
 
-.place-add-form > .form-input {
+.place-input-fields {
     display: flex;
-    align-items: center;
-    justify-content: space-around;
+    justify-content: space-between;
     width: 80%;
-    border: 0;
+    gap: 1rem;
 }
 
-.place-add-form input {
+.place-input {
+    flex: 1;
     margin: 10px 0;
     padding: 10px;
     border: 1px solid #ccc;
@@ -161,4 +222,30 @@
   
 .accommodation-button:hover .accommodation-icon {
     transform: translateY(-3px);
+}
+
+.places-list {
+    display: flex;
+    justify-content: space-around;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+}
+
+.edit-icon, .delete-icon {
+    width: 32px;
+    height: 32px;
+    vertical-align: middle;
+    border: 0;
+    background-color: transparent;
+    transition: transform 0.2s ease-in-out;
+}
+
+.button-icon {
+    border: none;
+    background-color: transparent;
+    padding: 0;
+    cursor: pointer;
 }
