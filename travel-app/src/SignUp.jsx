@@ -1,5 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { AuthContext } from './AuthContext';
+import './SignUp.css';
 
 export default function SignUp() {
   const [username, setUsername] = useState('');
@@ -18,14 +19,16 @@ export default function SignUp() {
   };
 
   return (
-    <div>
-      <h2>Sign Up</h2>
-      <form onSubmit={handleSubmit}>
-        <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Username" required />
-        <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" required />
-        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" required />
-        <button type="submit">Sign Up</button>
-      </form>
+    <div className="signup-container">
+      <div className="signup-box">
+        <h2 className="signup-heading">Sign Up</h2>
+        <form onSubmit={handleSubmit} className="signup-form">
+          <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Username" required className="signup-input" />
+          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" required className="signup-input" />
+          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" required className="signup-input" />
+          <button type="submit" className="signup-button">Sign Up</button>
+        </form>
+      </div>
     </div>
   );
 }
