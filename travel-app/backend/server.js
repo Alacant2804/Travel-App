@@ -5,8 +5,8 @@ import dotenv from 'dotenv';
 import authRoutes from './routes/auth.js';
 import tripRoutes from './routes/trips.js';
 
-dotenv.config();
-const app = express();
+dotenv.config(); // Load environment variables from .env file
+const app = express(); 
 
 const corsOptions = {
   origin: 'http://localhost:5173',
@@ -18,9 +18,11 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use('/api/auth', authRoutes);
-app.use('/api/trips', tripRoutes);
+// Define base paths for routes
+app.use('/api/auth', authRoutes); // Authentication routes
+app.use('/api/trips', tripRoutes); // Trip-related routes
 
+// Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
@@ -28,5 +30,6 @@ mongoose.connect(process.env.MONGO_URI, {
   .then(() => console.log('MongoDB connected'))
   .catch((err) => console.error('MongoDB connection error:', err));
 
+// Start the server
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

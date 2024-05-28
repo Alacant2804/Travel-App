@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import { useState, useContext } from 'react';
 import { AuthContext } from './AuthContext';
 import './SignUp.css';
 
@@ -12,8 +12,9 @@ export default function SignUp() {
     e.preventDefault();
     try {
       await register(username, email, password);
+      alert('User registered successfully');
     } catch (error) {
-      console.error(error);
+      console.error('Error registering user:', error.response ? error.response.data : error.message);
       alert('Error registering user');
     }
   };
