@@ -16,7 +16,8 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await authService.login({ email, password });
       localStorage.setItem('token', response.token);
-      setUser(response.user); // Assuming response contains user data
+      setUser(response.user);
+      console.log('User logged in:', response.user); // Log the user data
     } catch (error) {
       setError(error.response ? error.response.data.message : 'Login failed');
     } finally {

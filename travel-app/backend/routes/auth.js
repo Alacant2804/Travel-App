@@ -27,7 +27,8 @@ router.post('/sign-up', async (req, res) => {
 
     const payload = {
       user: {
-        id: user.id
+        id: user.id,
+        email: user.email
       }
     };
 
@@ -37,7 +38,7 @@ router.post('/sign-up', async (req, res) => {
       { expiresIn: '1h' },
       (err, token) => {
         if (err) throw err;
-        res.status(201).json({ token });
+        res.status(201).json({ token, user: payload.user });
       }
     );
   } catch (error) {
@@ -73,7 +74,8 @@ router.post('/login', async (req, res) => {
 
     const payload = {
       user: {
-        id: user.id
+        id: user.id,
+        email: user.email
       }
     };
 
@@ -83,7 +85,7 @@ router.post('/login', async (req, res) => {
       { expiresIn: '1h' },
       (err, token) => {
         if (err) throw err;
-        res.json({ token });
+        res.json({ token, user: payload.user });
       }
     );
   } catch (error) {

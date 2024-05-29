@@ -1,10 +1,14 @@
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { AuthContext } from './AuthContext';
 import './Header.css';
 
 export default function Header() {
     const { user, logout } = useContext(AuthContext);
+
+    useEffect(() => {
+        console.log('NavBar user:', user);
+      }, [user]);
     
     return (
         <header className="header">
@@ -20,6 +24,7 @@ export default function Header() {
                 <ul className="auth-nav-links">
                 {user ? (
                     <>
+                        <span>Welcome, {user.email}</span>
                         <li><button onClick={logout}>Log Out</button></li>
                     </>
                     ) : (
