@@ -23,8 +23,6 @@ router.post('/sign-up', async (req, res) => {
       password
     });
 
-    const salt = await bcrypt.genSalt(10);
-    user.password = await bcrypt.hash(password, salt);
     await user.save();
 
     const payload = {
@@ -43,6 +41,10 @@ router.post('/sign-up', async (req, res) => {
       }
     );
   } catch (error) {
+    if (error.code === 11000) {
+      console.error('Duplicate key error:', error.message);
+      return res.status(400).json({ message: 'Username or email already exists' });
+    }
     console.error('Error registering user:', error.message);
     res.status(500).send('Server error');
   }
@@ -60,7 +62,10 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
+    console.log('Stored hashed password:', user.password);
+
     const isMatch = await bcrypt.compare(password, user.password);
+    console.log('Password match:', isMatch);
     if (!isMatch) {
       console.log('Invalid credentials - password mismatch:', email);
       return res.status(400).json({ message: 'Invalid credentials' });
