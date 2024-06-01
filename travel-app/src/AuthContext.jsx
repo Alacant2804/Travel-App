@@ -1,7 +1,8 @@
 import { createContext, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import authService from './api/auth';
-import {useNavigate} from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 export const AuthContext = createContext();
 
@@ -19,10 +20,15 @@ export const AuthProvider = ({ children }) => {
       const response = await authService.login({ email, password });
       localStorage.setItem('token', response.token);
       setUser(response.user);
-      console.log('User logged in:', response.user); // Log the user data
+      toast.success('Login successful!', {
+        theme: "colored"
+      });
       navigate('/');
     } catch (error) {
       setError(error.response ? error.response.data.message : 'Login failed');
+      toast.error(error.response ? error.response.data.message : 'Login failed', {
+        theme: "colored"
+      });
     } finally {
       setLoading(false);
     }
@@ -34,9 +40,15 @@ export const AuthProvider = ({ children }) => {
     setError(null);
     try {
       await authService.register({ username, email, password });
-      await login(email, password); // Ensure the user is logged in after registration
+      toast.success('User signed up successfully!', {
+        theme: "colored"
+      });
+      await login(email, password); // Logs in the user after registration
     } catch (error) {
       setError(error.response ? error.response.data.message : 'Registration failed');
+      toast.error(error.response ? error.response.data.message : 'Registration failed', {
+        theme: "colored"
+      });
     } finally {
       setLoading(false);
     }
@@ -47,6 +59,9 @@ export const AuthProvider = ({ children }) => {
     localStorage.removeItem('token');
     setUser(null);
     navigate('/');
+    toast.success('Logged out!', {
+      theme: "colored"
+    });
   };
 
   // Fetch user function

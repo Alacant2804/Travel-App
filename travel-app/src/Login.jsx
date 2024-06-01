@@ -14,7 +14,6 @@ export default function Login() {
       await login(email, password);
     } catch (error) {
       console.error(error);
-      alert('Invalid credentials');
     }
   };
 

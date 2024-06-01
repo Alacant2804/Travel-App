@@ -11,17 +11,17 @@ router.post('/sign-up', async (req, res) => {
   try {
     console.log('Received registration request:', req.body);
 
-    let user = await User.findOne({ email });
+    let user = await User.findOne({ username });
     if (user) {
-      console.log('User already exists:', email);
-      return res.status(400).json({ message: 'User already exists' });
+      return res.status(400).json({ message: 'Username already exists' });
     }
 
-    user = new User({
-      username,
-      email,
-      password
-    });
+    user = await User.findOne({ email });
+    if (user) {
+      return res.status(400).json({ message: 'Email already exists' });
+    }
+
+    user = new User({ username, email, password });
 
     await user.save();
 
@@ -43,12 +43,8 @@ router.post('/sign-up', async (req, res) => {
       }
     );
   } catch (error) {
-    if (error.code === 11000) {
-      console.error('Duplicate key error:', error.message);
-      return res.status(400).json({ message: 'Username or email already exists' });
-    }
-    console.error('Error registering user:', error.message);
-    res.status(500).send('Server error');
+      console.error('Error registering user:', error.message);
+      res.status(500).send('Server error');
   }
 });
 

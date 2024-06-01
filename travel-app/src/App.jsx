@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './AuthContext';
+import { ToastContainer } from 'react-toastify';
 import Header from './Header.jsx';
 import MainPhoto from './MainPhoto.jsx';
 import AboutApp from './AboutApp.jsx';
@@ -13,6 +14,7 @@ import SignUp from './SignUp.jsx';
 import NotFound from './NotFound.jsx';
 import { useState, useEffect } from 'react';
 import 'leaflet/dist/leaflet.css';
+import 'react-toastify/dist/ReactToastify.css'
 
 
 export default function App() {
@@ -46,6 +48,16 @@ export default function App() {
             <Route path="*" element={<NotFound />} />
           </Routes>
           <Footer />
+          <ToastContainer
+            position="bottom-right"
+            autoClose={3000}
+            hideProgressBar
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            pauseOnHover
+          />
         </div>
       </AuthProvider>
     </BrowserRouter>
