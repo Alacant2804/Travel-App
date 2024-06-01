@@ -44,7 +44,6 @@ nav {
     display: flex;
     justify-content: center;
     flex-grow: 1;
-    margin: 0 20px;
 }
 
 .main-nav-links li, .auth-nav-links li{
@@ -64,4 +63,25 @@ nav {
 
 .main-nav-links li a:hover, .auth-nav-links li a:hover {
     color: #f05b0b;
+}
+
+.logout-links {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2rem;
+}
+
+.logout-button {
+    background-color: #f05b0b;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 12px;
+}
+  
+.logout-button:hover {
+    background-color: #d0490a;
 }

@@ -23,10 +23,10 @@ export default function Header() {
                 </ul>
                 <ul className="auth-nav-links">
                 {user ? (
-                    <>
-                        <span>Welcome, {user.email}</span>
-                        <li><button onClick={logout}>Log Out</button></li>
-                    </>
+                    <div className='logout-links'>
+                        <li>Welcome, {user.username}</li>
+                        <li><button className='logout-button' onClick={logout}>Log Out</button></li>
+                    </div>
                     ) : (
                     <>
                         <li><Link to="/login">Log In</Link></li>

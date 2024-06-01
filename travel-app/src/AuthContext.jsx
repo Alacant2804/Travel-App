@@ -1,6 +1,7 @@
 import { createContext, useState, useEffect } from 'react';
 import axios from 'axios';
 import authService from './api/auth';
+import {useNavigate} from 'react-router-dom';
 
 export const AuthContext = createContext();
 
@@ -8,6 +9,7 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   // Login function
   const login = async (email, password) => {
@@ -18,6 +20,7 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('token', response.token);
       setUser(response.user);
       console.log('User logged in:', response.user); // Log the user data
+      navigate('/');
     } catch (error) {
       setError(error.response ? error.response.data.message : 'Login failed');
     } finally {
@@ -43,6 +46,7 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     localStorage.removeItem('token');
     setUser(null);
+    navigate('/');
   };
 
   // Fetch user function

@@ -26,8 +26,8 @@ export default function App() {
   }, []);
 
   return (
-    <AuthProvider>
-      <BrowserRouter>
+    <BrowserRouter>
+      <AuthProvider>
         <div className="App">
           <Header />
           <Routes>
@@ -47,7 +47,7 @@ export default function App() {
           </Routes>
           <Footer />
         </div>
-      </BrowserRouter>
-    </AuthProvider>
+      </AuthProvider>
+    </BrowserRouter>
   );
 }
