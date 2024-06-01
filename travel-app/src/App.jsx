@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './AuthContext';
+import { TripsProvider } from './TripsContext.jsx';
 import { ToastContainer } from 'react-toastify';
 import Header from './Header.jsx';
 import MainPhoto from './MainPhoto.jsx';
@@ -24,12 +25,14 @@ export default function App() {
     const storedTrips = localStorage.getItem('trips');
     if (storedTrips) {
         setTrips(JSON.parse(storedTrips));
+        console.log(storedTrips)
     }
   }, []);
 
   return (
     <BrowserRouter>
       <AuthProvider>
+        <TripsProvider>
         <div className="App">
           <Header />
           <Routes>
@@ -40,8 +43,8 @@ export default function App() {
                 <BlockMain />
               </>
             } />
-            <Route path="/trips" element={<Trips trips={trips} setTrips={setTrips} />} />
-            <Route path="/trips/:tripId" element={<TripDetail trips={trips} />} />
+            <Route path="/trips" element={<Trips />} />
+            <Route path="/trips/:tripId" element={<TripDetail />} />
             <Route path="/travel-hacks" element={<TravelHacks />} />
             <Route path="/login" element={<Login />} />
             <Route path="/sign-up" element={<SignUp />} />
@@ -59,6 +62,7 @@ export default function App() {
             pauseOnHover
           />
         </div>
+        </TripsProvider>
       </AuthProvider>
     </BrowserRouter>
   );

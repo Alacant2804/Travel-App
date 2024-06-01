@@ -1,76 +1,95 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useContext, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import TripFormModal from './TripFormModal';
+import axios from 'axios';
+import { toast } from 'react-toastify';
 import './Trips.css';
+import { TripsContext } from './TripsContext';
 
-export default function Trips({ trips, setTrips }) {
+export default function Trips() {
+  const { trips, setTrips, fetchTrips } = useContext(TripsContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTrip, setEditingTrip] = useState(null);
 
-  const calculateDuration = (startDate, endDate) => {
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    const durationInMilliseconds = end - start;
-    return Math.ceil(durationInMilliseconds / (1000 * 60 * 60 * 24)); // convert to days
-  };
+  // Fetch trips when the component mounts
+  useEffect(() => {
+    fetchTrips();
+  }, [fetchTrips]);
 
-  const handleCreateTrip = useCallback((newTripData) => {
-    if (newTripData.id) {
-      // Editing existing trip
-      const updatedTrips = trips.map(trip => trip.id === newTripData.id ? {
-        ...trip,
-        tripName: newTripData.tripName,
-        country: newTripData.country,
-        destinations: [
-          {
-            name: newTripData.city,
-            startDate: newTripData.startDate,
-            endDate: newTripData.endDate,
-            duration: calculateDuration(newTripData.startDate, newTripData.endDate),
-            places: trip.destinations[0]?.places || []
-          }
-        ]
-      } : trip);
-      setTrips(updatedTrips);
-      localStorage.setItem('trips', JSON.stringify(updatedTrips));
-    } else {
-      // Creating new trip
-      const newTrip = {
-        id: trips.length + 1,
-        tripName: newTripData.tripName,
-        country: newTripData.country,
-        destinations: [
-          {
-            name: newTripData.city,
-            startDate: newTripData.startDate,
-            endDate: newTripData.endDate,
-            duration: calculateDuration(newTripData.startDate, newTripData.endDate),
-            places: []
-          }
-        ]
+  const handleCreateTrip = useCallback(async (newTripData) => {
+    try {
+      const token = localStorage.getItem('token');
+      const config = {
+        headers: {
+          'x-auth-token': token,
+          'Content-Type': 'application/json',
+        },
       };
-      const updatedTrips = [...trips, newTrip];
-      setTrips(updatedTrips);
-      localStorage.setItem('trips', JSON.stringify(updatedTrips));
-    }
-  }, [trips, setTrips]);
 
-  const handleDeleteTrip = useCallback((tripId) => {
-    console.log('Deleting trip with ID:', tripId);
-    const updatedTrips = trips.filter(trip => trip.id !== tripId);
-    console.log('Updated trips after deletion:', updatedTrips);
-    setTrips(updatedTrips);
-    localStorage.setItem('trips', JSON.stringify(updatedTrips));
-  }, [trips, setTrips]);
+      if (newTripData.id) {
+        // Editing existing trip
+        const response = await axios.put(`http://localhost:5001/api/trips/${newTripData.id}`, newTripData, config);
+        const updatedTrips = trips.map(trip => trip._id === newTripData.id ? response.data : trip);
+        setTrips(updatedTrips);
+        localStorage.setItem('trips', JSON.stringify(updatedTrips));
+      } else {
+        // Creating new trip
+        const response = await axios.post('http://localhost:5001/api/trips', newTripData, config);
+        const newTrip = response.data; // This should include the ID from the backend
+        const updatedTrips = [...trips, newTrip];
+        setTrips(updatedTrips);
+        localStorage.setItem('trips', JSON.stringify(updatedTrips));
+      }
+    } catch (error) {
+      toast.error('Error saving trip. Please try again.', {
+        theme: "colored"
+      });
+      console.error('Error saving trip:', error);
+    }
+  }, [trips, setTrips, fetchTrips]);
+
+  const handleDeleteTrip = useCallback(async (tripId) => {
+    try {
+      const token = localStorage.getItem('token');
+      const config = {
+        headers: {
+          'x-auth-token': token,
+          'Content-Type': 'application/json',
+        },
+      };
+
+      const response = await axios.delete(`http://localhost:5001/api/trips/${tripId}`, config);
+
+      if (response.status === 200) {
+        toast.success('Trip deleted successfully!');
+
+        const updatedTrips = trips.filter(trip => trip._id !== tripId);
+        setTrips(updatedTrips);
+        localStorage.setItem('trips', JSON.stringify(updatedTrips));
+        
+        // Optionally, you can refetch trips to ensure state is up-to-date
+        fetchTrips();
+        
+      } else {
+        toast.error('Error deleting trip. Please try again.', {
+          theme: "colored"
+        });
+      }
+    } catch (error) {
+      toast.error('Error deleting trip. Please try again.', {
+        theme: "colored"
+      });
+      console.error('Error deleting trip:', error);
+    }
+  }, [trips, setTrips, fetchTrips]);
 
   const renderedTrips = useMemo(() => (
     trips.map((trip) => {
-      console.log('Rendering trip with ID:', trip.id);
       if (!trip.destinations || trip.destinations.length === 0) {
         return null;
       }
       return (
-        <li key={trip.id} className="trip-card">
+        <li key={trip._id} className="trip-card">
           <h3>{trip.tripName}</h3>
           <p><strong>Country:</strong> {trip.country}</p>
           <p><strong>Destination:</strong> {trip.destinations[0].name}</p>
@@ -78,9 +97,9 @@ export default function Trips({ trips, setTrips }) {
           <p><strong>End Date:</strong> {trip.destinations[0].endDate}</p>
           <p><strong>Trip Duration:</strong> {trip.destinations[0].duration} days</p>
           <div className="trip-actions">
-            <Link to={`/trips/${trip.id}`} className="trip-btn">View</Link>
+            <Link to={`/trips/${trip._id}`} className="trip-btn">View</Link>
             <button className="trip-btn edit" onClick={() => { setIsModalOpen(true); setEditingTrip(trip); }}>Edit</button>
-            <button className="trip-btn delete" onClick={() => handleDeleteTrip(trip.id)}>Delete</button>
+            <button className="trip-btn delete" onClick={() => handleDeleteTrip(trip._id)}>Delete</button>
           </div>
         </li>
       );

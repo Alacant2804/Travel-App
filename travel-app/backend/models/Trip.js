@@ -7,14 +7,14 @@ const TripSchema = new mongoose.Schema({
   destinations: [
     {
       name: String,
-      startDate: String,
-      endDate: String,
+      startDate: Date,
+      endDate: Date,
       duration: Number,
       places: [{ name: String, price: Number, coordinates: Object }],
       accommodation: { address: String, coordinates: Object, price: Number, bookingLink: String },
     },
   ],
-});
+}, { timestamps: true });
 
 const Trip = mongoose.model('Trip', TripSchema);
 

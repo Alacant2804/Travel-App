@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useContext } from 'react';
 import { useParams } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import Destination from './Destination';
@@ -8,6 +8,7 @@ import './TripDetail.css';
 import budgetIcon from './assets/budget.png';
 import carIcon from './assets/car.png';
 import planeIcon from './assets/plane.png';
+import { TripsContext } from './TripsContext';
 
 const getAndSetCoordinates = async (query, setState = null) => {
   try {
@@ -58,17 +59,24 @@ const fetchAllCoordinates = async (trip, setPlaces) => {
   setPlaces(allPlaces);
 };
 
-export default function TripDetail({ trips }) {
+export default function TripDetail() {
   const { tripId } = useParams();
+  const { trips, fetchTrips } = useContext(TripsContext);
   const [destinations, setDestinations] = useState([]);
   const [places, setPlaces] = useState([]);
   const [mapCenter, setMapCenter] = useState(null);
 
-  // Find the trip once and store it in a variable
-  const trip = trips.find(t => t.id === parseInt(tripId, 10));
+  useEffect(() => {
+    if (!trips.length) {
+      fetchTrips();
+    }
+  }, [fetchTrips, trips.length]);
+
+  const trip = trips.find(t => t._id === tripId);
 
   useEffect(() => {
     if (trip && trip.destinations) {
+      console.log('TripsDetail, trips: ', trip)
       setDestinations(trip.destinations);
       fetchAllCoordinates(trip, setPlaces);
       getAndSetCoordinates(`${trip.destinations[0].name}, ${trip.country}`, setMapCenter);
