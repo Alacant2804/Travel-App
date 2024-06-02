@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo, useContext } from 'react';
+import { useState, useCallback, useMemo, useContext, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import TripFormModal from './TripFormModal';
 import { toast } from 'react-toastify';
@@ -7,9 +7,13 @@ import './Trips.css';
 import { TripsContext } from './TripsContext';
 
 export default function Trips() {
-  const { trips, fetchTrips, addTrip, deleteTrip } = useContext(TripsContext);
+  const { trips, setTrips, fetchTrips, addTrip, deleteTrip } = useContext(TripsContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTrip, setEditingTrip] = useState(null);
+
+  useEffect(() => {
+    console.log(trips);
+  }, [trips])
 
   const handleCreateTrip = useCallback(async (newTripData) => {
     try {
@@ -37,7 +41,7 @@ export default function Trips() {
       });
       console.error('Error saving trip:', error);
     }
-  }, [trips, addTrip, fetchTrips, editingTrip]);
+  }, [trips, setTrips, addTrip, fetchTrips, editingTrip]);
 
   const handleDeleteTrip = useCallback(async (tripId) => {
     try {
@@ -50,26 +54,21 @@ export default function Trips() {
   }, [deleteTrip, fetchTrips]);
 
   const renderedTrips = useMemo(() => (
-    trips.map((trip) => {
-      if (!trip.destinations || trip.destinations.length === 0) {
-        return null;
-      }
-      return (
-        <li key={trip._id} className="trip-card">
-          <h3>{trip.tripName}</h3>
-          <p><strong>Country:</strong> {trip.country}</p>
-          <p><strong>Destination:</strong> {trip.destinations[0].name}</p>
-          <p><strong>Start Date:</strong> {trip.destinations[0].startDate}</p>
-          <p><strong>End Date:</strong> {trip.destinations[0].endDate}</p>
-          <p><strong>Trip Duration:</strong> {trip.destinations[0].duration} days</p>
-          <div className="trip-actions">
-            <Link to={`/trips/${trip._id}`} className="trip-btn">View</Link>
-            <button className="trip-btn edit" onClick={() => { setIsModalOpen(true); setEditingTrip(trip); }}>Edit</button>
-            <button className="trip-btn delete" onClick={() => handleDeleteTrip(trip._id)}>Delete</button>
-          </div>
-        </li>
-      );
-    })
+    trips.map((trip) => (
+      <li key={trip._id} className="trip-card">
+        <h3>{trip.tripName}</h3>
+        <p><strong>Country: </strong> {trip.country}</p>
+        <p><strong>City: </strong> {trip.destinations[0].city}</p>
+        <p><strong>Start Date: </strong> {trip.destinations[0].startDate.split('T')[0]}</p>
+        <p><strong>End Date: </strong> {trip.destinations[0].endDate.split('T')[0]}</p>
+        <p><strong>Duration: </strong> {trip.destinations[0]?.duration} days</p>
+        <div className="trip-actions">
+          <Link to={`/trips/${trip._id}`} className="trip-btn">View</Link>
+          <button className="trip-btn edit" onClick={() => { setIsModalOpen(true); setEditingTrip(trip); }}>Edit</button>
+          <button className="trip-btn delete" onClick={() => handleDeleteTrip(trip._id)}>Delete</button>
+        </div>
+      </li>
+    ))
   ), [trips, handleDeleteTrip]);
 
   return (

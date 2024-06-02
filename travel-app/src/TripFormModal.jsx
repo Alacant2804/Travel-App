@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from 'react';
+import { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
 import './TripFormModal.css';
 
@@ -12,12 +12,12 @@ export default function TripFormModal({ onRequestClose, onSubmit, trip }) {
   useEffect(() => {
     if (trip) {
       const { tripName, country, destinations } = trip;
-      const { name, startDate, endDate } = destinations[0] || {};
+      const { city, startDate, endDate } = destinations[0] || {};
       setTripName(tripName);
       setCountry(country);
-      setCity(name || '');
-      setStartDate(startDate || '');
-      setEndDate(endDate || '');
+      setCity(city || '');
+      setStartDate(startDate ? startDate.split('T')[0] : '');
+      setEndDate(endDate ? endDate.split('T')[0] : '');
     }
   }, [trip]);
 
@@ -40,7 +40,7 @@ export default function TripFormModal({ onRequestClose, onSubmit, trip }) {
       return;
     }
 
-    const tripData = { tripName, country, destinations: [{ name: city, startDate, endDate }] };
+    const tripData = { tripName, country, destinations: [{ city, startDate, endDate }] };
 
     onSubmit(tripData);
 

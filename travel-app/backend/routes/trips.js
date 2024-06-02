@@ -21,6 +21,13 @@ router.post('/', auth, async (req, res) => {
   console.log('Received trip data:', req.body);
   console.log('User ID from middleware:', req.user.id);
 
+  destinations.forEach(destination => {
+    const start = new Date(destination.startDate);
+    const end = new Date(destination.endDate);
+    const durationInMilliseconds = end - start;
+    destination.duration = Math.ceil(durationInMilliseconds / (1000 * 60 * 60 * 24)); // Convert to days
+  });
+
   try {
     const newTrip = new Trip({
       userId: req.user.id,
@@ -42,6 +49,13 @@ router.post('/', auth, async (req, res) => {
 // Update an existing trip
 router.put('/:id', auth, async (req, res) => {
   const { tripName, country, destinations } = req.body;
+
+  destinations.forEach(destination => {
+    const start = new Date(destination.startDate);
+    const end = new Date(destination.endDate);
+    const durationInMilliseconds = end - start;
+    destination.duration = Math.ceil(durationInMilliseconds / (1000 * 60 * 60 * 24)); // Convert to days
+  });
 
   try {
     const trip = await Trip.findById(req.params.id);
