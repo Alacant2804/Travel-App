@@ -1,44 +1,35 @@
-import { useState, useCallback, useMemo, useContext, useEffect } from 'react';
+import { useState, useCallback, useMemo, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import TripFormModal from './TripFormModal';
-import axios from 'axios';
 import { toast } from 'react-toastify';
+import axios from 'axios';
 import './Trips.css';
 import { TripsContext } from './TripsContext';
 
 export default function Trips() {
-  const { trips, setTrips, fetchTrips } = useContext(TripsContext);
+  const { trips, fetchTrips, addTrip, deleteTrip } = useContext(TripsContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTrip, setEditingTrip] = useState(null);
 
-  // Fetch trips when the component mounts
-  useEffect(() => {
-    fetchTrips();
-  }, [fetchTrips]);
-
   const handleCreateTrip = useCallback(async (newTripData) => {
     try {
-      const token = localStorage.getItem('token');
-      const config = {
-        headers: {
-          'x-auth-token': token,
-          'Content-Type': 'application/json',
-        },
-      };
-
-      if (newTripData.id) {
+      if (editingTrip) {
         // Editing existing trip
-        const response = await axios.put(`http://localhost:5001/api/trips/${newTripData.id}`, newTripData, config);
-        const updatedTrips = trips.map(trip => trip._id === newTripData.id ? response.data : trip);
+        const token = localStorage.getItem('token');
+        const config = {
+          headers: {
+            'x-auth-token': token,
+            'Content-Type': 'application/json',
+          },
+        };
+        const response = await axios.put(`http://localhost:5001/api/trips/${editingTrip._id}`, newTripData, config);
+        const updatedTrips = trips.map(trip => trip._id === editingTrip._id ? response.data : trip);
         setTrips(updatedTrips);
         localStorage.setItem('trips', JSON.stringify(updatedTrips));
       } else {
         // Creating new trip
-        const response = await axios.post('http://localhost:5001/api/trips', newTripData, config);
-        const newTrip = response.data; // This should include the ID from the backend
-        const updatedTrips = [...trips, newTrip];
-        setTrips(updatedTrips);
-        localStorage.setItem('trips', JSON.stringify(updatedTrips));
+        await addTrip(newTripData);
+        fetchTrips(); // Fetch trips after adding a new trip
       }
     } catch (error) {
       toast.error('Error saving trip. Please try again.', {
@@ -46,42 +37,17 @@ export default function Trips() {
       });
       console.error('Error saving trip:', error);
     }
-  }, [trips, setTrips, fetchTrips]);
+  }, [trips, addTrip, fetchTrips, editingTrip]);
 
   const handleDeleteTrip = useCallback(async (tripId) => {
     try {
-      const token = localStorage.getItem('token');
-      const config = {
-        headers: {
-          'x-auth-token': token,
-          'Content-Type': 'application/json',
-        },
-      };
-
-      const response = await axios.delete(`http://localhost:5001/api/trips/${tripId}`, config);
-
-      if (response.status === 200) {
-        toast.success('Trip deleted successfully!');
-
-        const updatedTrips = trips.filter(trip => trip._id !== tripId);
-        setTrips(updatedTrips);
-        localStorage.setItem('trips', JSON.stringify(updatedTrips));
-        
-        // Optionally, you can refetch trips to ensure state is up-to-date
-        fetchTrips();
-        
-      } else {
-        toast.error('Error deleting trip. Please try again.', {
-          theme: "colored"
-        });
-      }
+      console.log('Attempting to delete trip with ID:', tripId);
+      await deleteTrip(tripId);
+      fetchTrips(); // Fetch trips after deleting a trip
     } catch (error) {
-      toast.error('Error deleting trip. Please try again.', {
-        theme: "colored"
-      });
       console.error('Error deleting trip:', error);
     }
-  }, [trips, setTrips, fetchTrips]);
+  }, [deleteTrip, fetchTrips]);
 
   const renderedTrips = useMemo(() => (
     trips.map((trip) => {

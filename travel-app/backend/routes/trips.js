@@ -1,5 +1,4 @@
 import express from 'express';
-import mongoose from 'mongoose';
 import auth from '../middleware/auth.js';
 import Trip from '../models/Trip.js';
 
@@ -81,7 +80,7 @@ router.delete('/:id', auth, async (req, res) => {
       return res.status(401).json({ msg: 'User not authorized' });
     }
 
-    await trip.remove();
+    await trip.deleteOne();
     res.json({ msg: 'Trip removed' });
   } catch (err) {
     console.error('Error deleting trip:', err);

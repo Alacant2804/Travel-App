@@ -1,8 +1,5 @@
 import { useState, useEffect, useContext } from 'react';
-import { TripsContext } from './TripsContext';
-import { AuthContext } from './AuthContext';
 import { toast } from 'react-toastify';
-import axios from 'axios';
 import './TripFormModal.css';
 
 export default function TripFormModal({ onRequestClose, onSubmit, trip }) {
@@ -11,8 +8,6 @@ export default function TripFormModal({ onRequestClose, onSubmit, trip }) {
   const [city, setCity] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-  const { user } = useContext(AuthContext);
-  const { fetchTrips } = useContext(TripsContext);
 
   useEffect(() => {
     if (trip) {
@@ -47,32 +42,7 @@ export default function TripFormModal({ onRequestClose, onSubmit, trip }) {
 
     const tripData = { tripName, country, destinations: [{ name: city, startDate, endDate }] };
 
-    try {
-      const token = localStorage.getItem('token');
-      const config = {
-        headers: {
-          'x-auth-token': token,
-          'Content-Type': 'application/json',
-        },
-      };
-      if (trip) {
-        // Update existing trip
-        console.log('Sending update request:', tripData); // Log request
-        await axios.put(`http://localhost:5001/api/trips/${trip._id}`, tripData, config);
-        toast.success('Trip updated successfully!');
-      } else {
-        // Create new trip
-        console.log('Sending create request:', tripData); // Log request
-        await axios.post('http://localhost:5001/api/trips', tripData, config);
-        toast.success('Trip created successfully!');
-      }
-      fetchTrips();
-    } catch (error) {
-      console.error('Error saving trip:', error.response ? error.response.data : error.message); // Log detailed error
-      toast.error(`Error saving trip: ${error.response ? error.response.data.message : error.message}`);
-    }
-
-    onSubmit({ id: trip?.id, tripName, country, city, startDate, endDate });
+    onSubmit(tripData);
 
     setTripName('');
     setCountry('');
