@@ -247,8 +247,8 @@ export default function TripDetail() {
       <h1 className="trip-title">{trip.tripName}</h1> {/* Trip details */}
       <div className="trip-info-row">
         <p><strong>Country:</strong> {trip.country}</p>
-        <p><strong>Start Date:</strong> {trip.destinations[0].startDate}</p>
-        <p><strong>End Date:</strong> {trip.destinations[0].endDate}</p>
+        <p><strong>Start Date:</strong> {trip.destinations[0].startDate.split('T')[0]}</p>
+        <p><strong>End Date:</strong> {trip.destinations[0].endDate.split('T')[0]}</p>
         <p><strong>Duration:</strong> {trip.destinations[0].duration} days</p>
       </div>
       <div className="destinations"> {/* Destination component */}
