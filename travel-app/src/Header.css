@@ -1,88 +1,160 @@
 .header {
-    width: 100%;
-    height: 10vh;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 2rem;
-    z-index: 10;
-    background-color: #333;
-    color: white;
+  width: 100%;
+  height: 10vh;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2rem;
+  z-index: 10;
+  background-color: #333;
+  color: white;
+  position: relative;
 }
 
 .logo-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 20px;
-    white-space: nowrap;
-    margin-left: 50px;
-}
-
-.logo {
-    width: 100px;
-    height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  white-space: nowrap;
+  margin-left: 50px;
 }
 
 .logo-container a {
-    font-weight: bold;
-    font-size: 1rem;
-    text-decoration: none;
-    color: white;
+  font-weight: bold;
+  font-size: 1rem;
+  text-decoration: none;
+  color: white;
 }
 
 nav {
-    display: flex;
-    justify-content: space-between;
-    width: 100%;
-    align-items: center;
-    margin-left: 50px;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  align-items: center;
+  margin-left: 50px;
 }
 
-.main-nav-links, .auth-nav-links {
-    list-style: none;
-    display: flex;
-    justify-content: center;
-    flex-grow: 1;
+.main-nav-links,
+.auth-nav-links {
+  list-style: none;
+  display: flex;
+  justify-content: center;
+  flex-grow: 1;
 }
 
-.main-nav-links li, .auth-nav-links li{
-    padding: 0 15px;  
-    margin-right: 30px;
+.main-nav-links li,
+.auth-nav-links li {
+  padding: 0 15px;
+  margin-right: 30px;
 }
 
 .main-nav-links li:last-child {
-    margin-right: 0;  
+  margin-right: 0;
 }
 
-.main-nav-links li a, .auth-nav-links li a {
-    text-decoration: none;
-    color: white;
-    font-size: 1.2rem;
+.main-nav-links li a,
+.auth-nav-links li a {
+  text-decoration: none;
+  color: white;
+  font-size: 1.2rem;
 }
 
-.main-nav-links li a:hover, .auth-nav-links li a:hover {
-    color: #f05b0b;
+.main-nav-links li a:hover,
+.auth-nav-links li a:hover {
+  color: #f05b0b;
 }
 
 .logout-links {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 1.2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.2rem;
 }
 
 .logout-button {
-    background-color: #f05b0b;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 12px;
-    font-weight: bold;
+  background-color: #f05b0b;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: bold;
 }
-  
+
 .logout-button:hover {
-    background-color: #d0490a;
+  background-color: #d0490a;
+}
+
+/* Hamburger Menu */
+.hamburger {
+  display: none;
+  font-size: 2rem;
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+.nav-open {
+  display: flex !important;
+  flex-direction: column;
+  align-items: center; /* Center the links horizontally */
+  justify-content: center; /* Center the links vertically */
+  position: absolute;
+  top: 10vh;
+  left: 0;
+  width: 100%;
+  background-color: #333;
+}
+
+@media (max-width: 870px) {
+  .hamburger {
+    display: block;
+  }
+
+  nav {
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    top: 10vh;
+    left: 0;
+    width: 100%;
+    background-color: #333;
+  }
+
+  .nav-open {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .main-nav-links,
+  .auth-nav-links {
+    flex-direction: column;
+    align-items: center; /* Center the links horizontally */
+    justify-content: center; /* Center the links vertically */
+    width: 100%;
+  }
+
+  .main-nav-links li,
+  .auth-nav-links li {
+    margin-right: 0;
+    margin-bottom: 15px;
+  }
+
+  .main-nav-links li a,
+  .auth-nav-links li a {
+    font-size: 1.5rem;
+  }
+
+  .logout-links {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .logout-button {
+    width: 100%;
+  }
 }
