@@ -6,9 +6,9 @@ import deleteIcon from './assets/delete-icon.png';
 import editIcon from './assets/edit-icon.png';
 
 export default function Destination({ initialData = {}, onSave, calculateDuration, onAddPlace, onEditPlace, onDeletePlace }) {
-  const [destination, setDestination] = useState(initialData.name || 'New Destination');
-  const [startDate, setStartDate] = useState(initialData.startDate || '');
-  const [endDate, setEndDate] = useState(initialData.endDate || '');
+  const [destination, setDestination] = useState(initialData.city || 'New Destination');
+  const [startDate, setStartDate] = useState(initialData.startDate.split('T')[0] || '');
+  const [endDate, setEndDate] = useState(initialData.endDate.split('T')[0] || '');
   const [places, setPlaces] = useState(initialData.places || []);
   const [duration, setDuration] = useState(calculateDuration(startDate, endDate));
   const [editingIndex, setEditingIndex] = useState(-1);
@@ -52,12 +52,12 @@ export default function Destination({ initialData = {}, onSave, calculateDuratio
   const handleDeletePlace = (index) => {
     onDeletePlace(index);
     setPlaces(places.filter((_, idx) => idx !== index));
-  };  
+  };
 
   const handleSaveAccommodation = (accommodationData) => {
     setAccommodation(accommodationData);
     setShowAccommodationModal(false);
-    onSave({ name: destination, startDate, endDate, places, duration, accommodation: accommodationData });
+    onSave({ city: destination, startDate, endDate, places, duration, accommodation: accommodationData });
   };
 
   const totalPlaces = places.length;
@@ -71,7 +71,7 @@ export default function Destination({ initialData = {}, onSave, calculateDuratio
           className="destination-input"
           value={destination}
           onChange={(e) => setDestination(e.target.value)}
-          onBlur={() => onSave({ name: destination, startDate, endDate, places, duration, accommodation })}
+          onBlur={() => onSave({ city: destination, startDate, endDate, places, duration, accommodation })}
         />
         <div className="breaker"></div>
         <div className="date-info">
@@ -81,7 +81,7 @@ export default function Destination({ initialData = {}, onSave, calculateDuratio
               type="date"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
-              onBlur={() => onSave({ name: destination, startDate, endDate, places, duration, accommodation })}
+              onBlur={() => onSave({ city: destination, startDate, endDate, places, duration, accommodation })}
             />
           </p>
           <p>
@@ -90,7 +90,7 @@ export default function Destination({ initialData = {}, onSave, calculateDuratio
               type="date"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
-              onBlur={() => onSave({ name: destination, startDate, endDate, places, duration, accommodation })}
+              onBlur={() => onSave({ city: destination, startDate, endDate, places, duration, accommodation })}
             />
           </p>
           <p>

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
 import './TripFormModal.css';
 
 export default function TripFormModal({ onRequestClose, onSubmit, trip }) {
@@ -11,19 +12,21 @@ export default function TripFormModal({ onRequestClose, onSubmit, trip }) {
   useEffect(() => {
     if (trip) {
       const { tripName, country, destinations } = trip;
-      const { name, startDate, endDate } = destinations[0] || {};
+      const { city, startDate, endDate } = destinations[0] || {};
       setTripName(tripName);
       setCountry(country);
-      setCity(name || '');
-      setStartDate(startDate || '');
-      setEndDate(endDate || '');
+      setCity(city || '');
+      setStartDate(startDate ? startDate.split('T')[0] : '');
+      setEndDate(endDate ? endDate.split('T')[0] : '');
     }
   }, [trip]);
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     if (!tripName || !country || !city || !startDate || !endDate) {
-      alert('Please fill out all fields.');
+      toast.error('Please fill out all fields.', {
+        theme: "colored"
+      });
       return;
     }
 
@@ -31,11 +34,15 @@ export default function TripFormModal({ onRequestClose, onSubmit, trip }) {
     const end = new Date(endDate);
 
     if (start > end) {
-      alert('The start date cannot be after the end date. Please select valid dates.');
+      toast.error('The start date cannot be after the end date. Please select valid dates.', {
+        theme: "colored"
+      });
       return;
     }
 
-    onSubmit({ id: trip?.id, tripName, country, city, startDate, endDate });
+    const tripData = { tripName, country, destinations: [{ city, startDate, endDate }] };
+
+    onSubmit(tripData);
 
     setTripName('');
     setCountry('');
