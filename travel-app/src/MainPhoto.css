@@ -1,78 +1,86 @@
 .main-photo-container {
-    height: 90vh;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
-    position: relative;
-  }
-  
-  .main-photo-container img {
-    width: 100%;
-    height: auto;
-    object-fit: cover;
-    object-position: center 20%;
-  }
-  
-  .main-photo-text {
-    position: absolute;
-    top: 40%;
-    left: 10%;
-    transform: translateY(-50%);
-    background-color: rgba(0, 0, 0, 0.5);
-    color: white;
-    padding: 20px;
-    border-radius: 8px;
-    text-align: left;
-    max-width: 500px;
-  }
-  
-  .main-photo-text h2 {
-    margin: 0 0 10px 0;
-    font-size: 2.5em;
-    font-weight: bold;
-    color: #f05b0b;
-  }
-  
-  .main-photo-text p {
-    font-size: 1.1em;
-    margin: 0;
-    line-height: 1.5;
-  }
+  height: 90vh;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  position: relative;
+}
 
+.main-photo-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 20%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.main-photo-text {
+  position: absolute;
+  top: 50%;
+  left: 10%;
+  transform: translateY(-50%);
+  background-color: rgba(0, 0, 0, 0.5);
+  color: white;
+  padding: 2vw;
+  border-radius: 8px;
+  text-align: left;
+  max-width: 40vw;
+}
+
+.main-photo-text h2 {
+  margin: 0 0 1vw 0;
+  font-size: 4vw;
+  font-weight: bold;
+  color: #f05b0b;
+}
+
+.main-photo-text p {
+  font-size: 1.5vw;
+  margin: 0;
+  line-height: 2vw;
+}
+
+.trip-button {
+  display: inline-block;
+  background-color: #f05b0b;
+  color: white;
+  text-decoration: none;
+  padding: 1vw 2vw;
+  border-radius: 5px;
+  margin-top: 2vw;
+  transition: background-color 0.3s ease;
+  font-size: 1.5vw;
+}
+
+.trip-button:hover {
+  background-color: #d94c09;
+}
+
+@media (max-width: 768px) {
+  .main-photo-container {
+    height: 50vh;
+  }
+  .main-photo-container img {
+    object-position: center 5%;
+  }
+  .main-photo-text {
+    left: 5%;
+    right: 5%;
+    max-width: none;
+    padding: 4vw;
+  }
+  .main-photo-text h2 {
+    font-size: 6vw;
+  }
+  .main-photo-text p {
+    font-size: 3vw;
+  }
   .trip-button {
-    display: inline-block;
-    background-color: #f05b0b;
-    color: white;
-    text-decoration: none;
-    padding: 10px 20px;
-    border-radius: 5px;
-    margin-top: 15px;
-    transition: background-color 0.3s ease;
-    font-size: 1.1em;
+    font-size: 3vw;
+    padding: 2vw 4vw;
   }
-  
-  .trip-button:hover {
-    background-color: #d94c09;
-  }
-  
-  @media (max-width: 768px) {
-    .main-photo-container {
-      height: 50vh;
-    }
-    .main-photo-container img {
-      object-position: center 5%;
-    }
-    .main-photo-text {
-      left: 5%;
-      right: 5%;
-      max-width: none;
-    }
-    .main-photo-text h2 {
-      font-size: 1.5em;
-    }
-    .main-photo-text p {
-      font-size: 1em;
-    }
-  }
+}
