@@ -46,6 +46,41 @@ router.post('/', auth, async (req, res) => {
   }
 });
 
+// Route for the Trip Detail page 
+router.post('/:tripId/destinations', auth, async (req, res) => {
+  const { tripId } = req.params;
+  const { city, startDate, endDate, places, accommodation } = req.body;
+
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  const durationInMilliseconds = end - start;
+  const duration = Math.ceil(durationInMilliseconds / (1000 * 60 * 60 * 24)); // Convert to days
+
+  try {
+    const trip = await Trip.findById(tripId);
+    if (!trip) {
+      return res.status(404).json({ msg: 'Trip not found' });
+    }
+
+    const newDestination = {
+      city,
+      startDate,
+      endDate,
+      duration,
+      places,
+      accommodation
+    };
+
+    trip.destinations.push(newDestination);
+    await trip.save();
+
+    res.json(trip);
+  } catch (err) {
+    console.error('Error adding destination:', err);
+    res.status(500).send('Server Error');
+  }
+});
+
 // Update an existing trip
 router.put('/:id', auth, async (req, res) => {
   const { tripName, country, destinations } = req.body;
@@ -80,6 +115,42 @@ router.put('/:id', auth, async (req, res) => {
   }
 });
 
+router.put('/:tripId/destinations/:destinationId', auth, async (req, res) => {
+  const { tripId, destinationId } = req.params;
+  const { city, startDate, endDate, places, accommodation } = req.body;
+
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  const durationInMilliseconds = end - start;
+  const duration = Math.ceil(durationInMilliseconds / (1000 * 60 * 60 * 24)); // Convert to days
+
+  try {
+    const trip = await Trip.findById(tripId);
+    if (!trip) {
+      return res.status(404).json({ msg: 'Trip not found' });
+    }
+
+    const destination = trip.destinations.id(destinationId);
+    if (!destination) {
+      return res.status(404).json({ msg: 'Destination not found' });
+    }
+
+    destination.city = city;
+    destination.startDate = startDate;
+    destination.endDate = endDate;
+    destination.duration = duration;
+    destination.places = places;
+    destination.accommodation = accommodation;
+
+    await trip.save();
+
+    res.json(trip);
+  } catch (err) {
+    console.error('Error updating destination:', err);
+    res.status(500).send('Server Error');
+  }
+});
+
 // Delete a trip
 router.delete('/:id', auth, async (req, res) => {
   try {
@@ -98,6 +169,30 @@ router.delete('/:id', auth, async (req, res) => {
     res.json({ msg: 'Trip removed' });
   } catch (err) {
     console.error('Error deleting trip:', err);
+    res.status(500).send('Server Error');
+  }
+});
+
+router.delete('/:tripId/destinations/:destinationId', auth, async (req, res) => {
+  const { tripId, destinationId } = req.params;
+
+  try {
+    const trip = await Trip.findById(tripId);
+    if (!trip) {
+      return res.status(404).json({ msg: 'Trip not found' });
+    }
+
+    const destination = trip.destinations.id(destinationId);
+    if (!destination) {
+      return res.status(404).json({ msg: 'Destination not found' });
+    }
+
+    destination.remove();
+    await trip.save();
+
+    res.json(trip);
+  } catch (err) {
+    console.error('Error deleting destination:', err);
     res.status(500).send('Server Error');
   }
 });
