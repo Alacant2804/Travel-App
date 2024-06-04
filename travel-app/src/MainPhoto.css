@@ -25,23 +25,23 @@
   transform: translateY(-50%);
   background-color: rgba(0, 0, 0, 0.5);
   color: white;
-  padding: 2vw;
+  padding: 1rem;
   border-radius: 8px;
   text-align: left;
-  max-width: 40vw;
+  max-width: 500px;
 }
 
 .main-photo-text h2 {
-  margin: 0 0 1vw 0;
-  font-size: 4vw;
+  margin: 0 0 1rem 0;
+  font-size: 2.5rem;
   font-weight: bold;
   color: #f05b0b;
 }
 
 .main-photo-text p {
-  font-size: 1.5vw;
+  font-size: 1.5rem;
   margin: 0;
-  line-height: 2vw;
+  line-height: 2rem;
 }
 
 .trip-button {
@@ -49,11 +49,11 @@
   background-color: #f05b0b;
   color: white;
   text-decoration: none;
-  padding: 1vw 2vw;
+  padding: 0.5rem 1rem;
   border-radius: 5px;
-  margin-top: 2vw;
+  margin-top: 1rem;
   transition: background-color 0.3s ease;
-  font-size: 1.5vw;
+  font-size: 1.3rem;
 }
 
 .trip-button:hover {
@@ -64,23 +64,30 @@
   .main-photo-container {
     height: 50vh;
   }
+
   .main-photo-container img {
     object-position: center 5%;
   }
+
   .main-photo-text {
     left: 5%;
     right: 5%;
-    max-width: none;
-    padding: 4vw;
+    max-width: 70vw;
+    padding: 2rem;
+    top: 50%;
+    transform: translateY(-50%);
   }
+
   .main-photo-text h2 {
-    font-size: 6vw;
+    font-size: 2rem;
   }
+
   .main-photo-text p {
-    font-size: 3vw;
+    font-size: 1rem;
   }
+
   .trip-button {
-    font-size: 3vw;
-    padding: 2vw 4vw;
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
   }
 }

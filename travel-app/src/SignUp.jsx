@@ -1,32 +1,39 @@
-import { useState, useContext } from 'react';
-import { AuthContext } from './AuthContext';
-import './SignUp.css';
+import "./SignUp.css";
 
 export default function SignUp() {
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const { register } = useContext(AuthContext);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await register(username, email, password);
-    } catch (error) {
-      console.error('Error registering user:', error.response ? error.response.data : error.message);
-    }
-  };
-
   return (
-    <div className="signup-container">
-      <div className="signup-box">
-        <h2 className="signup-heading">Sign Up</h2>
-        <form onSubmit={handleSubmit} className="signup-form">
-          <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} placeholder="Username" required className="signup-input" />
-          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="Email" required className="signup-input" />
-          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Password" required className="signup-input" />
-          <button type="submit" className="signup-button">Sign Up</button>
-        </form>
+    <div className="page-content">
+      <div className="signup-container">
+        <h2 className="signup-header">Create new account</h2>
+
+        <section className="signup-section">
+          <form>
+            <div className="input-group">
+              <label htmlFor="username">Username</label>
+              <input type="text" id="username-" placeholder="Username" />
+            </div>
+            <div className="input-group">
+              <label htmlFor="email">Email</label>
+              <input
+                type="email"
+                id="email"
+                placeholder="username@example.com"
+              />
+            </div>
+            <div className="input-group">
+              <label htmlFor="password">Password</label>
+              <input type="password" id="password" placeholder="********" />
+            </div>
+            <div className="buttons">
+              <button type="submit" className="create-account">
+                Create account
+              </button>
+            </div>
+          </form>
+          <p>
+            Have an account? <a href="#">Log In</a>
+          </p>
+        </section>
       </div>
     </div>
   );

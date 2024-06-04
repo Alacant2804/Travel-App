@@ -1,91 +1,93 @@
 .about-app {
-    padding: 60px 20px;
-    background-color: #f8f9fa;
-    text-align: center;
+  padding: 60px 20px;
+  background-color: #f8f9fa;
+  text-align: center;
 }
 
 .about-header {
-    margin-bottom: 40px;
-    max-width: 800px;
-    margin-left: auto;
-    margin-right: auto;
+  margin-bottom: 40px;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .about-header h2 {
-    font-size: 2.5em;
-    color: #f05b0b;
-    margin-bottom: 15px;
+  font-size: 2.5em;
+  color: #f05b0b;
+  margin-bottom: 15px;
 }
 
 .about-header p {
-    font-size: 1.2em;
-    color: #333;
-    line-height: 1.5;
+  font-size: 1.2em;
+  color: #333;
+  line-height: 1.5;
 }
 
 .features {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 30px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 30px;
 }
 
 .feature-card {
-    background-color: #fff;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    padding: 20px;
-    width: 280px;
-    text-align: center;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  width: 280px;
+  text-align: center;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 .feature-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+  transform: translateY(-5px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
 }
 
 .feature-icon {
-    font-size: 2em;
-    color: #f05b0b;
-    margin-bottom: 10px;
+  font-size: 2em;
+  color: #f05b0b;
+  margin-bottom: 10px;
 }
 
 .feature-card h3 {
-    font-size: 1.4em;
-    margin-bottom: 10px;
+  font-size: 1.4em;
+  margin-bottom: 10px;
 }
 
 .feature-card p {
-    font-size: 1em;
-    color: #666;
-    line-height: 1.4;
+  font-size: 1em;
+  color: #666;
+  line-height: 1.4;
 }
 
 .start-planning-btn {
-    margin-top: 40px;
-    padding: 12px 24px;
-    font-size: 1.2em;
-    color: #fff;
-    background-color: #f05b0b;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+  margin-top: 40px;
+  padding: 12px 24px;
+  font-size: 1.2em;
+  color: #fff;
+  background-color: #f05b0b;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 .start-planning-btn:hover {
-    background-color: #d94c09;
+  background-color: #d94c09;
 }
 
-@media (max-width: 768px) {
-    .features {
-        flex-direction: column;
-        gap: 20px;
-    }
+@media (max-width: 940px) {
+  .features {
+    flex-direction: column;
+    align-items: center;
+  }
 
-    .feature-card {
-        width: 80%;
-        margin: 0 auto;
-    }
+  .feature-card {
+    width: 80%;
+    margin-bottom: 10px;
+  }
 }
