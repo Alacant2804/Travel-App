@@ -67,6 +67,11 @@
   margin-bottom: 2rem;
 }
 
+.input-group input:focus {
+  outline: none;
+  border-color: #f05b0b;
+}
+
 .input-group label {
   display: block;
   margin-bottom: 5px;
