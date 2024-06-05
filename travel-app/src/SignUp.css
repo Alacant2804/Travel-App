@@ -100,3 +100,24 @@
 .create-account-button:hover {
   background-color: #d0490a;
 }
+
+.password-strength {
+  margin-top: 5px;
+  font-size: 0.9em;
+}
+
+.password-strength.too-short {
+  color: red;
+}
+
+.password-strength.weak {
+  color: red;
+}
+
+.password-strength.medium {
+  color: orange;
+}
+
+.password-strength.strong {
+  color: green;
+}

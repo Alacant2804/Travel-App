@@ -7,11 +7,19 @@ import "./SignUp.css";
 export default function SignUp() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
+  const [emailValid, setEmailValid] = useState(true);
   const [password, setPassword] = useState("");
+  const [passwordStrength, setPasswordStrength] = useState("");
   const { register } = useContext(AuthContext);
 
   const handleSubmitForm = async (e) => {
     e.preventDefault();
+    if (!emailValid) {
+      toast.error("Invalid email address", {
+        theme: "colored",
+      });
+      return;
+    }
     try {
       await register(username, email, password);
     } catch (error) {
@@ -19,6 +27,35 @@ export default function SignUp() {
         theme: "colored",
       });
     }
+  };
+
+  const checkPasswordStrength = (password) => {
+    let strength = "";
+    if (password.length >= 8) {
+      strength = "Weak";
+      if (/[A-Z]/.test(password)) strength = "Medium";
+      if (/[0-9]/.test(password) && /[^A-Za-z0-9]/.test(password)) strength = "Strong";
+    } else {
+      strength = "Too short";
+    }
+    setPasswordStrength(strength);
+  };
+
+  const handlePasswordChange = (e) => {
+    const newPassword = e.target.value;
+    setPassword(newPassword);
+    checkPasswordStrength(newPassword);
+  };
+
+  const validateEmail = (email) => {
+    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return regex.test(email);
+  };
+
+  const handleEmailChange = (e) => {
+    const newEmail = e.target.value;
+    setEmail(newEmail);
+    setEmailValid(validateEmail(newEmail));
   };
 
   return (
@@ -46,7 +83,7 @@ export default function SignUp() {
                 id="email"
                 placeholder="username@example.com"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={handleEmailChange}
                 required
               />
             </div>
@@ -57,9 +94,12 @@ export default function SignUp() {
                 id="password"
                 placeholder="********"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={handlePasswordChange}
                 required
               />
+               <div className={`password-strength ${passwordStrength.toLowerCase().replace(' ', '-')}`}>
+                {passwordStrength}
+              </div>
             </div>
             <div className="buttons">
               <button type="submit" className="create-account-button">

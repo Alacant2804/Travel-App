@@ -22,10 +22,10 @@ export default function Login() {
 
   return (
     <div className="page-content">
-      <div className="signup-container">
-        <h2 className="signup-header">Log In</h2>
+      <div className="login-container">
+        <h2 className="login-header">Log In</h2>
 
-        <section className="signup-section">
+        <section className="login-section">
           <form onSubmit={handleSubmitForm}>
             <div className="input-group">
               <label htmlFor="email">Email</label>
@@ -50,13 +50,13 @@ export default function Login() {
               />
             </div>
             <div className="buttons">
-              <button type="submit" className="create-account-button">
+              <button type="submit" className="login-button">
                 Log In
               </button>
             </div>
           </form>
           <p>
-            Don't have an account? <Link to="/signup">Sign Up</Link>
+            Don't have an account? <Link to="/sign-up">Sign Up</Link>
           </p>
         </section>
       </div>
