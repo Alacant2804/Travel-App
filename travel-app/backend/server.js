@@ -4,6 +4,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import authRoutes from './routes/auth.js';
 import tripRoutes from './routes/trips.js';
+import cookieParser from 'cookie-parser';
 
 dotenv.config(); // Load environment variables from .env file
 const app = express(); 
@@ -17,6 +18,7 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 // Define base paths for routes
 app.use('/api/auth', authRoutes); // Authentication routes

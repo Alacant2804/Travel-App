@@ -20,6 +20,20 @@ import 'react-toastify/dist/ReactToastify.css'
 
 export default function App() {
   const [trips, setTrips] = useState([]);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const response = await axios.get('http://localhost:5001/api/auth/check-auth', { withCredentials: true });
+        setIsAuthenticated(response.data.isAuthenticated);
+      } catch (error) {
+        setIsAuthenticated(false);
+      }
+    };
+
+    checkAuth();
+  }, []);
 
   useEffect(() => {
     const storedTrips = localStorage.getItem('trips');
@@ -28,6 +42,11 @@ export default function App() {
         console.log(storedTrips)
     }
   }, []);
+
+  const handleLogout = async () => {
+    await axios.post('http://localhost:5001/api/auth/logout', {}, { withCredentials: true });
+    setIsAuthenticated(false);
+  };
 
   return (
     <BrowserRouter>

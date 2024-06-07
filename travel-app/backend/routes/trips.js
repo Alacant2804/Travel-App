@@ -8,6 +8,11 @@ const router = express.Router();
 router.get('/', auth, async (req, res) => {
   try {
     const trips = await Trip.find({ userId: req.user.id });
+    if (!trips.length) {
+      console.log('No trips found for user:', req.user.id);
+    } else {
+      console.log('Trips retrieved for user:', req.user.id, trips);
+    }
     res.json(trips);
   } catch (err) {
     console.error('Error fetching trips:', err);

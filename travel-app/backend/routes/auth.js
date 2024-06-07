@@ -2,15 +2,24 @@ import express from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
+import auth from '../middleware/auth.js';
 
 const router = express.Router();
+
+// Fetch authenticated user details
+router.get('/user', auth, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select('-password');
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ message: 'Server Error', error: err.message });
+  }
+});
 
 // Register a new user
 router.post('/sign-up', async (req, res) => {
   const { username, email, password } = req.body;
   try {
-    console.log('Received registration request:', req.body);
-
     let user = await User.findOne({ username });
     if (user) {
       return res.status(400).json({ message: 'Username already exists' });
@@ -52,20 +61,13 @@ router.post('/sign-up', async (req, res) => {
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
   try {
-    console.log('Received login request:', req.body);
-
     let user = await User.findOne({ email });
     if (!user) {
-      console.log('Invalid credentials - user not found:', email);
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
-    console.log('Stored hashed password:', user.password);
-
     const isMatch = await bcrypt.compare(password, user.password);
-    console.log('Password match:', isMatch);
     if (!isMatch) {
-      console.log('Invalid credentials - password mismatch:', email);
       return res.status(400).json({ message: 'Invalid credentials' });
     }
 
@@ -83,13 +85,27 @@ router.post('/login', async (req, res) => {
       { expiresIn: '1h' },
       (err, token) => {
         if (err) throw err;
-        res.json({ token, user: payload.user });
+
+        // Set token as cookie
+        res.cookie('token', token, {
+          httpOnly: true, // Make the cookie inaccessible to JavaScript on the client side
+          secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
+          sameSite: 'Strict', // Ensure the cookie is only sent with same-site requests
+          maxAge: 3600000 // Cookie expires in 1 hour (same as the token)
+        });
+
+        res.json({ user: payload.user }); // Send user details without token
       }
     );
   } catch (error) {
     console.error('Error during login:', error.message);
     res.status(500).send('Server error');
   }
+});
+
+router.post('/logout', (req, res) => {
+  res.clearCookie('token');
+  res.json({ message: 'Logged out successfully' });
 });
 
 export default router;

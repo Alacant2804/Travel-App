@@ -12,10 +12,7 @@ export const TripsProvider = ({ children }) => {
   const fetchTrips = useCallback(async () => {
     if (!user) return;
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get('http://localhost:5001/api/trips', {
-        headers: { 'x-auth-token': token },
-      });
+      const response = await axios.get('http://localhost:5001/api/trips', { withCredentials: true });
       setTrips(response.data);
       console.log('Fetched trips:', response.data);
     } catch (error) {
@@ -29,12 +26,8 @@ export const TripsProvider = ({ children }) => {
 
   const addTrip = async (tripData) => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.post('http://localhost:5001/api/trips', tripData, {
-        headers: { 'x-auth-token': token },
-      });
+      const response = await axios.post('http://localhost:5001/api/trips', tripData, { withCredentials: true })
       setTrips([...trips, response.data]);
-      console.log("Trip data: ", tripData)
       toast.success('Trip added successfully!', {
         theme: "colored"
       });
@@ -46,15 +39,11 @@ export const TripsProvider = ({ children }) => {
   };
 
   const deleteTrip = async (tripId) => {
-    console.log('Deleting trip with ID:', tripId);
     try {
-      const token = localStorage.getItem('token');
       const url = `http://localhost:5001/api/trips/${tripId}`;
       console.log('DELETE request URL:', url); // Log the URL
 
-      const response = await axios.delete(url, {
-        headers: { 'x-auth-token': token },
-      });
+      const response = await axios.delete(url, { withCredentials: true });
       
       if (response.status === 200) {
         const updatedTrips = trips.filter(trip => { trip._id !== tripId});

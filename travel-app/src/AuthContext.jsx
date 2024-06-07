@@ -55,25 +55,30 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Logout function
-  const logout = () => {
-    localStorage.removeItem('token');
-    setUser(null);
-    navigate('/');
-    toast.success('Logged out!', {
-      theme: "colored"
-    });
+  const logout = async () => {
+    try {
+      await authService.logout({ withCredentials: true });
+      setUser(null);
+      navigate('/');
+      toast.success('Logged out!', {
+        theme: "colored"
+      });
+    } catch (error) {
+      toast.error('Error during logout', {
+        theme: "colored"
+      });
+    }
   };
 
   // Fetch user function
   const fetchUser = async () => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      try {
-        const response = await axios.get('http://localhost:5001/api/auth/user', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setUser(response.data);
-      } catch (error) {
+    try {
+      const response = await axios.get('http://localhost:5001/api/auth/user', { withCredentials: true });
+      setUser(response.data);
+    } catch (error) {
+      console.error('Error fetching user:', error);
+      if (error.response && error.response.status === 401) {
+        // Handle the case when user is not authenticated
         logout();
       }
     }
