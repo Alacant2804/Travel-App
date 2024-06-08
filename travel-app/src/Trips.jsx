@@ -5,9 +5,12 @@ import { toast } from 'react-toastify';
 import axios from 'axios';
 import './Trips.css';
 import { TripsContext } from './TripsContext';
+import { AuthContext } from './AuthContext';
+
 
 export default function Trips() {
   const { trips, setTrips, fetchTrips, addTrip, deleteTrip } = useContext(TripsContext);
+  const { user } = useContext(AuthContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTrip, setEditingTrip] = useState(null);
 
@@ -42,6 +45,15 @@ export default function Trips() {
     }
   }, [deleteTrip, fetchTrips]);
 
+  const handleCreateButtonClick = () => {
+    if (user) {
+      setIsModalOpen(true);
+      setEditingTrip(null);
+    } else {
+      toast.error('Please log in to create a trip.', { theme: "colored" });
+    }
+  };
+
   const renderedTrips = useMemo(() => (
     trips.map((trip) => (
       <li key={trip._id} className="trip-card">
@@ -65,7 +77,7 @@ export default function Trips() {
     <div className="trips-page">
       <main className="trips-main">
         <h1>Your Trips</h1>
-        <button className="create-trip-btn" onClick={() => { setIsModalOpen(true); setEditingTrip(null); }}>
+        <button className="create-trip-btn" onClick={handleCreateButtonClick}>
           Create Trip
         </button>
 

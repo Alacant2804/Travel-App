@@ -20,6 +20,19 @@ router.get('/', auth, async (req, res) => {
   }
 });
 
+router.get('/:tripId', auth, async (req, res) => {
+  try {
+    const trip = await Trip.findById(req.params.tripId);
+    if (!trip) {
+      return res.status(404).json({ msg: 'Trip not found' });
+    }
+    res.json(trip);
+  } catch (err) {
+    console.error('Error fetching trip:', err);
+    res.status(500).send('Server Error');
+  }
+});
+
 // Add a new trip
 router.post('/', auth, async (req, res) => {
   const { tripName, country, destinations } = req.body;

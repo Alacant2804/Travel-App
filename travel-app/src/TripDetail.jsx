@@ -79,15 +79,22 @@ export default function TripDetail() {
   const trip = trips.find(t => t._id === tripId);
 
   useEffect(() => {
-    if (trip && trip.destinations) {
-      setDestinations(trip.destinations);
-      fetchAllCoordinates(trip, setPlaces);
-      getAndSetCoordinates(`${trip.destinations[0].city}, ${trip.country}`, setMapCenter);
-    } else {
-      console.error("Trip not found or no destinations available!");
-    }
-  }, [trip, tripId]);
-
+    const fetchTripDetails = async () => {
+      try {
+        const response = await axios.get(`http://localhost:5001/api/trips/${tripId}`, { withCredentials: true });
+        setDestinations(response.data.destinations);
+        fetchAllCoordinates(response.data, setPlaces);
+        if (response.data.destinations.length > 0) {
+          getAndSetCoordinates(`${response.data.destinations[0].city}, ${response.data.country}`, setMapCenter);
+        }
+      } catch (error) {
+        console.error("Error fetching trip details:", error);
+      }
+    };
+  
+    fetchTripDetails();
+  }, [tripId]);
+  
   const handleAddDestination = async () => {
     const startDate = new Date().toISOString().slice(0, 10);
     const endDate = new Date().toISOString().slice(0, 10);
@@ -118,20 +125,32 @@ export default function TripDetail() {
 
   const handleSaveDestination = useCallback(
     async (updatedData, index) => {
-      const updatedDestinations = destinations.map((dest, idx) =>
-        idx === index
-          ? { ...updatedData, duration: calculateDuration(updatedData.startDate, updatedData.endDate) }
-          : dest
-      );
-
+      // Ensure the updatedData has the destination's _id
+      const destinationId = destinations[index]._id; // Original destination ID
+      const updatedDestination = {
+        ...destinations[index], // Preserve existing fields
+        ...updatedData, // Apply updates
+        duration: calculateDuration(updatedData.startDate, updatedData.endDate),
+      };
+  
       try {
-        const response = await axios.put(`http://localhost:5001/api/trips/${tripId}/destinations/${updatedDestinations[index]._id}`, updatedDestinations[index], { withCredentials: true });
+        // Update destination in the backend
+        const response = await axios.put(
+          `http://localhost:5001/api/trips/${tripId}/destinations/${destinationId}`,
+          updatedDestination,
+          { withCredentials: true }
+        );
+        // Update destinations state with the response data
         setDestinations(response.data.destinations);
       } catch (error) {
         console.error('Error updating destination:', error);
       }
-
-      const updatedPlaces = await fetchPlacesAndAccommodationsCoordinates(updatedDestinations, trip.country);
+  
+      // Update places coordinates
+      const updatedPlaces = await fetchPlacesAndAccommodationsCoordinates(
+        updatedDestination,
+        trip.country
+      );
       setPlaces(updatedPlaces);
     },
     [destinations, tripId, trip.country]
