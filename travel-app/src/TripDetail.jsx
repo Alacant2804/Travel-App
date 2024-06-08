@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback, useContext } from 'react';
-import { useParams } from 'react-router-dom';
-import { Link } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import Destination from './Destination';
 import MapComponent from './MapComponent';
 import axios from 'axios';
@@ -10,7 +9,6 @@ import carIcon from './assets/car.png';
 import planeIcon from './assets/plane.png';
 import { TripsContext } from './TripsContext';
 
-// Fetch and set coordinates from the provided location query
 const getAndSetCoordinates = async (query, setState = null) => {
   try {
     const response = await axios.get('https://nominatim.openstreetmap.org/search', {
@@ -39,7 +37,6 @@ const getAndSetCoordinates = async (query, setState = null) => {
   }
 };
 
-// Fetch coordinates for all places and accommodations
 const fetchPlacesAndAccommodationsCoordinates = async (destinations, tripCountry) => {
   const allPlaces = await Promise.all(destinations.flatMap(async (destination) => {
     const placeResults = await Promise.all(destination.places.map(async (place) => {
@@ -56,45 +53,40 @@ const fetchPlacesAndAccommodationsCoordinates = async (destinations, tripCountry
   return allPlaces.flat();
 };
 
-// Fetch all coordinates for the trip
 const fetchAllCoordinates = async (trip, setPlaces) => {
   const allPlaces = await fetchPlacesAndAccommodationsCoordinates(trip.destinations, trip.country);
   setPlaces(allPlaces);
 };
 
-//Main Component
 export default function TripDetail() {
   const { tripId } = useParams();
   const { trips, fetchTrips } = useContext(TripsContext);
+  const [trip, setTrip] = useState(null);
   const [destinations, setDestinations] = useState([]);
   const [places, setPlaces] = useState([]);
   const [mapCenter, setMapCenter] = useState(null);
-
-  useEffect(() => {
-    if (!trips.length) {
-      fetchTrips();
-    }
-  }, [fetchTrips, trips.length]);
-
-  const trip = trips.find(t => t._id === tripId);
+  const [loading, setLoading] = useState(true); // Loading state
 
   useEffect(() => {
     const fetchTripDetails = async () => {
       try {
         const response = await axios.get(`http://localhost:5001/api/trips/${tripId}`, { withCredentials: true });
+        setTrip(response.data);
         setDestinations(response.data.destinations);
         fetchAllCoordinates(response.data, setPlaces);
         if (response.data.destinations.length > 0) {
           getAndSetCoordinates(`${response.data.destinations[0].city}, ${response.data.country}`, setMapCenter);
         }
+        setLoading(false); // Set loading to false after data is fetched
       } catch (error) {
         console.error("Error fetching trip details:", error);
+        setLoading(false);
       }
     };
-  
+
     fetchTripDetails();
   }, [tripId]);
-  
+
   const handleAddDestination = async () => {
     const startDate = new Date().toISOString().slice(0, 10);
     const endDate = new Date().toISOString().slice(0, 10);
@@ -125,64 +117,59 @@ export default function TripDetail() {
 
   const handleSaveDestination = useCallback(
     async (updatedData, index) => {
-      // Ensure the updatedData has the destination's _id
       const destinationId = destinations[index]._id; // Original destination ID
       const updatedDestination = {
         ...destinations[index], // Preserve existing fields
         ...updatedData, // Apply updates
         duration: calculateDuration(updatedData.startDate, updatedData.endDate),
       };
-  
+
       try {
-        // Update destination in the backend
         const response = await axios.put(
           `http://localhost:5001/api/trips/${tripId}/destinations/${destinationId}`,
           updatedDestination,
           { withCredentials: true }
         );
-        // Update destinations state with the response data
         setDestinations(response.data.destinations);
       } catch (error) {
         console.error('Error updating destination:', error);
       }
-  
-      // Update places coordinates
+
       const updatedPlaces = await fetchPlacesAndAccommodationsCoordinates(
         updatedDestination,
         trip.country
       );
       setPlaces(updatedPlaces);
     },
-    [destinations, tripId, trip.country]
+    [destinations, tripId, trip?.country]
   );
 
   const handleAddPlace = async (destinationIndex, placeName, placePrice) => {
     const coordinates = await getAndSetCoordinates(`${placeName}, ${destinations[destinationIndex].city}, ${trip.country}`);
     const newPlace = { name: placeName, price: parseFloat(placePrice) || 0, coordinates };
-    
-    const destinationId = destinations[destinationIndex]._id; // Ensure this is valid
-  
+
+    const destinationId = destinations[destinationIndex]._id;
+
     if (!destinationId) {
       console.error("Invalid destination ID");
       return;
     }
-  
+
     try {
       const response = await axios.post(`http://localhost:5001/api/trips/${tripId}/destinations/${destinationId}/places`, newPlace, { withCredentials: true });
       setDestinations(response.data.destinations);
     } catch (error) {
       console.error('Error adding place:', error);
     }
-  
+
     const updatedDestinations = destinations.map((dest, idx) =>
       idx === destinationIndex ? { ...dest, places: [...dest.places, newPlace] } : dest
     );
     setDestinations(updatedDestinations);
-  
+
     const updatedPlaces = await fetchPlacesAndAccommodationsCoordinates(updatedDestinations, trip.country);
     setPlaces(updatedPlaces);
   };
-  
 
   const handleEditPlace = async (destinationIndex, placeIndex, placeName, placePrice) => {
     const coordinates = await getAndSetCoordinates(`${placeName}, ${destinations[destinationIndex].city}, ${trip.country}`);
@@ -211,19 +198,19 @@ export default function TripDetail() {
   const handleDeletePlace = async (destinationIndex, placeIndex) => {
     const placeId = destinations[destinationIndex].places[placeIndex]._id;
     const destinationId = destinations[destinationIndex]._id;
-    
+
     if (!placeId || !destinationId) {
       console.error('Invalid placeId or destinationId');
       return;
     }
-  
+
     try {
       const response = await axios.delete(`http://localhost:5001/api/trips/${tripId}/destinations/${destinationId}/places/${placeId}`, { withCredentials: true });
       setDestinations(response.data.destinations);
     } catch (error) {
       console.error('Error deleting place:', error);
     }
-  
+
     const updatedDestinations = destinations.map((dest, idx) =>
       idx === destinationIndex ? { ...dest, places: dest.places.filter((_, pIdx) => pIdx !== placeIndex) } : dest
     );
@@ -232,9 +219,9 @@ export default function TripDetail() {
 
   const handleDeleteDestination = async (destinationIndex) => {
     if (destinationIndex === 0) return; // Prevent deletion of the first destination
-  
+
     const updatedDestinations = destinations.filter((_, idx) => idx !== destinationIndex);
-  
+
     try {
       const response = await axios.put(`http://localhost:5001/api/trips/${tripId}`, { ...trip, destinations: updatedDestinations }, { withCredentials: true });
       setDestinations(response.data.destinations);
@@ -242,7 +229,10 @@ export default function TripDetail() {
       console.error('Error deleting destination:', error);
     }
   };
-  
+
+  if (loading) {
+    return <p>Loading...</p>;
+  }
 
   if (!trip) {
     return <p>Trip not found!</p>;
@@ -259,12 +249,15 @@ export default function TripDetail() {
         </div>
       </div>
       <h1 className="trip-title">{trip.tripName}</h1> {/* Trip details */}
-      <div className="trip-info-row">
-        <p><strong>Country:</strong> {trip.country}</p>
-        <p><strong>Start Date:</strong> {trip.destinations[0].startDate.split('T')[0]}</p>
-        <p><strong>End Date:</strong> {trip.destinations[0].endDate.split('T')[0]}</p>
-        <p><strong>Duration:</strong> {trip.destinations[0].duration} days</p>
-      </div>
+      {destinations.length > 0 && (
+        <div className="trip-info-row">
+          <p><strong>Country:</strong> {trip.country}</p>
+          <p><strong>City:</strong> {destinations[0].city}</p>
+          <p><strong>Start Date:</strong> {destinations[0].startDate.split('T')[0]}</p>
+          <p><strong>End Date:</strong> {destinations[0].endDate.split('T')[0]}</p>
+          <p><strong>Duration:</strong> {destinations[0].duration} days</p>
+        </div>
+      )}
       <div className="destinations"> {/* Destination component */}
         {destinations.map((destination, index) => (
           <Destination
