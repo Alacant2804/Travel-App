@@ -18,6 +18,10 @@
     margin-bottom: 10px;
 }
 
+.destination-header {
+    display: flex;
+}
+
 .breaker {
     width: 50px;
     height: 3px;
@@ -246,6 +250,15 @@
 .button-icon {
     border: none;
     background-color: transparent;
+    padding: 0;
+    cursor: pointer;
+}
+
+.x-icon, .delete-destination-button {
+    width: 18px;
+    height: 18px;
+    background-color: transparent;
+    border: none;
     padding: 0;
     cursor: pointer;
 }

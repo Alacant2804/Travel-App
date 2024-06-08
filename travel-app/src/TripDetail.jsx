@@ -62,6 +62,7 @@ const fetchAllCoordinates = async (trip, setPlaces) => {
   setPlaces(allPlaces);
 };
 
+//Main Component
 export default function TripDetail() {
   const { tripId } = useParams();
   const { trips, fetchTrips } = useContext(TripsContext);
@@ -154,7 +155,6 @@ export default function TripDetail() {
       console.error('Error adding place:', error);
     }
   
-    // Update local state
     const updatedDestinations = destinations.map((dest, idx) =>
       idx === destinationIndex ? { ...dest, places: [...dest.places, newPlace] } : dest
     );
@@ -205,11 +205,23 @@ export default function TripDetail() {
       console.error('Error deleting place:', error);
     }
   
-    // Update local state
     const updatedDestinations = destinations.map((dest, idx) =>
       idx === destinationIndex ? { ...dest, places: dest.places.filter((_, pIdx) => pIdx !== placeIndex) } : dest
     );
     setDestinations(updatedDestinations);
+  };
+
+  const handleDeleteDestination = async (destinationIndex) => {
+    if (destinationIndex === 0) return; // Prevent deletion of the first destination
+  
+    const updatedDestinations = destinations.filter((_, idx) => idx !== destinationIndex);
+  
+    try {
+      const response = await axios.put(`http://localhost:5001/api/trips/${tripId}`, { ...trip, destinations: updatedDestinations }, { withCredentials: true });
+      setDestinations(response.data.destinations);
+    } catch (error) {
+      console.error('Error deleting destination:', error);
+    }
   };
   
 
@@ -244,6 +256,8 @@ export default function TripDetail() {
             onAddPlace={(placeName, placePrice) => handleAddPlace(index, placeName, placePrice)}
             onEditPlace={(placeIndex, placeName, placePrice) => handleEditPlace(index, placeIndex, placeName, placePrice)}
             onDeletePlace={(placeIndex) => handleDeletePlace(index, placeIndex)}
+            onDeleteDestination={() => handleDeleteDestination(index)}
+            index={index}
           />
         ))}
       </div>

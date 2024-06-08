@@ -11,10 +11,6 @@ export default function Trips() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTrip, setEditingTrip] = useState(null);
 
-  useEffect(() => {
-    console.log(trips);
-  }, [trips])
-
   const handleCreateTrip = useCallback(async (newTripData) => {
     try {
       if (editingTrip) {
@@ -49,14 +45,15 @@ export default function Trips() {
   const renderedTrips = useMemo(() => (
     trips.map((trip) => (
       <li key={trip._id} className="trip-card">
+        <Link to={`/trips/${trip._id}`} className="trip-link">
         <h3>{trip.tripName}</h3>
         <p><strong>Country: </strong> {trip.country}</p>
         <p><strong>City: </strong> {trip.destinations[0].city}</p>
         <p><strong>Start Date: </strong> {trip.destinations[0].startDate.split('T')[0]}</p>
         <p><strong>End Date: </strong> {trip.destinations[0].endDate.split('T')[0]}</p>
         <p><strong>Duration: </strong> {trip.destinations[0]?.duration} days</p>
+        </Link>
         <div className="trip-actions">
-          <Link to={`/trips/${trip._id}`} className="trip-btn">View</Link>
           <button className="trip-btn edit" onClick={() => { setIsModalOpen(true); setEditingTrip(trip); }}>Edit</button>
           <button className="trip-btn delete" onClick={() => handleDeleteTrip(trip._id)}>Delete</button>
         </div>

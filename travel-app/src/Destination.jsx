@@ -4,8 +4,18 @@ import AccommodationModal from './AccommodationModal';
 import accommodationIcon from './assets/accommodation-icon.png';
 import deleteIcon from './assets/delete-icon.png';
 import editIcon from './assets/edit-icon.png';
+import Xicon from './assets/x-icon.png'
 
-export default function Destination({ initialData = {}, onSave, calculateDuration, onAddPlace, onEditPlace, onDeletePlace }) {
+export default function Destination({
+  initialData = {},
+  onSave,
+  calculateDuration,
+  onAddPlace,
+  onEditPlace,
+  onDeletePlace,
+  onDeleteDestination, // Handler to delete destination
+  index, // Index of this destination
+}) {
   const [destination, setDestination] = useState(initialData.city || 'New Destination');
   const [startDate, setStartDate] = useState(initialData.startDate ? initialData.startDate.split('T')[0] : '');
   const [endDate, setEndDate] = useState(initialData.endDate ? initialData.endDate.split('T')[0] : '');
@@ -62,13 +72,24 @@ export default function Destination({ initialData = {}, onSave, calculateDuratio
   return (
     <div className="trip-detail-container">
       <div className="trip-info">
-        <input
-          type="text"
-          className="destination-input"
-          value={destination}
-          onChange={(e) => setDestination(e.target.value)}
-          onBlur={() => onSave({ city: destination, startDate, endDate, places, duration, accommodation })}
-        />
+        <div className="destination-header">
+          <input
+            type="text"
+            className="destination-input"
+            value={destination}
+            onChange={(e) => setDestination(e.target.value)}
+            onBlur={() => onSave({ city: destination, startDate, endDate, places, duration, accommodation })}
+          />
+          {/* Show delete button only if it's not the first destination */}
+          {index > 0 && (
+            <button
+              className="delete-destination-button"
+              onClick={() => onDeleteDestination(index)}
+            >
+              <img src={Xicon} alt="delete destination" className='x-icon'/>
+            </button>
+          )}
+        </div>
         <div className="breaker"></div>
         <div className="date-info">
           <p>
