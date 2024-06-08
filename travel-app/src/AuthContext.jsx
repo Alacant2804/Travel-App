@@ -18,7 +18,6 @@ export const AuthProvider = ({ children }) => {
     setError(null);
     try {
       const response = await authService.login({ email, password });
-      localStorage.setItem('token', response.token);
       setUser(response.user);
       toast.success('Login successful!', {
         theme: "colored"

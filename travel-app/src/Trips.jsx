@@ -19,14 +19,7 @@ export default function Trips() {
     try {
       if (editingTrip) {
         // Editing existing trip
-        const token = localStorage.getItem('token');
-        const config = {
-          headers: {
-            'x-auth-token': token,
-            'Content-Type': 'application/json',
-          },
-        };
-        const response = await axios.put(`http://localhost:5001/api/trips/${editingTrip._id}`, newTripData, config);
+        const response = await axios.put(`http://localhost:5001/api/trips/${editingTrip._id}`, newTripData, {withCredentials: true});
         const updatedTrips = trips.map(trip => trip._id === editingTrip._id ? response.data : trip);
         setTrips(updatedTrips);
         localStorage.setItem('trips', JSON.stringify(updatedTrips));

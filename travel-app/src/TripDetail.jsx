@@ -10,6 +10,7 @@ import carIcon from './assets/car.png';
 import planeIcon from './assets/plane.png';
 import { TripsContext } from './TripsContext';
 
+// Fetch and set coordinates from the provided location query
 const getAndSetCoordinates = async (query, setState = null) => {
   try {
     const response = await axios.get('https://nominatim.openstreetmap.org/search', {
@@ -38,6 +39,7 @@ const getAndSetCoordinates = async (query, setState = null) => {
   }
 };
 
+// Fetch coordinates for all places and accommodations
 const fetchPlacesAndAccommodationsCoordinates = async (destinations, tripCountry) => {
   const allPlaces = await Promise.all(destinations.flatMap(async (destination) => {
     const placeResults = await Promise.all(destination.places.map(async (place) => {
@@ -54,6 +56,7 @@ const fetchPlacesAndAccommodationsCoordinates = async (destinations, tripCountry
   return allPlaces.flat();
 };
 
+// Fetch all coordinates for the trip
 const fetchAllCoordinates = async (trip, setPlaces) => {
   const allPlaces = await fetchPlacesAndAccommodationsCoordinates(trip.destinations, trip.country);
   setPlaces(allPlaces);
@@ -76,14 +79,13 @@ export default function TripDetail() {
 
   useEffect(() => {
     if (trip && trip.destinations) {
-      console.log('TripsDetail, trips: ', trip)
       setDestinations(trip.destinations);
       fetchAllCoordinates(trip, setPlaces);
       getAndSetCoordinates(`${trip.destinations[0].city}, ${trip.country}`, setMapCenter);
     } else {
       console.error("Trip not found or no destinations available!");
     }
-  }, [trip, tripId, trips]);
+  }, [trip, tripId]);
 
   const handleAddDestination = async () => {
     const startDate = new Date().toISOString().slice(0, 10);
@@ -99,14 +101,7 @@ export default function TripDetail() {
     };
 
     try {
-      const token = localStorage.getItem('token');
-      const config = {
-        headers: {
-          'x-auth-token': token,
-          'Content-Type': 'application/json',
-        },
-      };
-      const response = await axios.post(`http://localhost:5001/api/trips/${tripId}/destinations`, newDestination, config);
+      const response = await axios.post(`http://localhost:5001/api/trips/${tripId}/destinations`, newDestination, { withCredentials: true });
       setDestinations(response.data.destinations);
     } catch (error) {
       console.error('Error adding destination:', error);
@@ -129,20 +124,11 @@ export default function TripDetail() {
       );
 
       try {
-        const token = localStorage.getItem('token');
-        const config = {
-          headers: {
-            'x-auth-token': token,
-            'Content-Type': 'application/json',
-          },
-        };
-        const response = await axios.put(`http://localhost:5001/api/trips/${tripId}/destinations/${updatedDestinations[index]._id}`, updatedDestinations[index], config);
+        const response = await axios.put(`http://localhost:5001/api/trips/${tripId}/destinations/${updatedDestinations[index]._id}`, updatedDestinations[index], { withCredentials: true });
         setDestinations(response.data.destinations);
       } catch (error) {
         console.error('Error updating destination:', error);
       }
-
-      setDestinations(updatedDestinations);
 
       const updatedPlaces = await fetchPlacesAndAccommodationsCoordinates(updatedDestinations, trip.country);
       setPlaces(updatedPlaces);
@@ -153,27 +139,31 @@ export default function TripDetail() {
   const handleAddPlace = async (destinationIndex, placeName, placePrice) => {
     const coordinates = await getAndSetCoordinates(`${placeName}, ${destinations[destinationIndex].city}, ${trip.country}`);
     const newPlace = { name: placeName, price: parseFloat(placePrice) || 0, coordinates };
-    const updatedDestinations = destinations.map((dest, idx) =>
-      idx === destinationIndex ? { ...dest, places: [...dest.places, newPlace] } : dest
-    );
-
+    
+    const destinationId = destinations[destinationIndex]._id; // Ensure this is valid
+  
+    if (!destinationId) {
+      console.error("Invalid destination ID");
+      return;
+    }
+  
     try {
-      const token = localStorage.getItem('token');
-      const config = {
-        headers: {
-          'x-auth-token': token,
-          'Content-Type': 'application/json',
-        },
-      };
-      const response = await axios.post(`http://localhost:5001/api/trips/${tripId}/destinations/${updatedDestinations[destinationIndex]._id}/places`, newPlace, config);
+      const response = await axios.post(`http://localhost:5001/api/trips/${tripId}/destinations/${destinationId}/places`, newPlace, { withCredentials: true });
       setDestinations(response.data.destinations);
     } catch (error) {
       console.error('Error adding place:', error);
     }
-
+  
+    // Update local state
+    const updatedDestinations = destinations.map((dest, idx) =>
+      idx === destinationIndex ? { ...dest, places: [...dest.places, newPlace] } : dest
+    );
     setDestinations(updatedDestinations);
-    setPlaces(await fetchPlacesAndAccommodationsCoordinates(updatedDestinations, trip.country));
+  
+    const updatedPlaces = await fetchPlacesAndAccommodationsCoordinates(updatedDestinations, trip.country);
+    setPlaces(updatedPlaces);
   };
+  
 
   const handleEditPlace = async (destinationIndex, placeIndex, placeName, placePrice) => {
     const coordinates = await getAndSetCoordinates(`${placeName}, ${destinations[destinationIndex].city}, ${trip.country}`);
@@ -189,46 +179,39 @@ export default function TripDetail() {
     );
 
     try {
-      const token = localStorage.getItem('token');
-      const config = {
-        headers: {
-          'x-auth-token': token,
-          'Content-Type': 'application/json',
-        },
-      };
-      const response = await axios.put(`http://localhost:5001/api/trips/${tripId}/destinations/${updatedDestinations[destinationIndex]._id}/places/${updatedDestinations[destinationIndex].places[placeIndex]._id}`, updatedDestinations[destinationIndex].places[placeIndex], config);
+      const response = await axios.put(`http://localhost:5001/api/trips/${tripId}/destinations/${updatedDestinations[destinationIndex]._id}/places/${updatedDestinations[destinationIndex].places[placeIndex]._id}`, updatedDestinations[destinationIndex].places[placeIndex], { withCredentials: true });
       setDestinations(response.data.destinations);
     } catch (error) {
       console.error('Error editing place:', error);
     }
 
-    setDestinations(updatedDestinations);
-    setPlaces(await fetchPlacesAndAccommodationsCoordinates(updatedDestinations, trip.country));
+    const updatedPlaces = await fetchPlacesAndAccommodationsCoordinates(updatedDestinations, trip.country);
+    setPlaces(updatedPlaces);
   };
 
   const handleDeletePlace = async (destinationIndex, placeIndex) => {
-    const updatedDestinations = destinations.map((dest, idx) =>
-      idx === destinationIndex ? { ...dest, places: dest.places.filter((_, pIdx) => pIdx !== placeIndex) } : dest
-    );
-
+    const placeId = destinations[destinationIndex].places[placeIndex]._id;
+    const destinationId = destinations[destinationIndex]._id;
+    
+    if (!placeId || !destinationId) {
+      console.error('Invalid placeId or destinationId');
+      return;
+    }
+  
     try {
-      const token = localStorage.getItem('token');
-      const config = {
-        headers: {
-          'x-auth-token': token,
-          'Content-Type': 'application/json',
-        },
-      };
-      const response = await axios.delete(`http://localhost:5001/api/trips/${tripId}/destinations/${updatedDestinations[destinationIndex]._id}/places/${destinations[destinationIndex].places[placeIndex]._id}`, config);
+      const response = await axios.delete(`http://localhost:5001/api/trips/${tripId}/destinations/${destinationId}/places/${placeId}`, { withCredentials: true });
       setDestinations(response.data.destinations);
     } catch (error) {
       console.error('Error deleting place:', error);
     }
-
+  
+    // Update local state
+    const updatedDestinations = destinations.map((dest, idx) =>
+      idx === destinationIndex ? { ...dest, places: dest.places.filter((_, pIdx) => pIdx !== placeIndex) } : dest
+    );
     setDestinations(updatedDestinations);
-    const updatedPlaces = await fetchPlacesAndAccommodationsCoordinates(updatedDestinations, trip.country);
-    setPlaces(updatedPlaces);
   };
+  
 
   if (!trip) {
     return <p>Trip not found!</p>;

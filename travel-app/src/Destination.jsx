@@ -7,8 +7,8 @@ import editIcon from './assets/edit-icon.png';
 
 export default function Destination({ initialData = {}, onSave, calculateDuration, onAddPlace, onEditPlace, onDeletePlace }) {
   const [destination, setDestination] = useState(initialData.city || 'New Destination');
-  const [startDate, setStartDate] = useState(initialData.startDate.split('T')[0] || '');
-  const [endDate, setEndDate] = useState(initialData.endDate.split('T')[0] || '');
+  const [startDate, setStartDate] = useState(initialData.startDate ? initialData.startDate.split('T')[0] : '');
+  const [endDate, setEndDate] = useState(initialData.endDate ? initialData.endDate.split('T')[0] : '');
   const [places, setPlaces] = useState(initialData.places || []);
   const [duration, setDuration] = useState(calculateDuration(startDate, endDate));
   const [editingIndex, setEditingIndex] = useState(-1);
@@ -20,26 +20,22 @@ export default function Destination({ initialData = {}, onSave, calculateDuratio
     setDuration(calculateDuration(startDate, endDate));
   }, [startDate, endDate, calculateDuration]);
 
-  useEffect(() => {
-    console.log('Current places after update: ', places);
-  }, [places]);
-
-  const handleAddPlace = (event) => {
+  const handleAddPlace = async (event) => {
     event.preventDefault();
     const placeInput = event.target.elements.placeInput.value.trim();
     const priceInput = event.target.elements.priceInput.value.trim();
     if (placeInput) {
-      onAddPlace(placeInput, priceInput);
-      setPlaces(prev => [...prev, { name: placeInput, price: parseFloat(priceInput) || 0 }]);
+      const newPlace = { name: placeInput, price: parseFloat(priceInput) || 0 };
+      await onAddPlace(newPlace);
+      setPlaces((prev) => [...prev, newPlace]);
     }
     event.target.reset();
   };
 
-  const handleSaveEditPlace = () => {
-    onEditPlace(editingIndex, editPlaceValue.name, editPlaceValue.price);
-    setPlaces(places.map((place, idx) =>
-      idx === editingIndex ? { ...editPlaceValue } : place
-    ));
+  const handleSaveEditPlace = async () => {
+    const updatedPlace = { ...editPlaceValue, price: parseFloat(editPlaceValue.price) || 0 };
+    await onEditPlace(editingIndex, updatedPlace);
+    setPlaces(places.map((place, idx) => (idx === editingIndex ? updatedPlace : place)));
     setEditingIndex(-1);
     setEditPlaceValue({ name: '', price: 0 });
   };
@@ -49,15 +45,15 @@ export default function Destination({ initialData = {}, onSave, calculateDuratio
     setEditPlaceValue(places[index]);
   };
 
-  const handleDeletePlace = (index) => {
-    onDeletePlace(index);
+  const handleDeletePlace = async (index) => {
+    await onDeletePlace(index);
     setPlaces(places.filter((_, idx) => idx !== index));
   };
 
-  const handleSaveAccommodation = (accommodationData) => {
+  const handleSaveAccommodation = async (accommodationData) => {
     setAccommodation(accommodationData);
     setShowAccommodationModal(false);
-    onSave({ city: destination, startDate, endDate, places, duration, accommodation: accommodationData });
+    await onSave({ city: destination, startDate, endDate, places, duration, accommodation: accommodationData });
   };
 
   const totalPlaces = places.length;
