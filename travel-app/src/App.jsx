@@ -12,41 +12,14 @@ import TripDetail from './TripDetail.jsx';
 import TravelHacks from './TravelHacks.jsx';
 import Login from './Login.jsx';
 import SignUp from './SignUp.jsx';
+import PrivacyPolicy from './PrivacyPolicy.jsx';
+import TermsOfConditions from './TermsOfConditions.jsx';
 import NotFound from './NotFound.jsx';
-import { useState, useEffect } from 'react';
 import 'leaflet/dist/leaflet.css';
 import 'react-toastify/dist/ReactToastify.css'
 
 
 export default function App() {
-  const [trips, setTrips] = useState([]);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        const response = await axios.get('http://localhost:5001/api/auth/check-auth', { withCredentials: true });
-        setIsAuthenticated(response.data.isAuthenticated);
-      } catch (error) {
-        setIsAuthenticated(false);
-      }
-    };
-
-    checkAuth();
-  }, []);
-
-  useEffect(() => {
-    const storedTrips = localStorage.getItem('trips');
-    if (storedTrips) {
-        setTrips(JSON.parse(storedTrips));
-        console.log(storedTrips)
-    }
-  }, []);
-
-  const handleLogout = async () => {
-    await axios.post('http://localhost:5001/api/auth/logout', {}, { withCredentials: true });
-    setIsAuthenticated(false);
-  };
 
   return (
     <BrowserRouter>
@@ -67,6 +40,8 @@ export default function App() {
             <Route path="/travel-hacks" element={<TravelHacks />} />
             <Route path="/login" element={<Login />} />
             <Route path="/sign-up" element={<SignUp />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/terms-of-conditions" element={<TermsOfConditions />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
           <Footer />

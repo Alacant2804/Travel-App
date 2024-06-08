@@ -1,3 +1,4 @@
+import {Link} from 'react-router-dom';
 import facebookLogo from './assets/facebook-logo.png';
 import twitterLogo from './assets/x-logo.png';
 import instagramLogo from './assets/instagram-logo.png';
@@ -19,8 +20,8 @@ export default function Footer() {
             </div>
             <p>© 2024 <a href='https://github.com/Alacant2804/Travel-App'>Alacant2804</a>. All rights reserved.</p>
             <ul className="footer-links">
-                    <li><a href="/privacy-policy">Privacy Policy</a></li>
-                    <li><a href="/terms-of-service">Terms of Service</a></li>
+                    <Link to="/privacy-policy"><li className='link'>Privacy Policy</li></Link>
+                    <Link to="/terms-of-conditions"><li className='link'>Terms of Service</li></Link>
             </ul>
         </footer>
     );

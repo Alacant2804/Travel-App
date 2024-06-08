@@ -1,0 +1,26 @@
+.terms-of-conditions-container {
+    max-width: 800px;
+    height: 80vh;
+    margin: auto;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+  }
+  
+  .terms-of-conditions-container h1,
+  .terms-of-conditions-container h2 {
+    color: #333;
+    margin-top: 20px;
+    margin-bottom: 10px;
+  }
+  
+  .terms-of-conditions-container p,
+  .terms-of-conditions-container ul {
+    color: #555;
+    line-height: 1.6;
+  }
+  
+  .terms-of-conditions-container ul {
+    list-style: disc;
+    padding-left: 20px;
+  }
+  
