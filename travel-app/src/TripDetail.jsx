@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useContext } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import Destination from './Destination';
 import MapComponent from './MapComponent';
 import axios from 'axios';
@@ -38,7 +39,17 @@ const getAndSetCoordinates = async (query, setState = null) => {
 };
 
 const fetchPlacesAndAccommodationsCoordinates = async (destinations, tripCountry) => {
+  if (!Array.isArray(destinations) || destinations.length === 0) {
+    console.error("Invalid or empty destinations array.");
+    return [];
+  }
+  
   const allPlaces = await Promise.all(destinations.flatMap(async (destination) => {
+    if (!Array.isArray(destination.places)) {
+      console.error("Invalid places array in destination.");
+      return [];
+    }
+
     const placeResults = await Promise.all(destination.places.map(async (place) => {
       const coordinates = await getAndSetCoordinates(`${place.name}, ${destination.city}, ${tripCountry}`);
       return { ...place, coordinates };
@@ -50,6 +61,7 @@ const fetchPlacesAndAccommodationsCoordinates = async (destinations, tripCountry
       ...(destination.accommodation ? [{ ...destination.accommodation, coordinates: accommodationCoordinates }] : [])
     ];
   }));
+
   return allPlaces.flat();
 };
 
@@ -60,27 +72,29 @@ const fetchAllCoordinates = async (trip, setPlaces) => {
 
 export default function TripDetail() {
   const { tripId } = useParams();
-  const { trips, fetchTrips } = useContext(TripsContext);
+  const { fetchTrips } = useContext(TripsContext);
   const [trip, setTrip] = useState(null);
   const [destinations, setDestinations] = useState([]);
   const [places, setPlaces] = useState([]);
   const [mapCenter, setMapCenter] = useState(null);
-  const [loading, setLoading] = useState(true); // Loading state
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchTripDetails = async () => {
       try {
         const response = await axios.get(`http://localhost:5001/api/trips/${tripId}`, { withCredentials: true });
         setTrip(response.data);
-        setDestinations(response.data.destinations);
-        fetchAllCoordinates(response.data, setPlaces);
-        if (response.data.destinations.length > 0) {
+        setDestinations(response.data.destinations || []);
+        
+        if (Array.isArray(response.data.destinations) && response.data.destinations.length > 0) {
+          fetchAllCoordinates(response.data, setPlaces);
           getAndSetCoordinates(`${response.data.destinations[0].city}, ${response.data.country}`, setMapCenter);
         }
-        setLoading(false); // Set loading to false after data is fetched
+
+        setLoading(false);
       } catch (error) {
         console.error("Error fetching trip details:", error);
-        setLoading(false);
+        setLoading(false); // Ensure loading is stopped even if there's an error
       }
     };
 
@@ -117,10 +131,10 @@ export default function TripDetail() {
 
   const handleSaveDestination = useCallback(
     async (updatedData, index) => {
-      const destinationId = destinations[index]._id; // Original destination ID
+      const destinationId = destinations[index]._id;
       const updatedDestination = {
-        ...destinations[index], // Preserve existing fields
-        ...updatedData, // Apply updates
+        ...destinations[index],
+        ...updatedData,
         duration: calculateDuration(updatedData.startDate, updatedData.endDate),
       };
 
@@ -147,7 +161,6 @@ export default function TripDetail() {
   const handleAddPlace = async (destinationIndex, placeName, placePrice) => {
     const coordinates = await getAndSetCoordinates(`${placeName}, ${destinations[destinationIndex].city}, ${trip.country}`);
     const newPlace = { name: placeName, price: parseFloat(placePrice) || 0, coordinates };
-
     const destinationId = destinations[destinationIndex]._id;
 
     if (!destinationId) {
@@ -219,9 +232,9 @@ export default function TripDetail() {
 
   const handleDeleteDestination = async (destinationIndex) => {
     if (destinationIndex === 0) return; // Prevent deletion of the first destination
-
+  
     const updatedDestinations = destinations.filter((_, idx) => idx !== destinationIndex);
-
+  
     try {
       const response = await axios.put(`http://localhost:5001/api/trips/${tripId}`, { ...trip, destinations: updatedDestinations }, { withCredentials: true });
       setDestinations(response.data.destinations);
@@ -248,17 +261,14 @@ export default function TripDetail() {
           <button className="button-icon"><img src={planeIcon} alt="Plane" className="icon" /></button>
         </div>
       </div>
-      <h1 className="trip-title">{trip.tripName}</h1> {/* Trip details */}
-      {destinations.length > 0 && (
-        <div className="trip-info-row">
-          <p><strong>Country:</strong> {trip.country}</p>
-          <p><strong>City:</strong> {destinations[0].city}</p>
-          <p><strong>Start Date:</strong> {destinations[0].startDate.split('T')[0]}</p>
-          <p><strong>End Date:</strong> {destinations[0].endDate.split('T')[0]}</p>
-          <p><strong>Duration:</strong> {destinations[0].duration} days</p>
-        </div>
-      )}
-      <div className="destinations"> {/* Destination component */}
+      <h1 className="trip-title">{trip.tripName}</h1>
+      <div className="trip-info-row">
+        <p><strong>Country:</strong> {trip.country}</p>
+        <p><strong>Start Date:</strong> {trip.destinations[0].startDate.split('T')[0]}</p>
+        <p><strong>End Date:</strong> {trip.destinations[0].endDate.split('T')[0]}</p>
+        <p><strong>Duration:</strong> {trip.destinations[0].duration} days</p>
+      </div>
+      <div className="destinations">
         {destinations.map((destination, index) => (
           <Destination
             key={index}
