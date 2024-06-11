@@ -34,13 +34,23 @@ export default function Destination({
     event.preventDefault();
     const placeInput = event.target.elements.placeInput.value.trim();
     const priceInput = event.target.elements.priceInput.value.trim();
-    if (placeInput) {
-      const newPlace = { name: placeInput, price: parseFloat(priceInput) || 0 };
-      await onAddPlace(newPlace);
-      setPlaces((prev) => [...prev, newPlace]);
+  
+    // Check for valid place input and price input
+    if (!placeInput) {
+      console.error("Place name is empty");
+      return;
     }
+  
+    if (isNaN(parseFloat(priceInput))) {
+      console.error("Invalid price input");
+      return;
+    }
+  
+    await onAddPlace(placeInput, priceInput);
+    setPlaces((prev) => [...prev, { name: placeInput, price: parseFloat(priceInput) || 0, coordinates: null }]);
     event.target.reset();
   };
+  
 
   const handleSaveEditPlace = async () => {
     const updatedPlace = { ...editPlaceValue, price: parseFloat(editPlaceValue.price) || 0 };
@@ -160,6 +170,7 @@ export default function Destination({
             type="text"
             placeholder="Add a place to visit"
             className="place-input"
+            required
           />
           <input
             name="priceInput"
@@ -168,6 +179,7 @@ export default function Destination({
             step="0.01"
             min="0"
             className="place-input"
+            required
           />
         </div>
         <button type="submit" className="add-place-button">Add Place</button>

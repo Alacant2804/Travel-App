@@ -85,19 +85,19 @@ export default function TripDetail() {
         const response = await axios.get(`http://localhost:5001/api/trips/${tripId}`, { withCredentials: true });
         setTrip(response.data);
         setDestinations(response.data.destinations || []);
-        
+  
         if (Array.isArray(response.data.destinations) && response.data.destinations.length > 0) {
-          fetchAllCoordinates(response.data, setPlaces);
-          getAndSetCoordinates(`${response.data.destinations[0].city}, ${response.data.country}`, setMapCenter);
+          await fetchAllCoordinates(response.data, setPlaces);
+          await getAndSetCoordinates(`${response.data.destinations[0].city}, ${response.data.country}`, setMapCenter);
         }
-
+  
         setLoading(false);
       } catch (error) {
         console.error("Error fetching trip details:", error);
-        setLoading(false); // Ensure loading is stopped even if there's an error
+        setLoading(false);
       }
     };
-
+  
     fetchTripDetails();
   }, [tripId]);
 
@@ -159,54 +159,95 @@ export default function TripDetail() {
   );
 
   const handleAddPlace = async (destinationIndex, placeName, placePrice) => {
+    // Ensure placeName is a string and not empty
+    if (typeof placeName !== 'string' || !placeName.trim()) {
+      console.error("Invalid place name:", placeName);
+      return;
+    }
+  
+    // Ensure placePrice is a valid number
+    const parsedPrice = parseFloat(placePrice);
+    if (isNaN(parsedPrice)) {
+      console.error("Invalid place price:", placePrice);
+      return;
+    }
+  
     const coordinates = await getAndSetCoordinates(`${placeName}, ${destinations[destinationIndex].city}, ${trip.country}`);
-    const newPlace = { name: placeName, price: parseFloat(placePrice) || 0, coordinates };
+    
+    // Ensure coordinates are properly formatted
+    if (!coordinates || typeof coordinates.lat !== 'number' || typeof coordinates.lon !== 'number') {
+      console.error("Invalid coordinates:", coordinates);
+      return;
+    }
+  
+    const newPlace = { name: placeName.trim(), price: parsedPrice, coordinates };
     const destinationId = destinations[destinationIndex]._id;
-
+  
     if (!destinationId) {
       console.error("Invalid destination ID");
       return;
     }
-
+  
     try {
-      const response = await axios.post(`http://localhost:5001/api/trips/${tripId}/destinations/${destinationId}/places`, newPlace, { withCredentials: true });
+      const response = await axios.post(
+        `http://localhost:5001/api/trips/${tripId}/destinations/${destinationId}/places`,
+        newPlace,
+        { withCredentials: true }
+      );
       setDestinations(response.data.destinations);
     } catch (error) {
       console.error('Error adding place:', error);
     }
-
+  
     const updatedDestinations = destinations.map((dest, idx) =>
       idx === destinationIndex ? { ...dest, places: [...dest.places, newPlace] } : dest
     );
     setDestinations(updatedDestinations);
-
+  
     const updatedPlaces = await fetchPlacesAndAccommodationsCoordinates(updatedDestinations, trip.country);
     setPlaces(updatedPlaces);
   };
-
+  
+  
+  
   const handleEditPlace = async (destinationIndex, placeIndex, placeName, placePrice) => {
     const coordinates = await getAndSetCoordinates(`${placeName}, ${destinations[destinationIndex].city}, ${trip.country}`);
+    
+    // Ensure coordinates are properly formatted
+    if (!coordinates || typeof coordinates.lat !== 'number' || typeof coordinates.lon !== 'number') {
+      console.error("Invalid coordinates:", coordinates);
+      return;
+    }
+  
     const updatedDestinations = destinations.map((dest, idx) =>
       idx === destinationIndex
         ? {
             ...dest,
             places: dest.places.map((place, pIdx) =>
-              pIdx === placeIndex ? { name: placeName, price: parseFloat(placePrice) || 0, coordinates } : place
+              pIdx === placeIndex ? { name: placeName.trim(), price: parseFloat(placePrice) || 0, coordinates } : place
             )
           }
         : dest
     );
-
+  
+    const destinationId = updatedDestinations[destinationIndex]._id;
+    const placeId = updatedDestinations[destinationIndex].places[placeIndex]._id;
+  
     try {
-      const response = await axios.put(`http://localhost:5001/api/trips/${tripId}/destinations/${updatedDestinations[destinationIndex]._id}/places/${updatedDestinations[destinationIndex].places[placeIndex]._id}`, updatedDestinations[destinationIndex].places[placeIndex], { withCredentials: true });
+      const response = await axios.put(
+        `http://localhost:5001/api/trips/${tripId}/destinations/${destinationId}/places/${placeId}`,
+        updatedDestinations[destinationIndex].places[placeIndex],
+        { withCredentials: true }
+      );
       setDestinations(response.data.destinations);
     } catch (error) {
       console.error('Error editing place:', error);
     }
-
+  
     const updatedPlaces = await fetchPlacesAndAccommodationsCoordinates(updatedDestinations, trip.country);
     setPlaces(updatedPlaces);
   };
+  
 
   const handleDeletePlace = async (destinationIndex, placeIndex) => {
     const placeId = destinations[destinationIndex].places[placeIndex]._id;

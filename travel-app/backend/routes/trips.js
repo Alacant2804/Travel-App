@@ -105,6 +105,11 @@ router.post('/:tripId/destinations/:destinationId/places', auth, async (req, res
   const { tripId, destinationId } = req.params;
   const { name, price, coordinates } = req.body;
 
+  // Validate coordinates
+  if (!coordinates || typeof coordinates.lat !== 'number' || typeof coordinates.lon !== 'number') {
+    return res.status(400).json({ msg: 'Invalid coordinates' });
+  }
+
   try {
     const trip = await Trip.findById(tripId);
     if (!trip) {
@@ -125,8 +130,6 @@ router.post('/:tripId/destinations/:destinationId/places', auth, async (req, res
     res.status(500).json({ msg: 'Server Error', error: error.message });
   }
 });
-
-
 
 // Update an existing trip
 router.put('/:id', auth, async (req, res) => {
@@ -162,6 +165,7 @@ router.put('/:id', auth, async (req, res) => {
   }
 });
 
+// Update an existing destination
 router.put('/:tripId/destinations/:destinationId', auth, async (req, res) => {
   const { tripId, destinationId } = req.params;
   const { city, startDate, endDate, places, accommodation } = req.body;
@@ -190,13 +194,51 @@ router.put('/:tripId/destinations/:destinationId', auth, async (req, res) => {
     destination.accommodation = accommodation;
 
     await trip.save();
-
     res.json(trip);
   } catch (err) {
     console.error('Error updating destination:', err);
     res.status(500).send('Server Error');
   }
 });
+
+router.put('/:tripId/destinations/:destinationId/places/:placeId', auth, async (req, res) => {
+  const { tripId, destinationId, placeId } = req.params;
+  const { name, price, coordinates } = req.body;
+
+  // Validate coordinates
+  if (!coordinates || typeof coordinates.lat !== 'number' || typeof coordinates.lon !== 'number') {
+    return res.status(400).json({ msg: 'Invalid coordinates' });
+  }
+
+  try {
+    const trip = await Trip.findById(tripId);
+    if (!trip) {
+      return res.status(404).json({ msg: 'Trip not found' });
+    }
+
+    const destination = trip.destinations.id(destinationId);
+    if (!destination) {
+      return res.status(404).json({ msg: 'Destination not found' });
+    }
+
+    const place = destination.places.id(placeId);
+    if (!place) {
+      return res.status(404).json({ msg: 'Place not found' });
+    }
+
+    place.name = name;
+    place.price = price;
+    place.coordinates = coordinates;
+
+    await trip.save();
+    res.json({ destinations: trip.destinations });
+  } catch (error) {
+    console.error('Error editing place:', error);
+    res.status(500).json({ msg: 'Server Error', error: error.message });
+  }
+});
+
+
 
 // Delete a trip
 router.delete('/:id', auth, async (req, res) => {
