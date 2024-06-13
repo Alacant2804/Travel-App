@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useContext } from 'react';
 import { useParams } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import Destination from './Destination';
+import FlightModal from './FlightModal';
 import MapComponent from './MapComponent';
 import axios from 'axios';
 import './TripDetail.css';
@@ -78,26 +79,28 @@ export default function TripDetail() {
   const [places, setPlaces] = useState([]);
   const [mapCenter, setMapCenter] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showFlightModal, setShowFlightModal] = useState(false);
+  const [currentFlight, setCurrentFlight] = useState(null);
+
+  const fetchTripDetails = async () => {
+    try {
+      const response = await axios.get(`http://localhost:5001/api/trips/${tripId}`, { withCredentials: true });
+      setTrip(response.data);
+      setDestinations(response.data.destinations || []);
+
+      if (Array.isArray(response.data.destinations) && response.data.destinations.length > 0) {
+        await fetchAllCoordinates(response.data, setPlaces);
+        await getAndSetCoordinates(`${response.data.destinations[0].city}, ${response.data.country}`, setMapCenter);
+      }
+
+      setLoading(false);
+    } catch (error) {
+      console.error("Error fetching trip details:", error);
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchTripDetails = async () => {
-      try {
-        const response = await axios.get(`http://localhost:5001/api/trips/${tripId}`, { withCredentials: true });
-        setTrip(response.data);
-        setDestinations(response.data.destinations || []);
-  
-        if (Array.isArray(response.data.destinations) && response.data.destinations.length > 0) {
-          await fetchAllCoordinates(response.data, setPlaces);
-          await getAndSetCoordinates(`${response.data.destinations[0].city}, ${response.data.country}`, setMapCenter);
-        }
-  
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching trip details:", error);
-        setLoading(false);
-      }
-    };
-  
     fetchTripDetails();
   }, [tripId]);
 
@@ -284,6 +287,37 @@ export default function TripDetail() {
     }
   };
 
+  const handleSaveFlight = async (flightData) => {
+  try {
+    if (flightData._id) {
+      // Update flight
+      const response = await axios.put(
+        `http://localhost:5001/api/trips/${tripId}/flights/${flightData._id}`,
+        flightData,
+        { withCredentials: true }
+      );
+      setCurrentFlight(response.data);
+    } else {
+      // Create new flight
+      const response = await axios.post(
+        `http://localhost:5001/api/trips/${tripId}/flights`,
+        flightData,
+        { withCredentials: true }
+      );
+      setCurrentFlight(response.data);
+    }
+    setShowFlightModal(false);
+    fetchTripDetails(); // Fetch updated trip details
+  } catch (error) {
+    console.error("Error saving flight:", error);
+  }
+};
+
+const handleOpenFlightModal = (flight = null) => {
+  setCurrentFlight(flight);
+  setShowFlightModal(true);
+};
+
   if (loading) {
     return <p>Loading...</p>;
   }
@@ -299,7 +333,7 @@ export default function TripDetail() {
         <div className='trip-icons'>
           <button className="button-icon"><img src={budgetIcon} alt="Budget" className="budget-icon" /></button>
           <button className="button-icon"><img src={carIcon} alt="Car" className="icon" /></button>
-          <button className="button-icon"><img src={planeIcon} alt="Plane" className="icon" /></button>
+          <button className="button-icon" onClick={handleOpenFlightModal}><img src={planeIcon} alt="Plane" className="icon" /></button>
         </div>
       </div>
       <h1 className="trip-title">{trip.tripName}</h1>
@@ -326,6 +360,15 @@ export default function TripDetail() {
       </div>
       <button className="add-destination-button" onClick={handleAddDestination}>Add New Destination</button>
       {mapCenter && <MapComponent places={places} center={mapCenter} />}
+
+      {showFlightModal && (
+        <FlightModal
+          tripId={tripId}
+          flight={currentFlight}
+          onSave={handleSaveFlight}
+          onClose={() => setShowFlightModal(false)}
+        />
+      )}
     </div>
   );
 }

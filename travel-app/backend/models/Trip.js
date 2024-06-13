@@ -1,5 +1,14 @@
 import mongoose from 'mongoose';
 
+const FlightSchema = new mongoose.Schema({
+  departureAirport: String,
+  arrivalAirport: String,
+  departureDate: Date,
+  arrivalDate: Date,
+  bookingLink: String,
+  price: Number,
+});
+
 const CoordinatesSchema = new mongoose.Schema({
   lat: {
     type: Number,
@@ -60,6 +69,7 @@ const TripSchema = new mongoose.Schema({
   tripName: { type: String, required: true },
   country: { type: String, required: true },
   destinations: [DestinationSchema],
+  flights: [FlightSchema],
 }, { timestamps: true });
 
 
