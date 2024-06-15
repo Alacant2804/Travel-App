@@ -35,7 +35,7 @@ Open the application in your browser
 
 Create a new trip by clicking on the "Create Trip" button.
 
-Add destinations and places to visit within each destination.
+Add destinations (if needed) and places to visit within each destination.
 
 Add accommodation details for each destination.
 
@@ -43,10 +43,11 @@ View the trip details on the interactive map.
 
 ## 🛠️ Technologies Used
 
+💥 Node.js (Express.js)
 ⚛️ React
 🛣️ React Router
 🗺️ Leaflet
 🌐 Axios
 ⚡ Vite
 🎨 CSS
-Node.js (Express.js)
+🔐 JWT token authentication 
