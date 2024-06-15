@@ -74,7 +74,7 @@ export default function AccommodationModal({ accommodation, onSave, onClose }) {
           <form className="modal-form" onSubmit={(e) => { e.preventDefault(); handleSave(); }}>
             <input
               type="text"
-              placeholder="Address"
+              placeholder="Address (without country name)"
               value={address}
               onChange={(e) => setAddress(e.target.value)}
               className="form-input"

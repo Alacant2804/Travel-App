@@ -33,6 +33,39 @@ router.get('/:tripId', auth, async (req, res) => {
   }
 });
 
+router.get('/:tripId/flights', auth, async (req, res) => {
+  try {
+    const trip = await Trip.findById(req.params.tripId);
+    if (!trip) {
+      return res.status(404).json({ msg: 'Trip not found' });
+    }
+
+    res.json(trip.flights);
+  } catch (error) {
+    console.error('Error fetching flights:', error);
+    res.status(500).send('Server Error');
+  }
+});
+
+router.get('/:tripId/flights/:flightId', auth, async (req, res) => {
+  try {
+    const trip = await Trip.findById(req.params.tripId);
+    if (!trip) {
+      return res.status(404).json({ msg: 'Trip not found' });
+    }
+
+    const flight = trip.flights.id(req.params.flightId);
+    if (!flight) {
+      return res.status(404).json({ msg: 'Flight not found' });
+    }
+
+    res.json(flight);
+  } catch (error) {
+    console.error('Error fetching flight:', error);
+    res.status(500).send('Server Error');
+  }
+});
+
 // Add a new trip
 router.post('/', auth, async (req, res) => {
   const { tripName, country, destinations } = req.body;
@@ -133,7 +166,8 @@ router.post('/:tripId/destinations/:destinationId/places', auth, async (req, res
 
 router.post('/:tripId/flights', auth, async (req, res) => {
   const { tripId } = req.params;
-  const { departureAirport, arrivalAirport, departureDate, arrivalDate, bookingLink, price } = req.body;
+  console.log("TripID Backend: ", tripId);
+  const { departureAirport, arrivalAirport, departureDate, arrivalDate, bookingLink, price, type } = req.body;
 
   try {
     const trip = await Trip.findById(tripId);
@@ -148,6 +182,7 @@ router.post('/:tripId/flights', auth, async (req, res) => {
       arrivalDate,
       bookingLink,
       price: parseFloat(price),
+      type // Ensure type is included
     };
 
     trip.flights.push(newFlight);
@@ -160,7 +195,7 @@ router.post('/:tripId/flights', auth, async (req, res) => {
   }
 });
 
-// Update flight
+// Update an existing flight
 router.put('/:tripId/flights/:flightId', auth, async (req, res) => {
   const { tripId, flightId } = req.params;
   const { departureAirport, arrivalAirport, departureDate, arrivalDate, bookingLink, price } = req.body;
