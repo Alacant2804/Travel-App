@@ -7,6 +7,7 @@ export default function FlightModal({ tripId, onSave, onClose }) {
   const [outboundFlight, setOutboundFlight] = useState({});
   const [inboundFlight, setInboundFlight] = useState({});
   const [isEditingOutbound, setIsEditingOutbound] = useState(true);
+  const [isEditing, setIsEditing] = useState(false); // State to track if editing
 
   useEffect(() => {
     const fetchFlightData = async () => {
@@ -45,7 +46,7 @@ export default function FlightModal({ tripId, onSave, onClose }) {
           { withCredentials: true }
         );
       }
-
+      
       const response = await axios.get(`http://localhost:5001/api/trips/${tripId}/flights`, { withCredentials: true });
       const flights = response.data;
 
@@ -77,11 +78,45 @@ export default function FlightModal({ tripId, onSave, onClose }) {
             Inbound
           </button>
         </div>
-        <FlightForm
-          flight={isEditingOutbound ? outboundFlight : inboundFlight}
-          onSave={handleSaveFlight}
-          onClose={onClose}
-        />
+        {isEditing ? (
+          <FlightForm
+            flight={isEditingOutbound ? outboundFlight : inboundFlight}
+            onSave={handleSaveFlight}
+            onClose={() => setIsEditing(false)}
+          />
+        ) : (
+          <div>
+            <h3>{isEditingOutbound ? 'Outbound Flight' : 'Inbound Flight'}</h3>
+            <table className="flight-info-table">
+              <tbody>
+                <tr>
+                  <td><strong>Departure Airport:</strong></td>
+                  <td>{isEditingOutbound ? outboundFlight.departureAirport : inboundFlight.departureAirport}</td>
+                </tr>
+                <tr>
+                  <td><strong>Arrival Airport:</strong></td>
+                  <td>{isEditingOutbound ? outboundFlight.arrivalAirport : inboundFlight.arrivalAirport}</td>
+                </tr>
+                <tr>
+                  <td><strong>Departure Date:</strong></td>
+                  <td>{isEditingOutbound ? outboundFlight.departureDate?.split('T')[0] : inboundFlight.departureDate?.split('T')[0]}</td>
+                </tr>
+                <tr>
+                  <td><strong>Price:</strong></td>
+                  <td>${(isEditingOutbound ? outboundFlight.price : inboundFlight.price)?.toFixed(2)}</td>
+                </tr>
+                <tr>
+                  <td><strong>Booking Link:</strong></td>
+                  <td><a href={isEditingOutbound ? outboundFlight.bookingLink : inboundFlight.bookingLink} target="_blank" rel="noopener noreferrer">{isEditingOutbound ? outboundFlight.bookingLink : inboundFlight.bookingLink}</a></td>
+                </tr>
+              </tbody>
+            </table>
+            <div className="modal-actions">
+              <button className="modal-btn edit-btn" onClick={() => setIsEditing(true)}>Edit</button>
+              <button className="modal-btn close-btn" onClick={onClose}>Close</button>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

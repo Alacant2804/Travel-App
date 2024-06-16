@@ -19,28 +19,6 @@
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-.modal-tabs {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 20px;
-}
-
-.tab-btn {
-  flex: 1;
-  padding: 10px 20px;
-  cursor: pointer;
-  background: #f0f0f0;
-  border: 1px solid #ccc;
-  border-bottom: none;
-  text-align: center;
-}
-
-.tab-btn.active {
-  background: #4CAF50;
-  color: white;
-  border-color: #4CAF50;
-}
-
 .modal-form .form-input {
   width: 100%;
   padding: 10px;
@@ -66,6 +44,12 @@
   cursor: pointer;
 }
 
+.close-btn {
+  background: #f44336;
+  color: white;
+}
+
+.edit-btn,
 .submit-btn {
   background: #4CAF50;
   color: white;
@@ -73,5 +57,41 @@
 
 .cancel-btn {
   background: #f44336;
+}
+
+.flight-info-table {
+  width: 100%;
+  margin-top: 20px;
+  border-collapse: collapse;
+}
+
+.flight-info-table td {
+  padding: 8px;
+  border: 1px solid #ddd;
+}
+
+.flight-info-table td:first-child {
+  font-weight: bold;
+}
+
+.modal-tabs {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 10px 20px;
+  cursor: pointer;
+  background: #f0f0f0;
+  border: 1px solid #ccc;
+  border-bottom: none;
+  text-align: center;
+}
+
+.tab-btn.active {
+  background: #4CAF50;
   color: white;
+  border-color: #4CAF50;
 }
