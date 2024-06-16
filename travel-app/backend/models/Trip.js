@@ -4,9 +4,9 @@ const FlightSchema = new mongoose.Schema({
   departureAirport: String,
   arrivalAirport: String,
   departureDate: Date,
-  arrivalDate: Date,
   bookingLink: String,
   price: Number,
+  type: { type: String, required: true }
 });
 
 const CoordinatesSchema = new mongoose.Schema({

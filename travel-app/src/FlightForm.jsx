@@ -3,8 +3,7 @@ import { useState, useEffect } from 'react';
 export default function FlightForm({ flight, onSave, onClose }) {
   const [departureAirport, setDepartureAirport] = useState(flight?.departureAirport || '');
   const [arrivalAirport, setArrivalAirport] = useState(flight?.arrivalAirport || '');
-  const [departureDate, setDepartureDate] = useState(flight?.departureDate || '');
-  const [arrivalDate, setArrivalDate] = useState(flight?.arrivalDate || '');
+  const [departureDate, setDepartureDate] = useState(flight?.departureDate ? new Date(flight.departureDate).toISOString().split('T')[0] : '');
   const [bookingLink, setBookingLink] = useState(flight?.bookingLink || '');
   const [price, setPrice] = useState(flight?.price || 0);
 
@@ -12,8 +11,7 @@ export default function FlightForm({ flight, onSave, onClose }) {
     if (flight) {
       setDepartureAirport(flight.departureAirport || '');
       setArrivalAirport(flight.arrivalAirport || '');
-      setDepartureDate(flight.departureDate || '');
-      setArrivalDate(flight.arrivalDate || '');
+      setDepartureDate(flight.departureDate ? new Date(flight.departureDate).toISOString().split('T')[0] : '');
       setBookingLink(flight.bookingLink || '');
       setPrice(flight.price || 0);
     }
@@ -25,10 +23,9 @@ export default function FlightForm({ flight, onSave, onClose }) {
       departureAirport,
       arrivalAirport,
       departureDate,
-      arrivalDate,
       bookingLink,
-      price: parseFloat(price), // Ensure price is a number
-      _id: flight?._id // Include the _id if it's an update
+      price: parseFloat(price),
+      _id: flight?._id
     });
 
     console.log("Flight ID: ", flight?._id);
@@ -60,14 +57,6 @@ export default function FlightForm({ flight, onSave, onClose }) {
         id="departureDate"
         value={departureDate}
         onChange={(e) => setDepartureDate(e.target.value)}
-        className="form-input"
-      />
-      <label htmlFor="arrivalDate">Arrival Date</label>
-      <input
-        type="date"
-        id="arrivalDate"
-        value={arrivalDate}
-        onChange={(e) => setArrivalDate(e.target.value)}
         className="form-input"
       />
       <label htmlFor="price">Price</label>

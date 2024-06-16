@@ -47,24 +47,24 @@ router.get('/:tripId/flights', auth, async (req, res) => {
   }
 });
 
-router.get('/:tripId/flights/:flightId', auth, async (req, res) => {
-  try {
-    const trip = await Trip.findById(req.params.tripId);
-    if (!trip) {
-      return res.status(404).json({ msg: 'Trip not found' });
-    }
+// router.get('/:tripId/flights/:flightId', auth, async (req, res) => {
+//   try {
+//     const trip = await Trip.findById(req.params.tripId);
+//     if (!trip) {
+//       return res.status(404).json({ msg: 'Trip not found' });
+//     }
 
-    const flight = trip.flights.id(req.params.flightId);
-    if (!flight) {
-      return res.status(404).json({ msg: 'Flight not found' });
-    }
+//     const flight = trip.flights.id(req.params.flightId);
+//     if (!flight) {
+//       return res.status(404).json({ msg: 'Flight not found' });
+//     }
 
-    res.json(flight);
-  } catch (error) {
-    console.error('Error fetching flight:', error);
-    res.status(500).send('Server Error');
-  }
-});
+//     res.json(flight);
+//   } catch (error) {
+//     console.error('Error fetching flight:', error);
+//     res.status(500).send('Server Error');
+//   }
+// });
 
 // Add a new trip
 router.post('/', auth, async (req, res) => {
@@ -166,8 +166,7 @@ router.post('/:tripId/destinations/:destinationId/places', auth, async (req, res
 
 router.post('/:tripId/flights', auth, async (req, res) => {
   const { tripId } = req.params;
-  console.log("TripID Backend: ", tripId);
-  const { departureAirport, arrivalAirport, departureDate, arrivalDate, bookingLink, price, type } = req.body;
+  const { departureAirport, arrivalAirport, departureDate, bookingLink, price, type } = req.body;
 
   try {
     const trip = await Trip.findById(tripId);
@@ -179,10 +178,9 @@ router.post('/:tripId/flights', auth, async (req, res) => {
       departureAirport,
       arrivalAirport,
       departureDate,
-      arrivalDate,
       bookingLink,
       price: parseFloat(price),
-      type // Ensure type is included
+      type
     };
 
     trip.flights.push(newFlight);
@@ -195,10 +193,9 @@ router.post('/:tripId/flights', auth, async (req, res) => {
   }
 });
 
-// Update an existing flight
 router.put('/:tripId/flights/:flightId', auth, async (req, res) => {
   const { tripId, flightId } = req.params;
-  const { departureAirport, arrivalAirport, departureDate, arrivalDate, bookingLink, price } = req.body;
+  const { departureAirport, arrivalAirport, departureDate, bookingLink, price } = req.body;
 
   try {
     const trip = await Trip.findById(tripId);
@@ -214,7 +211,6 @@ router.put('/:tripId/flights/:flightId', auth, async (req, res) => {
     flight.departureAirport = departureAirport;
     flight.arrivalAirport = arrivalAirport;
     flight.departureDate = departureDate;
-    flight.arrivalDate = arrivalDate;
     flight.bookingLink = bookingLink;
     flight.price = parseFloat(price);
 
@@ -226,7 +222,6 @@ router.put('/:tripId/flights/:flightId', auth, async (req, res) => {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
-
 
 // Update an existing trip
 router.put('/:id', auth, async (req, res) => {
