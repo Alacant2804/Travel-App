@@ -2,7 +2,7 @@
 
 ## 🌟 Introduction
 
-🌍 **Travel App** is a web application that helps users plan their trips. Users can create trips, add destinations, places to visit, and accommodation details. The app also integrates a map to visualize the trip details.
+🌍 **Travel App** is a web application that helps users plan their trips. Users can create trips, add destinations, places to visit, and accommodation details. The app also integrates a map to visualize the trip details. Basically the user can plan the whole trip from flight details to places to visit. There is even a budget for each trip to plan beforehand.
 
 ## ✨ Features
 
