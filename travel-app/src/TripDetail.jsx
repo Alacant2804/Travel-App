@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import Destination from './Destination';
 import FlightModal from './FlightModal';
+import Transportation from './Transportation';
 import MapComponent from './MapComponent';
 import axios from 'axios';
 import './TripDetail.css';
@@ -73,7 +74,6 @@ const fetchAllCoordinates = async (trip, setPlaces) => {
 
 export default function TripDetail() {
   const { tripId } = useParams();
-  const { fetchTrips } = useContext(TripsContext);
   const [trip, setTrip] = useState(null);
   const [destinations, setDestinations] = useState([]);
   const [places, setPlaces] = useState([]);
@@ -81,6 +81,8 @@ export default function TripDetail() {
   const [loading, setLoading] = useState(true);
   const [showFlightModal, setShowFlightModal] = useState(false);
   const [currentFlight, setCurrentFlight] = useState(null);
+  const [showTransportationModal, setShowTransportationModal] = useState(false);
+  const [currentTransportation, setCurrentTransportation] = useState(null);
 
   const fetchTripDetails = async () => {
     try {
@@ -318,6 +320,38 @@ const handleOpenFlightModal = (flight = null) => {
   setShowFlightModal(true);
 };
 
+const handleSaveTransportation = async (transportationData) => {
+  try {
+    if (transportationData._id) {
+      // Update transportation
+      await axios.put(
+        `http://localhost:5001/api/trips/${tripId}/transportation/${transportationData._id}`,
+        transportationData,
+        { withCredentials: true }
+      );
+    } else {
+      // Create new transportation
+      await axios.post(
+        `http://localhost:5001/api/trips/${tripId}/transportation`,
+        transportationData,
+        { withCredentials: true }
+      );
+    }
+
+    setCurrentTransportation(transportationData);
+    setShowTransportationModal(false);
+    fetchTripDetails(); // Refresh trip details
+  } catch (error) {
+    console.error('Error saving transportation:', error);
+  }
+};
+
+// Open transportation modal
+const handleOpenTransportationModal = (transportationData = null) => {
+  setCurrentTransportation(transportationData);
+  setShowTransportationModal(true);
+};
+
   if (loading) {
     return <p>Loading...</p>;
   }
@@ -332,7 +366,7 @@ const handleOpenFlightModal = (flight = null) => {
         <Link to='/trips'><button className='back-button'>Go Back</button></Link>
         <div className='trip-icons'>
           <button className="button-icon"><img src={budgetIcon} alt="Budget" className="budget-icon" /></button>
-          <button className="button-icon"><img src={carIcon} alt="Car" className="icon" /></button>
+          <button className="button-icon" onClick={handleOpenTransportationModal}><img src={carIcon} alt="Car" className="icon" /></button>
           <button className="button-icon" onClick={handleOpenFlightModal}><img src={planeIcon} alt="Plane" className="icon" /></button>
         </div>
       </div>
@@ -367,6 +401,15 @@ const handleOpenFlightModal = (flight = null) => {
           flight={currentFlight}
           onSave={handleSaveFlight}
           onClose={() => setShowFlightModal(false)}
+        />
+      )}
+
+      {showTransportationModal && (
+        <Transportation
+          tripId={tripId}
+          transportation={currentTransportation}
+          onSave={handleSaveTransportation}
+          onClose={() => setShowTransportationModal(false)}
         />
       )}
     </div>

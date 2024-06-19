@@ -9,6 +9,16 @@ const FlightSchema = new mongoose.Schema({
   type: { type: String, required: true }
 });
 
+const TransportationSchema = new mongoose.Schema({
+    pickupPlace: String,
+    dropoffPlace: String,
+    pickupDate: Date,
+    dropoffDate: Date,
+    duration: Number,
+    price: Number,
+    bookingLink: String
+})
+
 const CoordinatesSchema = new mongoose.Schema({
   lat: {
     type: Number,
@@ -70,6 +80,7 @@ const TripSchema = new mongoose.Schema({
   country: { type: String, required: true },
   destinations: [DestinationSchema],
   flights: [FlightSchema],
+  transportation: [TransportationSchema]
 }, { timestamps: true });
 
 
