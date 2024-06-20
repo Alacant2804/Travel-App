@@ -3,8 +3,8 @@ import axios from 'axios';
 import TransportationForm from './TransportationForm';
 import './Transportation.css';
 
-export default function TransportationModal({ tripId, onSave, onClose }) {
-  const [transportationDetails, setTransportationDetails] = useState({});
+export default function Transportation({ tripId, onSave, onClose }) {
+  const [transportationDetails, setTransportationDetails] = useState(null); // Initially null
   const [isEditing, setIsEditing] = useState(false);
 
   // Fetch transportation data for the trip
@@ -13,7 +13,9 @@ export default function TransportationModal({ tripId, onSave, onClose }) {
       try {
         const response = await axios.get(`http://localhost:5001/api/trips/${tripId}/transportation`, { withCredentials: true });
         const details = response.data;
-        setTransportationDetails(details || {});
+        console.log("Fetched Transportation Details: ", details);
+
+        setTransportationDetails(details[0]); // Set the fetched details
       } catch (error) {
         console.error('Error fetching transportation data:', error);
       }
@@ -38,6 +40,8 @@ export default function TransportationModal({ tripId, onSave, onClose }) {
         );
       }
       
+      console.log("Saved Transportation Data: ", transportationData);
+
       setTransportationDetails(transportationData);
       onSave(transportationData);
       setIsEditing(false);
@@ -45,6 +49,10 @@ export default function TransportationModal({ tripId, onSave, onClose }) {
       console.error("Error saving transportation:", error);
     }
   };
+
+  if (transportationDetails === null) {
+    return <p>Loading...</p>; // Display a loading state if data is still being fetched
+  }
 
   return (
     <div className="modal-overlay" onClick={onClose}>

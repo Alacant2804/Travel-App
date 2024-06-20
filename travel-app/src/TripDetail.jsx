@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useContext } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import Destination from './Destination';
@@ -10,7 +10,6 @@ import './TripDetail.css';
 import budgetIcon from './assets/budget.png';
 import carIcon from './assets/car.png';
 import planeIcon from './assets/plane.png';
-import { TripsContext } from './TripsContext';
 
 const getAndSetCoordinates = async (query, setState = null) => {
   try {
