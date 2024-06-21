@@ -5,6 +5,7 @@ import Destination from './Destination';
 import FlightModal from './FlightModal';
 import Transportation from './Transportation';
 import MapComponent from './MapComponent';
+import BudgetModal from './BudgetModal';
 import axios from 'axios';
 import './TripDetail.css';
 import budgetIcon from './assets/budget.png';
@@ -82,6 +83,7 @@ export default function TripDetail() {
   const [currentFlight, setCurrentFlight] = useState(null);
   const [showTransportationModal, setShowTransportationModal] = useState(false);
   const [currentTransportation, setCurrentTransportation] = useState(null);
+  const [showBudgetModal, setShowBudgetModal] = useState(false);
 
   const fetchTripDetails = async () => {
     try {
@@ -351,6 +353,14 @@ const handleOpenTransportationModal = (transportationData = null) => {
   setShowTransportationModal(true);
 };
 
+const handleOpenBudgetModal = () => {
+    setShowBudgetModal(true);
+  };
+
+  const handleCloseBudgetModal = () => {
+    setShowBudgetModal(false);
+  };
+
   if (loading) {
     return <p>Loading...</p>;
   }
@@ -364,7 +374,7 @@ const handleOpenTransportationModal = (transportationData = null) => {
       <div className='button-section'>
         <Link to='/trips'><button className='back-button'>Go Back</button></Link>
         <div className='trip-icons'>
-          <button className="button-icon"><img src={budgetIcon} alt="Budget" className="budget-icon" /></button>
+          <button className="button-icon" onClick={handleOpenBudgetModal}><img src={budgetIcon} alt="Budget" className="budget-icon" /></button>
           <button className="button-icon" onClick={handleOpenTransportationModal}><img src={carIcon} alt="Car" className="icon" /></button>
           <button className="button-icon" onClick={handleOpenFlightModal}><img src={planeIcon} alt="Plane" className="icon" /></button>
         </div>
@@ -409,6 +419,13 @@ const handleOpenTransportationModal = (transportationData = null) => {
           transportation={currentTransportation}
           onSave={handleSaveTransportation}
           onClose={() => setShowTransportationModal(false)}
+        />
+      )}
+
+      {showBudgetModal && (
+        <BudgetModal
+          tripId={trip._id}
+          onClose={handleCloseBudgetModal}
         />
       )}
     </div>

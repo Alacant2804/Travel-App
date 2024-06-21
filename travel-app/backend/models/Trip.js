@@ -1,5 +1,10 @@
 import mongoose from 'mongoose';
 
+const BudgetItemSchema = new mongoose.Schema({
+  category: { type: String, required: true },
+  amount: { type: Number, required: true }
+});
+
 const FlightSchema = new mongoose.Schema({
   departureAirport: String,
   arrivalAirport: String,
@@ -80,7 +85,8 @@ const TripSchema = new mongoose.Schema({
   country: { type: String, required: true },
   destinations: [DestinationSchema],
   flights: [FlightSchema],
-  transportation: [TransportationSchema]
+  transportation: [TransportationSchema],
+  budget: [BudgetItemSchema]
 }, { timestamps: true });
 
 

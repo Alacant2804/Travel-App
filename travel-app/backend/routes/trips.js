@@ -62,6 +62,21 @@ router.get('/:tripId/transportation', auth, async (req, res) => {
   }
 });
 
+// Get budget items for a trip
+router.get('/:tripId/budget', auth, async (req, res) => {
+  try {
+    const trip = await Trip.findById(req.params.tripId);
+    if (!trip) {
+      return res.status(404).json({ msg: 'Trip not found' });
+    }
+
+    res.json(trip.budget || []);
+  } catch (error) {
+    console.error('Error fetching budget items:', error);
+    res.status(500).send('Server Error');
+  }
+});
+
 // Add a new trip
 router.post('/', auth, async (req, res) => {
   const { tripName, country, destinations } = req.body;
@@ -216,6 +231,55 @@ router.post('/:tripId/transportation', auth, async (req, res) => {
     res.status(201).json(newTransportation);
   } catch (error) {
     console.error('Error saving transportation:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+// Add a new budget item
+router.post('/:tripId/budget', auth, async (req, res) => {
+  const { tripId } = req.params;
+  const { category, amount } = req.body;
+
+  try {
+    const trip = await Trip.findById(tripId);
+    if (!trip) {
+      return res.status(404).json({ msg: 'Trip not found' });
+    }
+
+    const newBudgetItem = { category, amount: parseFloat(amount) };
+    trip.budget.push(newBudgetItem);
+    await trip.save();
+
+    res.status(201).json(trip.budget);
+  } catch (error) {
+    console.error('Error saving budget item:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+// Update an existing budget item
+router.put('/:tripId/budget/:budgetId', auth, async (req, res) => {
+  const { tripId, budgetId } = req.params;
+  const { category, amount } = req.body;
+
+  try {
+    const trip = await Trip.findById(tripId);
+    if (!trip) {
+      return res.status(404).json({ msg: 'Trip not found' });
+    }
+
+    const budgetItem = trip.budget.id(budgetId);
+    if (!budgetItem) {
+      return res.status(404).json({ msg: 'Budget item not found' });
+    }
+
+    budgetItem.category = category;
+    budgetItem.amount = parseFloat(amount);
+
+    await trip.save();
+    res.json(trip.budget);
+  } catch (error) {
+    console.error('Error updating budget item:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
@@ -463,6 +527,31 @@ router.delete('/:tripId/destinations/:destinationId/places/:placeId', auth, asyn
   } catch (error) {
     console.error('Error deleting place:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
+// Delete a budget item
+router.delete('/:tripId/budget/:budgetId', auth, async (req, res) => {
+  const { tripId, budgetId } = req.params;
+
+  try {
+    const trip = await Trip.findById(tripId);
+    if (!trip) {
+      return res.status(404).json({ msg: 'Trip not found' });
+    }
+
+    const budgetItem = trip.budget.id(budgetId);
+    if (!budgetItem) {
+      return res.status(404).json({ msg: 'Budget item not found' });
+    }
+
+    budgetItem.remove();
+    await trip.save();
+
+    res.json(trip.budget);
+  } catch (error) {
+    console.error('Error deleting budget item:', error);
+    res.status(500).send('Server Error');
   }
 });
 
