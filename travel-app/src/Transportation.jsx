@@ -4,7 +4,7 @@ import TransportationForm from './TransportationForm';
 import './Transportation.css';
 
 export default function Transportation({ tripId, onSave, onClose }) {
-  const [transportationDetails, setTransportationDetails] = useState(null); // Initially null
+  const [transportationDetails, setTransportationDetails] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
 
   // Fetch transportation data for the trip
