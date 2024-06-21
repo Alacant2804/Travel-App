@@ -69,10 +69,9 @@ router.get('/:tripId/budget', auth, async (req, res) => {
     if (!trip) {
       return res.status(404).json({ msg: 'Trip not found' });
     }
-
-    res.json(trip.budget || []);
+    res.json(trip.budget);
   } catch (error) {
-    console.error('Error fetching budget items:', error);
+    console.error('Error fetching budget:', error);
     res.status(500).send('Server Error');
   }
 });
@@ -239,7 +238,7 @@ router.post('/:tripId/transportation', auth, async (req, res) => {
 router.post('/:tripId/budget', auth, async (req, res) => {
   const { tripId } = req.params;
   const { category, amount } = req.body;
-
+  
   try {
     const trip = await Trip.findById(tripId);
     if (!trip) {
@@ -247,10 +246,10 @@ router.post('/:tripId/budget', auth, async (req, res) => {
     }
 
     const newBudgetItem = { category, amount: parseFloat(amount) };
+
     trip.budget.push(newBudgetItem);
     await trip.save();
-
-    res.status(201).json(trip.budget);
+    res.status(201).json(newBudgetItem);
   } catch (error) {
     console.error('Error saving budget item:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
@@ -277,7 +276,7 @@ router.put('/:tripId/budget/:budgetId', auth, async (req, res) => {
     budgetItem.amount = parseFloat(amount);
 
     await trip.save();
-    res.json(trip.budget);
+    res.json(budgetItem);
   } catch (error) {
     console.error('Error updating budget item:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
