@@ -35,7 +35,7 @@ export default function BudgetModal({ tripId, onSave, onClose }) {
         const responseBudget = await axios.get(`http://localhost:5001/api/trips/${tripId}/budget`, { withCredentials: true });
         const additionalItems = responseBudget.data.map(item => ({
           ...item,
-          amount: parseFloat(item.amount), // Ensure amount is a number
+          amount: parseFloat(item.amount),
         }));
 
         setBudgetItems([...defaultItems, ...additionalItems]);
@@ -61,7 +61,6 @@ export default function BudgetModal({ tripId, onSave, onClose }) {
       const updatedItem = { ...editedItem, amount: parseFloat(editedItem.amount) };
 
       if (updatedItem._id && !['default-flights', 'default-transportation', 'default-places', 'default-accommodation'].includes(updatedItem._id)) {
-        // Update existing budget item
         await axios.put(
           `http://localhost:5001/api/trips/${tripId}/budget/${updatedItem._id}`,
           updatedItem,
@@ -69,16 +68,17 @@ export default function BudgetModal({ tripId, onSave, onClose }) {
         );
       }
 
-      // Refetch and update budget items
-      const response = await axios.get(`http://localhost:5001/api/trips/${tripId}/budget`, { withCredentials: true });
-      const additionalItems = response.data.map(item => ({
+      // Refetch the budget items to synchronize state
+      const responseBudget = await axios.get(`http://localhost:5001/api/trips/${tripId}/budget`, { withCredentials: true });
+      const additionalItems = responseBudget.data.map(item => ({
         ...item,
-        amount: parseFloat(item.amount), // Ensure amount is a number
+        amount: parseFloat(item.amount),
       }));
+      setBudgetItems(prevItems => [
+        ...prevItems.filter(item => ['default-flights', 'default-transportation', 'default-places', 'default-accommodation'].includes(item._id)),
+        ...additionalItems
+      ]);
 
-      const defaultItems = budgetItems.filter(item => ['default-flights', 'default-transportation', 'default-places', 'default-accommodation'].includes(item._id));
-
-      setBudgetItems([...defaultItems, ...additionalItems]);
       setEditItemId(null);
       setEditedItem({ category: '', amount: '', _id: null });
       onSave();
@@ -89,21 +89,31 @@ export default function BudgetModal({ tripId, onSave, onClose }) {
 
   const handleSaveNew = async () => {
     try {
-      const newBudgetItem = { ...newItem, amount: parseFloat(newItem.amount) };
+        const newBudgetItem = { ...newItem, amount: parseFloat(newItem.amount) };
 
-      if (newBudgetItem.category && newBudgetItem.amount) {
-        // Add new budget item
-        const response = await axios.post(`http://localhost:5001/api/trips/${tripId}/budget`, newBudgetItem, { withCredentials: true });
-        const createdItem = { ...response.data, amount: parseFloat(response.data.amount) };
+        if (newBudgetItem.category && newBudgetItem.amount) {
+            await axios.post(`http://localhost:5001/api/trips/${tripId}/budget`, newBudgetItem, { withCredentials: true });
 
-        setBudgetItems([...budgetItems, createdItem]);
-        setNewItem({ category: '', amount: '' });
-        onSave();
-      }
+            // Refetch the budget items to synchronize state
+            const responseBudget = await axios.get(`http://localhost:5001/api/trips/${tripId}/budget`, { withCredentials: true });
+            const additionalItems = responseBudget.data.map(item => ({
+                ...item,
+                amount: parseFloat(item.amount),
+            }));
+
+            setBudgetItems(prevItems => [
+                ...prevItems.filter(item => ['default-flights', 'default-transportation', 'default-places', 'default-accommodation'].includes(item._id)),
+                ...additionalItems
+            ]);
+
+            setNewItem({ category: '', amount: '' });
+            onSave();
+        }
     } catch (error) {
-      console.error("Error saving budget item:", error);
+        console.error("Error saving budget item:", error);
     }
-  };
+};
+
 
   const handleDelete = async (id) => {
     if (!id || ['default-flights', 'default-transportation', 'default-places', 'default-accommodation'].includes(id)) {
@@ -114,16 +124,16 @@ export default function BudgetModal({ tripId, onSave, onClose }) {
     try {
       await axios.delete(`http://localhost:5001/api/trips/${tripId}/budget/${id}`, { withCredentials: true });
 
-      // Refetch budget items
-      const response = await axios.get(`http://localhost:5001/api/trips/${tripId}/budget`, { withCredentials: true });
-      const additionalItems = response.data.map(item => ({
+      // Refetch the budget items to synchronize state
+      const responseBudget = await axios.get(`http://localhost:5001/api/trips/${tripId}/budget`, { withCredentials: true });
+      const additionalItems = responseBudget.data.map(item => ({
         ...item,
-        amount: parseFloat(item.amount), // Ensure amount is a number
+        amount: parseFloat(item.amount),
       }));
-
-      const defaultItems = budgetItems.filter(item => ['default-flights', 'default-transportation', 'default-places', 'default-accommodation'].includes(item._id));
-
-      setBudgetItems([...defaultItems, ...additionalItems]);
+      setBudgetItems(prevItems => [
+        ...prevItems.filter(item => ['default-flights', 'default-transportation', 'default-places', 'default-accommodation'].includes(item._id)),
+        ...additionalItems
+      ]);
     } catch (error) {
       console.error("Error deleting budget item:", error);
     }
@@ -143,93 +153,91 @@ export default function BudgetModal({ tripId, onSave, onClose }) {
   };
 
   return (
-  <div className="modal-overlay" onClick={onClose}>
-    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-      <h2>Budget Details</h2>
-      <div className="modal-scroll">
-        <table className="budget-info-table">
-          <thead>
-            <tr>
-              <th>Category</th>
-              <th>Amount</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {budgetItems.map((item) => (
-              <tr key={item._id}>
-                <td>{editItemId === item._id ? (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+        <h2>Budget Details</h2>
+        <div className="modal-scroll">
+          <table className="budget-info-table">
+            <thead>
+              <tr>
+                <th>Category</th>
+                <th>Amount</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {budgetItems.map((item) => (
+                <tr key={item._id}>
+                  <td>{editItemId === item._id ? (
+                    <input
+                      type="text"
+                      name="category"
+                      value={editedItem.category}
+                      onChange={handleEditChange}
+                      readOnly={['default-flights', 'default-transportation', 'default-places', 'default-accommodation'].includes(item._id)}
+                    />
+                  ) : (
+                    item.category
+                  )}</td>
+                  <td>{editItemId === item._id ? (
+                    <input
+                      type="number"
+                      name="amount"
+                      value={editedItem.amount}
+                      onChange={handleEditChange}
+                    />
+                  ) : (
+                    `$${item.amount.toFixed(2)}`
+                  )}</td>
+                  <td>
+                    {editItemId === item._id ? (
+                      <>
+                        <button className="save-btn" onClick={handleSaveEdit}>Save</button>
+                        <button className="cancel-btn" onClick={handleCancelEdit}>Cancel</button>
+                      </>
+                    ) : !['default-flights', 'default-transportation', 'default-places', 'default-accommodation'].includes(item._id) ? (
+                      <>
+                        <button className="edit-btn" onClick={() => handleEdit(item)}>Edit</button>
+                        <button className="delete-btn" onClick={() => handleDelete(item._id)}>Delete</button>
+                      </>
+                    ) : null}
+                  </td>
+                </tr>
+              ))}
+              <tr>
+                <td>
                   <input
                     type="text"
                     name="category"
-                    value={editedItem.category}
-                    onChange={handleEditChange}
-                    readOnly={['default-flights', 'default-transportation', 'default-places', 'default-accommodation'].includes(item._id)}
+                    placeholder="New Category"
+                    value={newItem.category}
+                    onChange={handleNewChange}
                   />
-                ) : (
-                  item.category
-                )}</td>
-                <td>{editItemId === item._id ? (
+                </td>
+                <td>
                   <input
                     type="number"
                     name="amount"
-                    value={editedItem.amount}
-                    onChange={handleEditChange}
+                    placeholder="Amount"
+                    value={newItem.amount}
+                    onChange={handleNewChange}
                   />
-                ) : (
-                  `$${item.amount.toFixed(2)}`
-                )}</td>
+                </td>
                 <td>
-                  {!['default-flights', 'default-transportation', 'default-places', 'default-accommodation'].includes(item._id) && (
-                    <>
-                      <button className="edit-btn" onClick={() => handleEdit(item)}>Edit</button>
-                      <button className="delete-btn" onClick={() => handleDelete(item._id)}>Delete</button>
-                    </>
-                  )}
-                  {editItemId === item._id && (
-                    <>
-                      <button className="save-btn" onClick={handleSaveEdit}>Save</button>
-                      <button className="cancel-btn" onClick={handleCancelEdit}>Cancel</button>
-                    </>
-                  )}
+                  <button className="save-btn" onClick={handleSaveNew}>Save</button>
                 </td>
               </tr>
-            ))}
-            <tr>
-              <td>
-                <input
-                  type="text"
-                  name="category"
-                  placeholder="New Category"
-                  value={newItem.category}
-                  onChange={handleNewChange}
-                />
-              </td>
-              <td>
-                <input
-                  type="number"
-                  name="amount"
-                  placeholder="Amount"
-                  value={newItem.amount}
-                  onChange={handleNewChange}
-                />
-              </td>
-              <td>
-                <button className="save-btn" onClick={handleSaveNew}>Save</button>
-              </td>
-            </tr>
-            <tr>
-              <td colSpan="2" style={{ textAlign: 'right' }}><strong>Total:</strong></td>
-              <td>${budgetItems.reduce((total, item) => total + parseFloat(item.amount), 0).toFixed(2)}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <div className="modal-actions">
-        <button className="modal-btn close-btn" onClick={onClose}>Close</button>
+              <tr>
+                <td colSpan="2" style={{ textAlign: 'right' }}><strong>Total:</strong></td>
+                <td>${budgetItems.reduce((total, item) => total + parseFloat(item.amount), 0).toFixed(2)}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div className="modal-actions">
+          <button className="modal-btn close-btn" onClick={onClose}>Close</button>
+        </div>
       </div>
     </div>
-  </div>
-);
-
+  );
 }
