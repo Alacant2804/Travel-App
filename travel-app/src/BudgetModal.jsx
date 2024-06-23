@@ -143,9 +143,10 @@ export default function BudgetModal({ tripId, onSave, onClose }) {
   };
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
-      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <h2>Budget Details</h2>
+  <div className="modal-overlay" onClick={onClose}>
+    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+      <h2>Budget Details</h2>
+      <div className="modal-scroll">
         <table className="budget-info-table">
           <thead>
             <tr>
@@ -155,44 +156,43 @@ export default function BudgetModal({ tripId, onSave, onClose }) {
             </tr>
           </thead>
           <tbody>
-            {budgetItems.map((item, index) => (
-              <tr key={item._id || `item-${index}`}>
-                {editItemId === item._id ? (
-                  <>
-                    <td>
-                      <input
-                        type="text"
-                        name="category"
-                        value={editedItem.category}
-                        onChange={handleEditChange}
-                        readOnly={['default-flights', 'default-transportation', 'default-places', 'default-accommodation'].includes(item._id)}
-                      />
-                    </td>
-                    <td>
-                      <input
-                        type="number"
-                        name="amount"
-                        value={editedItem.amount}
-                        onChange={handleEditChange}
-                      />
-                    </td>
-                    <td>
+            {budgetItems.map((item) => (
+              <tr key={item._id}>
+                <td>{editItemId === item._id ? (
+                  <input
+                    type="text"
+                    name="category"
+                    value={editedItem.category}
+                    onChange={handleEditChange}
+                    readOnly={['default-flights', 'default-transportation', 'default-places', 'default-accommodation'].includes(item._id)}
+                  />
+                ) : (
+                  item.category
+                )}</td>
+                <td>{editItemId === item._id ? (
+                  <input
+                    type="number"
+                    name="amount"
+                    value={editedItem.amount}
+                    onChange={handleEditChange}
+                  />
+                ) : (
+                  `$${item.amount.toFixed(2)}`
+                )}</td>
+                <td>
+                  {!['default-flights', 'default-transportation', 'default-places', 'default-accommodation'].includes(item._id) && (
+                    <>
+                      <button className="edit-btn" onClick={() => handleEdit(item)}>Edit</button>
+                      <button className="delete-btn" onClick={() => handleDelete(item._id)}>Delete</button>
+                    </>
+                  )}
+                  {editItemId === item._id && (
+                    <>
                       <button className="save-btn" onClick={handleSaveEdit}>Save</button>
                       <button className="cancel-btn" onClick={handleCancelEdit}>Cancel</button>
-                    </td>
-                  </>
-                ) : (
-                  <>
-                    <td>{item.category}</td>
-                    <td>${item.amount.toFixed(2)}</td>
-                    <td>
-                      <button className="edit-btn" onClick={() => handleEdit(item)}>Edit</button>
-                      {!['default-flights', 'default-transportation', 'default-places', 'default-accommodation'].includes(item._id) && (
-                        <button className="delete-btn" onClick={() => handleDelete(item._id)}>Delete</button>
-                      )}
-                    </td>
-                  </>
-                )}
+                    </>
+                  )}
+                </td>
               </tr>
             ))}
             <tr>
@@ -224,10 +224,12 @@ export default function BudgetModal({ tripId, onSave, onClose }) {
             </tr>
           </tbody>
         </table>
-        <div className="modal-actions">
-          <button className="modal-btn close-btn" onClick={onClose}>Close</button>
-        </div>
+      </div>
+      <div className="modal-actions">
+        <button className="modal-btn close-btn" onClick={onClose}>Close</button>
       </div>
     </div>
-  );
+  </div>
+);
+
 }

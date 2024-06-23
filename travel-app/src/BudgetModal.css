@@ -20,6 +20,22 @@
     max-width: 80%;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     animation: fadeIn 0.3s;
+    display: flex;
+    flex-direction: column;
+    max-height: 80vh;
+    /* Ensures modal does not exceed viewport height */
+    overflow: hidden;
+    /* Hide overflow initially */
+}
+
+/* Scrollable content area */
+.modal-scroll {
+    overflow-y: auto;
+    /* Enable vertical scrolling */
+    max-height: 60vh;
+    /* Set max height for the scrollable content */
+    padding: 0 10px;
+    /* Add some padding for better look */
 }
 
 /* Table styling */

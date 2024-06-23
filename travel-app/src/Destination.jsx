@@ -8,6 +8,7 @@ import Xicon from './assets/x-icon.png';
 
 export default function Destination({
   initialData = {},
+  tripId,
   onSave,
   calculateDuration,
   onAddPlace,
@@ -68,7 +69,14 @@ export default function Destination({
   const handleSaveAccommodation = async (accommodationData) => {
     setAccommodation(accommodationData);
     setShowAccommodationModal(false);
-    await onSave({ city: destination, startDate, endDate, places, duration, accommodation: accommodationData });
+    await onSave({
+      city: destination,
+      startDate,
+      endDate,
+      places,
+      duration,
+      accommodation: accommodationData,
+    });
   };
 
   const totalPlaces = places.length;
@@ -83,7 +91,14 @@ export default function Destination({
             className="destination-input"
             value={destination}
             onChange={(e) => setDestination(e.target.value)}
-            onBlur={() => onSave({ city: destination, startDate, endDate, places, duration, accommodation })}
+            onBlur={() => onSave({
+              city: destination,
+              startDate,
+              endDate,
+              places,
+              duration,
+              accommodation,
+            })}
           />
           {index > 0 && (
             <button
@@ -102,7 +117,14 @@ export default function Destination({
               type="date"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
-              onBlur={() => onSave({ city: destination, startDate, endDate, places, duration, accommodation })}
+              onBlur={() => onSave({
+                city: destination,
+                startDate,
+                endDate,
+                places,
+                duration,
+                accommodation,
+              })}
             />
           </p>
           <p>
@@ -111,7 +133,14 @@ export default function Destination({
               type="date"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
-              onBlur={() => onSave({ city: destination, startDate, endDate, places, duration, accommodation })}
+              onBlur={() => onSave({
+                city: destination,
+                startDate,
+                endDate,
+                places,
+                duration,
+                accommodation,
+              })}
             />
           </p>
           <p>
@@ -188,6 +217,8 @@ export default function Destination({
         </button>
         {showAccommodationModal && (
           <AccommodationModal
+            tripId={tripId}
+            destinationId={initialData._id}
             accommodation={accommodation}
             onSave={handleSaveAccommodation}
             onClose={() => setShowAccommodationModal(false)}

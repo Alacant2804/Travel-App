@@ -234,6 +234,34 @@ router.post('/:tripId/transportation', auth, async (req, res) => {
   }
 });
 
+router.post('/:tripId/destinations/:destinationId/accommodation', auth, async (req, res) => {
+  try {
+    const trip = await Trip.findById(req.params.tripId);
+    const destination = trip.destinations.id(req.params.destinationId);
+
+    if (!trip || !destination) {
+      return res.status(404).json({ msg: 'Trip or Destination not found' });
+    }
+
+    const newAccommodation = {
+      address: req.body.address,
+      startDate: req.body.startDate,
+      endDate: req.body.endDate,
+      bookingLink: req.body.bookingLink,
+      price: req.body.price,
+      coordinates: req.body.coordinates
+    };
+
+    destination.accommodation = newAccommodation;
+    await trip.save();
+
+    res.status(201).json(newAccommodation);
+  } catch (error) {
+    console.error('Error adding accommodation:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
 // Add a new budget item
 router.post('/:tripId/budget', auth, async (req, res) => {
   const { tripId } = req.params;
@@ -255,6 +283,38 @@ router.post('/:tripId/budget', auth, async (req, res) => {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
+
+// Update accommodation
+router.put('/:tripId/destinations/:destinationId/accommodation/:accommodationId', auth, async (req, res) => {
+  try {
+    const trip = await Trip.findById(req.params.tripId);
+    const destination = trip.destinations.id(req.params.destinationId);
+
+    if (!trip || !destination) {
+      return res.status(404).json({ msg: 'Trip or Destination not found' });
+    }
+
+    const accommodation = destination.accommodation.id(req.params.accommodationId);
+    if (!accommodation) {
+      return res.status(404).json({ msg: 'Accommodation not found' });
+    }
+
+    accommodation.address = req.body.address;
+    accommodation.startDate = req.body.startDate;
+    accommodation.endDate = req.body.endDate;
+    accommodation.bookingLink = req.body.bookingLink;
+    accommodation.price = req.body.price;
+    accommodation.coordinates = req.body.coordinates;
+
+    await trip.save();
+
+    res.json(accommodation);
+  } catch (error) {
+    console.error('Error updating accommodation:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+});
+
 
 // Update an existing budget item
 router.put('/:tripId/budget/:budgetId', auth, async (req, res) => {

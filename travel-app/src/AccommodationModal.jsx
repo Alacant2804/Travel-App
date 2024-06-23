@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import './AccommodationModal.css';
 import axios from 'axios';
 
-export default function AccommodationModal({ accommodation, onSave, onClose }) {
+export default function AccommodationModal({ tripId, destinationId, accommodation, onSave, onClose }) {
   const [address, setAddress] = useState(accommodation?.address || '');
   const [startDate, setStartDate] = useState(accommodation?.startDate || '');
   const [endDate, setEndDate] = useState(accommodation?.endDate || '');
@@ -44,8 +44,29 @@ export default function AccommodationModal({ accommodation, onSave, onClose }) {
 
   const handleSave = async () => {
     const coordinates = await fetchCoordinates(address);
-    onSave({ address, startDate, endDate, bookingLink, price, coordinates });
-    onClose();
+    const accommodationData = { address, startDate, endDate, bookingLink, price, coordinates };
+
+    try {
+      if (accommodation && accommodation._id) {
+        // Update accommodation
+        await axios.put(
+          `http://localhost:5001/api/trips/${tripId}/destinations/${destinationId}/accommodation/${accommodation._id}`,
+          accommodationData,
+          { withCredentials: true }
+        );
+      } else {
+        // Create new accommodation
+        await axios.post(
+          `http://localhost:5001/api/trips/${tripId}/destinations/${destinationId}/accommodation`,
+          accommodationData,
+          { withCredentials: true }
+        );
+      }
+      onSave(accommodationData);
+      onClose();
+    } catch (error) {
+      console.error("Error saving accommodation:", error);
+    }
   };
 
   const handleEdit = () => {
