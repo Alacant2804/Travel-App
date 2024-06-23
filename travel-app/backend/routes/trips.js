@@ -234,31 +234,22 @@ router.post('/:tripId/transportation', auth, async (req, res) => {
   }
 });
 
-router.post('/:tripId/destinations/:destinationId/accommodation', auth, async (req, res) => {
+router.post('/trips/:tripId/destinations/:destinationId/accommodation', async (req, res) => {
   try {
-    const trip = await Trip.findById(req.params.tripId);
-    const destination = trip.destinations.id(req.params.destinationId);
+    const { tripId, destinationId } = req.params;
+    const trip = await Trip.findById(tripId);
+    if (!trip) return res.status(404).send('Trip not found');
 
-    if (!trip || !destination) {
-      return res.status(404).json({ msg: 'Trip or Destination not found' });
-    }
+    const destination = trip.destinations.id(destinationId);
+    if (!destination) return res.status(404).send('Destination not found');
 
-    const newAccommodation = {
-      address: req.body.address,
-      startDate: req.body.startDate,
-      endDate: req.body.endDate,
-      bookingLink: req.body.bookingLink,
-      price: req.body.price,
-      coordinates: req.body.coordinates
-    };
-
-    destination.accommodation = newAccommodation;
+    destination.accommodation = req.body;
     await trip.save();
 
-    res.status(201).json(newAccommodation);
+    res.status(200).send(destination);
   } catch (error) {
-    console.error('Error adding accommodation:', error);
-    res.status(500).json({ message: 'Server error', error: error.message });
+    console.error("Error saving accommodation:", error);
+    res.status(500).send('Internal Server Error');
   }
 });
 

@@ -136,32 +136,43 @@ export default function TripDetail() {
     };
 
     const handleSaveDestination = useCallback(
-        async (updatedData, index) => {
-            const destinationId = destinations[index]._id;
-            const updatedDestination = {
-                ...destinations[index],
-                ...updatedData,
-                duration: calculateDuration(updatedData.startDate, updatedData.endDate),
-            };
+    async (updatedData, index) => {
+        const destinationId = destinations[index]?._id; // Check if destinationId exists
+        const updatedDestination = {
+            ...destinations[index],
+            ...updatedData,
+            duration: calculateDuration(updatedData.startDate, updatedData.endDate),
+        };
 
-            try {
-                const response = await axios.put(
+        try {
+            let response;
+            if (destinationId) {
+                // Update existing destination
+                response = await axios.put(
                     `http://localhost:5001/api/trips/${tripId}/destinations/${destinationId}`,
                     updatedDestination,
                     { withCredentials: true }
                 );
-                setDestinations(response.data.destinations);
-            } catch (error) {
-                console.error('Error updating destination:', error);
+            } else {
+                // Create new destination
+                response = await axios.post(
+                    `http://localhost:5001/api/trips/${tripId}/destinations`,
+                    updatedDestination,
+                    { withCredentials: true }
+                );
             }
+            setDestinations(response.data.destinations);
 
             const updatedPlaces = await fetchPlacesAndAccommodationsCoordinates(
                 updatedDestination,
                 trip.country
             );
             setPlaces(updatedPlaces);
-        },
-        [destinations, tripId, trip?.country]
+        } catch (error) {
+            console.error('Error saving destination:', error);
+        }
+    },
+    [destinations, tripId, trip?.country]
     );
 
     const handleAddPlace = async (destinationIndex, placeName, placePrice) => {
@@ -366,6 +377,7 @@ export default function TripDetail() {
                         onDeletePlace={(placeIndex) => handleDeletePlace(index, placeIndex)}
                         onDeleteDestination={() => handleDeleteDestination(index)}
                         index={index}
+                        tripId={tripId}
                     />
                 ))}
             </div>

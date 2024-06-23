@@ -7,7 +7,6 @@ export default function AccommodationModal({ tripId, destinationId, accommodatio
   const [startDate, setStartDate] = useState(accommodation?.startDate || '');
   const [endDate, setEndDate] = useState(accommodation?.endDate || '');
   const [bookingLink, setBookingLink] = useState(accommodation?.bookingLink || '');
-  const [isEditing, setIsEditing] = useState(!accommodation);
   const [price, setPrice] = useState(accommodation?.price || 0);
 
   useEffect(() => {
@@ -43,97 +42,90 @@ export default function AccommodationModal({ tripId, destinationId, accommodatio
   };
 
   const handleSave = async () => {
-    const coordinates = await fetchCoordinates(address);
-    const accommodationData = { address, startDate, endDate, bookingLink, price, coordinates };
-
-    try {
-      if (accommodation && accommodation._id) {
-        // Update accommodation
-        await axios.put(
-          `http://localhost:5001/api/trips/${tripId}/destinations/${destinationId}/accommodation/${accommodation._id}`,
-          accommodationData,
-          { withCredentials: true }
-        );
-      } else {
-        // Create new accommodation
-        await axios.post(
-          `http://localhost:5001/api/trips/${tripId}/destinations/${destinationId}/accommodation`,
-          accommodationData,
-          { withCredentials: true }
-        );
-      }
-      onSave(accommodationData);
-      onClose();
-    } catch (error) {
-      console.error("Error saving accommodation:", error);
+  if (!tripId || !destinationId) {
+    console.error("Missing tripId or destinationId.");
+    return;
+  }
+  const coordinates = await fetchCoordinates(address);
+  const accommodationData = { address, startDate, endDate, bookingLink, price, coordinates, _id: accommodation?._id };
+  console.log("Accommodation Modal, handleSave, accomodation data: ", accommodationData);
+  try {
+    let response;
+    if (accommodation?._id) {
+      response = await axios.put(
+        `http://localhost:5001/api/trips/${tripId}/destinations/${destinationId}/accommodation`,
+        accommodationData,
+        { withCredentials: true }
+      );
+    } else {
+      response = await axios.post(
+        `http://localhost:5001/api/trips/${tripId}/destinations/${destinationId}/accommodation`,
+        accommodationData,
+        { withCredentials: true }
+      );
     }
-  };
-
-  const handleEdit = () => {
-    setIsEditing(true);
-  };
+    onSave(response.data);
+    onClose();
+  } catch (error) {
+    console.error("Error saving accommodation:", error);
+  }
+};
 
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <h2>Accommodation Details</h2>
-        {accommodation && !isEditing ? (
-          <div className="accommodation-info">
-            <p><strong>Address:</strong> {address}</p>
-            <p><strong>From:</strong> {startDate}</p>
-            <p><strong>To:</strong> {endDate}</p>
-            <p><strong>Price:</strong> ${price.toFixed(2)}</p>
-            {bookingLink && (
-              <p><strong>Booking Link:</strong> <a href={bookingLink} target="_blank" rel="noopener noreferrer">{bookingLink}</a></p>
-            )}
-            <div className="modal-actions">
-              <button className="modal-btn close-btn" onClick={onClose}>Close</button>
-              <button className="modal-btn edit-btn" onClick={handleEdit}>Edit</button>
-            </div>
+        <form className="modal-form" onSubmit={(e) => { e.preventDefault(); handleSave(); }}>
+          <label htmlFor="address">Address</label>
+          <input
+            type="text"
+            id="address"
+            placeholder="Address (without country name)"
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+            className="form-input"
+          />
+          <label htmlFor="startDate">Start Date</label>
+          <input
+            type="date"
+            id="startDate"
+            value={startDate}
+            onChange={(e) => setStartDate(e.target.value)}
+            className="form-input"
+          />
+          <label htmlFor="endDate">End Date</label>
+          <input
+            type="date"
+            id="endDate"
+            value={endDate}
+            onChange={(e) => setEndDate(e.target.value)}
+            className="form-input"
+          />
+          <label htmlFor="price">Price</label>
+          <input
+            type="number"
+            id="price"
+            placeholder="Price"
+            value={price}
+            onChange={(e) => setPrice(parseFloat(e.target.value))}
+            className="form-input"
+            step="0.01"
+            min="0"
+          />
+          <label htmlFor="bookingLink">Booking Link</label>
+          <input
+            type="url"
+            id="bookingLink"
+            placeholder="Booking Link"
+            value={bookingLink}
+            onChange={(e) => setBookingLink(e.target.value)}
+            className="form-input"
+          />
+          <div className="modal-actions">
+            <button type="button" className="modal-btn cancel-btn" onClick={onClose}>Cancel</button>
+            <button type="submit" className="modal-btn submit-btn">Save</button>
           </div>
-        ) : (
-          <form className="modal-form" onSubmit={(e) => { e.preventDefault(); handleSave(); }}>
-            <input
-              type="text"
-              placeholder="Address (without country name)"
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              className="form-input"
-            />
-            <input
-              type="date"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              className="form-input"
-            />
-            <input
-              type="date"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              className="form-input"
-            />
-            <input
-              type="number"
-              placeholder="Price"
-              value={price}
-              onChange={(e) => setPrice(parseFloat(e.target.value))}
-              className="form-input"
-              step="0.01"
-              min="0"
-            />
-            <input
-              type="url"
-              placeholder="Booking Link"
-              value={bookingLink}
-              onChange={(e) => setBookingLink(e.target.value)}
-              className="form-input"
-            />
-            <div className="modal-actions">
-              <button type="button" className="modal-btn cancel-btn" onClick={onClose}>Cancel</button>
-              <button type="submit" className="modal-btn submit-btn">Save</button>
-            </div>
-          </form>
-        )}
+        </form>
       </div>
     </div>
   );
