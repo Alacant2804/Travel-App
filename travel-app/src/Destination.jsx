@@ -4,7 +4,7 @@ import AccommodationModal from './AccommodationModal';
 import accommodationIcon from './assets/accommodation-icon.png';
 import deleteIcon from './assets/delete-icon.png';
 import editIcon from './assets/edit-icon.png';
-import Xicon from './assets/x-icon.png'
+import Xicon from './assets/x-icon.png';
 
 export default function Destination({
   initialData = {},
@@ -13,8 +13,8 @@ export default function Destination({
   onAddPlace,
   onEditPlace,
   onDeletePlace,
-  onDeleteDestination, // Handler to delete destination
-  index, // Index of this destination
+  onDeleteDestination,
+  index,
 }) {
   const [destination, setDestination] = useState(initialData.city || 'New Destination');
   const [startDate, setStartDate] = useState(initialData.startDate ? initialData.startDate.split('T')[0] : '');
@@ -34,23 +34,18 @@ export default function Destination({
     event.preventDefault();
     const placeInput = event.target.elements.placeInput.value.trim();
     const priceInput = event.target.elements.priceInput.value.trim();
-  
-    // Check for valid place input and price input
     if (!placeInput) {
       console.error("Place name is empty");
       return;
     }
-  
     if (isNaN(parseFloat(priceInput))) {
       console.error("Invalid price input");
       return;
     }
-  
     await onAddPlace(placeInput, priceInput);
     setPlaces((prev) => [...prev, { name: placeInput, price: parseFloat(priceInput) || 0, coordinates: null }]);
     event.target.reset();
   };
-  
 
   const handleSaveEditPlace = async () => {
     const updatedPlace = { ...editPlaceValue, price: parseFloat(editPlaceValue.price) || 0 };
@@ -77,7 +72,7 @@ export default function Destination({
   };
 
   const totalPlaces = places.length;
-  const totalPrice = places.reduce((sum, place) => sum + place.price, 0);
+  const totalPrice = places.reduce((sum, place) => sum + (parseFloat(place.price) || 0), 0);
 
   return (
     <div className="trip-detail-container">
@@ -90,7 +85,6 @@ export default function Destination({
             onChange={(e) => setDestination(e.target.value)}
             onBlur={() => onSave({ city: destination, startDate, endDate, places, duration, accommodation })}
           />
-          {/* Show delete button only if it's not the first destination */}
           {index > 0 && (
             <button
               className="delete-destination-button"
@@ -149,7 +143,7 @@ export default function Destination({
               </div>
             ) : (
               <div className="places-list">
-                {place.name} - ${place.price.toFixed(2)}
+                {place.name} - ${parseFloat(place.price).toFixed(2)}
                 <div className="action-buttons">
                   <button className="button-icon" onClick={() => handleEditPlace(index)}>
                     <img src={editIcon} alt="edit" className="edit-icon" />

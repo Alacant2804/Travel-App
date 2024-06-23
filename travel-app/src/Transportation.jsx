@@ -3,26 +3,35 @@ import axios from 'axios';
 import TransportationForm from './TransportationForm';
 import './Transportation.css';
 
-export default function Transportation({ tripId, onSave, onClose }) {
-  const [transportationDetails, setTransportationDetails] = useState(null);
+export default function TransportationModal({ tripId, transportation, onSave, onClose }) {
+  const [transportationDetails, setTransportationDetails] = useState({
+    pickupPlace: '',
+    dropoffPlace: '',
+    pickupDate: '',
+    dropoffDate: '',
+    duration: '',
+    price: 0,
+    bookingLink: ''
+  });
   const [isEditing, setIsEditing] = useState(false);
 
-  // Fetch transportation data for the trip
   useEffect(() => {
     const fetchTransportationData = async () => {
       try {
-        const response = await axios.get(`http://localhost:5001/api/trips/${tripId}/transportation`, { withCredentials: true });
-        const details = response.data;
-        console.log("Fetched Transportation Details: ", details);
-
-        setTransportationDetails(details[0]); // Set the fetched details
+        if (transportation && transportation._id) {
+          const response = await axios.get(`http://localhost:5001/api/trips/${tripId}/transportation/${transportation._id}`, { withCredentials: true });
+          setTransportationDetails(response.data);
+        } else {
+          const response = await axios.get(`http://localhost:5001/api/trips/${tripId}/transportation`, { withCredentials: true });
+          setTransportationDetails(response.data[0] || {});
+        }
       } catch (error) {
         console.error('Error fetching transportation data:', error);
       }
     };
 
     fetchTransportationData();
-  }, [tripId]);
+  }, [tripId, transportation]);
 
   const handleSaveTransportation = async (transportationData) => {
     try {
@@ -40,8 +49,6 @@ export default function Transportation({ tripId, onSave, onClose }) {
         );
       }
       
-      console.log("Saved Transportation Data: ", transportationData);
-
       setTransportationDetails(transportationData);
       onSave(transportationData);
       setIsEditing(false);
@@ -49,10 +56,6 @@ export default function Transportation({ tripId, onSave, onClose }) {
       console.error("Error saving transportation:", error);
     }
   };
-
-  if (transportationDetails === null) {
-    return <p>Loading...</p>; // Display a loading state if data is still being fetched
-  }
 
   return (
     <div className="modal-overlay" onClick={onClose}>

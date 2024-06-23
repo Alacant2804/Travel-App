@@ -539,18 +539,18 @@ router.delete('/:tripId/budget/:budgetId', auth, async (req, res) => {
       return res.status(404).json({ msg: 'Trip not found' });
     }
 
-    const budgetItem = trip.budget.id(budgetId);
-    if (!budgetItem) {
+    const budgetItemIndex = trip.budget.findIndex(item => item._id.toString() === budgetId);
+    if (budgetItemIndex === -1) {
       return res.status(404).json({ msg: 'Budget item not found' });
     }
 
-    budgetItem.remove();
+    trip.budget.splice(budgetItemIndex, 1);
     await trip.save();
 
     res.json(trip.budget);
   } catch (error) {
     console.error('Error deleting budget item:', error);
-    res.status(500).send('Server Error');
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 });
 

@@ -49,6 +49,7 @@
 .modal-btn,
 .save-btn,
 .edit-btn,
+.cancel-btn,
 .delete-btn {
     padding: 8px 16px;
     border: none;

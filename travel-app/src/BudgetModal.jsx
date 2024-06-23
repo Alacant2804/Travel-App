@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import './BudgetModal.css';
 
 export default function BudgetModal({ tripId, onSave, onClose }) {
@@ -19,21 +21,23 @@ export default function BudgetModal({ tripId, onSave, onClose }) {
         const placesTotal = trip.destinations.reduce((sum, destination) => {
           return sum + destination.places.reduce((placeSum, place) => placeSum + place.price, 0);
         }, 0);
+        const accommodationTotal = trip.destinations.reduce((sum, destination) => {
+          return sum + (destination.accommodation ? destination.accommodation.price : 0);
+        }, 0);
 
         const defaultItems = [
-          { category: 'Flights', amount: flightsTotal, type: 'flights', _id: 'flights' },
-          { category: 'Transportation', amount: transportationTotal, type: 'transportation', _id: 'transportation' },
-          { category: 'Places to Visit', amount: placesTotal, type: 'places', _id: 'places' }
+          { category: 'Flights', amount: flightsTotal, type: 'flights', _id: 'default-flights' },
+          { category: 'Transportation', amount: transportationTotal, type: 'transportation', _id: 'default-transportation' },
+          { category: 'Places to Visit', amount: placesTotal, type: 'places', _id: 'default-places' },
+          { category: 'Accommodation', amount: accommodationTotal, type: 'accommodation', _id: 'default-accommodation' }
         ];
 
-        // Fetch additional budget items from the backend
         const responseBudget = await axios.get(`http://localhost:5001/api/trips/${tripId}/budget`, { withCredentials: true });
         const additionalItems = responseBudget.data.map(item => ({
           ...item,
           amount: parseFloat(item.amount), // Ensure amount is a number
         }));
 
-        // Combine default items with additional items
         setBudgetItems([...defaultItems, ...additionalItems]);
       } catch (error) {
         console.error('Error fetching budget data:', error);
@@ -44,6 +48,10 @@ export default function BudgetModal({ tripId, onSave, onClose }) {
   }, [tripId]);
 
   const handleEdit = (item) => {
+    if (['default-flights', 'default-transportation', 'default-places', 'default-accommodation'].includes(item._id)) {
+      toast.error("This is a default category. You cannot edit it.");
+      return;
+    }
     setEditItemId(item._id);
     setEditedItem({ category: item.category, amount: item.amount.toString(), _id: item._id });
   };
@@ -52,7 +60,7 @@ export default function BudgetModal({ tripId, onSave, onClose }) {
     try {
       const updatedItem = { ...editedItem, amount: parseFloat(editedItem.amount) };
 
-      if (updatedItem._id && !['flights', 'transportation', 'places'].includes(updatedItem._id)) {
+      if (updatedItem._id && !['default-flights', 'default-transportation', 'default-places', 'default-accommodation'].includes(updatedItem._id)) {
         // Update existing budget item
         await axios.put(
           `http://localhost:5001/api/trips/${tripId}/budget/${updatedItem._id}`,
@@ -68,7 +76,7 @@ export default function BudgetModal({ tripId, onSave, onClose }) {
         amount: parseFloat(item.amount), // Ensure amount is a number
       }));
 
-      const defaultItems = budgetItems.filter(item => ['flights', 'transportation', 'places'].includes(item._id));
+      const defaultItems = budgetItems.filter(item => ['default-flights', 'default-transportation', 'default-places', 'default-accommodation'].includes(item._id));
 
       setBudgetItems([...defaultItems, ...additionalItems]);
       setEditItemId(null);
@@ -98,6 +106,11 @@ export default function BudgetModal({ tripId, onSave, onClose }) {
   };
 
   const handleDelete = async (id) => {
+    if (!id || ['default-flights', 'default-transportation', 'default-places', 'default-accommodation'].includes(id)) {
+      toast.error("Cannot delete this item.");
+      return;
+    }
+
     try {
       await axios.delete(`http://localhost:5001/api/trips/${tripId}/budget/${id}`, { withCredentials: true });
 
@@ -108,7 +121,7 @@ export default function BudgetModal({ tripId, onSave, onClose }) {
         amount: parseFloat(item.amount), // Ensure amount is a number
       }));
 
-      const defaultItems = budgetItems.filter(item => ['flights', 'transportation', 'places'].includes(item._id));
+      const defaultItems = budgetItems.filter(item => ['default-flights', 'default-transportation', 'default-places', 'default-accommodation'].includes(item._id));
 
       setBudgetItems([...defaultItems, ...additionalItems]);
     } catch (error) {
@@ -142,8 +155,8 @@ export default function BudgetModal({ tripId, onSave, onClose }) {
             </tr>
           </thead>
           <tbody>
-            {budgetItems.map((item) => (
-              <tr key={item._id}>
+            {budgetItems.map((item, index) => (
+              <tr key={item._id || `item-${index}`}>
                 {editItemId === item._id ? (
                   <>
                     <td>
@@ -152,7 +165,7 @@ export default function BudgetModal({ tripId, onSave, onClose }) {
                         name="category"
                         value={editedItem.category}
                         onChange={handleEditChange}
-                        readOnly={['flights', 'transportation', 'places'].includes(item._id)}
+                        readOnly={['default-flights', 'default-transportation', 'default-places', 'default-accommodation'].includes(item._id)}
                       />
                     </td>
                     <td>
@@ -174,7 +187,7 @@ export default function BudgetModal({ tripId, onSave, onClose }) {
                     <td>${item.amount.toFixed(2)}</td>
                     <td>
                       <button className="edit-btn" onClick={() => handleEdit(item)}>Edit</button>
-                      {!['flights', 'transportation', 'places'].includes(item._id) && (
+                      {!['default-flights', 'default-transportation', 'default-places', 'default-accommodation'].includes(item._id) && (
                         <button className="delete-btn" onClick={() => handleDelete(item._id)}>Delete</button>
                       )}
                     </td>
