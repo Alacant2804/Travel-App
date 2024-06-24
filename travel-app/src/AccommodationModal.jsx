@@ -54,7 +54,7 @@ export default function AccommodationModal({ tripId, destinationId, accommodatio
     bookingLink, 
     price, 
     coordinates,
-    _id: accommodation?._id // Ensure this is included for updates
+    _id: accommodation?._id
   };
 
   console.log("tripId:", tripId);
