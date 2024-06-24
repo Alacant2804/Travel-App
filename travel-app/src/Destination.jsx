@@ -77,14 +77,21 @@ export default function Destination({
   };
 
   const handleSaveAccommodation = async (accommodationData) => {
-    console.log("Destination.jsx, accomodation data: ", accommodationData)
-    setAccommodation(accommodationData);
-    await onSave({ city: destination, startDate, endDate, places, duration, accommodation: accommodationData });
-  };
+  console.log("Destination.jsx, accommodation data: ", accommodationData);
+  setAccommodation(accommodationData); // Save the accommodation in local state
+  await onSave({
+    city: destination,
+    startDate,
+    endDate,
+    places,
+    duration,
+    accommodation: accommodationData
+  });
+};
 
   const totalPlaces = places.length;
   const totalPrice = places.reduce((sum, place) => sum + (parseFloat(place.price) || 0), 0);
-
+ 
   return (
     <div className="trip-detail-container">
       <div className="trip-info">

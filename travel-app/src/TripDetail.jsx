@@ -136,43 +136,46 @@ export default function TripDetail() {
     };
 
     const handleSaveDestination = useCallback(
-    async (updatedData, index) => {
-        const destinationId = destinations[index]?._id; // Check if destinationId exists
-        const updatedDestination = {
+        async (updatedData, index) => {
+            const destinationId = destinations[index]?._id; // Check if destinationId exists
+            const updatedDestination = {
             ...destinations[index],
             ...updatedData,
             duration: calculateDuration(updatedData.startDate, updatedData.endDate),
-        };
+            };
 
-        try {
+            try {
             let response;
             if (destinationId) {
                 // Update existing destination
                 response = await axios.put(
-                    `http://localhost:5001/api/trips/${tripId}/destinations/${destinationId}`,
-                    updatedDestination,
-                    { withCredentials: true }
+                `http://localhost:5001/api/trips/${tripId}/destinations/${destinationId}`,
+                updatedDestination,
+                { withCredentials: true }
                 );
             } else {
                 // Create new destination
                 response = await axios.post(
-                    `http://localhost:5001/api/trips/${tripId}/destinations`,
-                    updatedDestination,
-                    { withCredentials: true }
+                `http://localhost:5001/api/trips/${tripId}/destinations`,
+                updatedDestination,
+                { withCredentials: true }
                 );
             }
-            setDestinations(response.data.destinations);
 
+            const updatedDestinations = response.data.destinations || [];
+            setDestinations(updatedDestinations);
+
+            // Update places and accommodations if needed
             const updatedPlaces = await fetchPlacesAndAccommodationsCoordinates(
                 updatedDestination,
                 trip.country
             );
             setPlaces(updatedPlaces);
-        } catch (error) {
+            } catch (error) {
             console.error('Error saving destination:', error);
-        }
-    },
-    [destinations, tripId, trip?.country]
+            }
+        },
+        [destinations, tripId, trip?.country]
     );
 
     const handleAddPlace = async (destinationIndex, placeName, placePrice) => {

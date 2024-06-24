@@ -246,12 +246,13 @@ router.post('/trips/:tripId/destinations/:destinationId/accommodation', async (r
     destination.accommodation = req.body;
     await trip.save();
 
-    res.status(200).send(destination);
+    res.status(200).send(destination.accommodation);
   } catch (error) {
     console.error("Error saving accommodation:", error);
     res.status(500).send('Internal Server Error');
   }
 });
+
 
 // Add a new budget item
 router.post('/:tripId/budget', auth, async (req, res) => {
@@ -276,33 +277,26 @@ router.post('/:tripId/budget', auth, async (req, res) => {
 });
 
 // Update accommodation
-router.put('/:tripId/destinations/:destinationId/accommodation/:accommodationId', auth, async (req, res) => {
+router.put('/trips/:tripId/destinations/:destinationId/accommodation/:accommodationId', async (req, res) => {
   try {
-    const trip = await Trip.findById(req.params.tripId);
-    const destination = trip.destinations.id(req.params.destinationId);
+    const { tripId, destinationId, accommodationId } = req.params;
+    const trip = await Trip.findById(tripId);
+    if (!trip) return res.status(404).send('Trip not found');
 
-    if (!trip || !destination) {
-      return res.status(404).json({ msg: 'Trip or Destination not found' });
-    }
+    const destination = trip.destinations.id(destinationId);
+    if (!destination) return res.status(404).send('Destination not found');
 
-    const accommodation = destination.accommodation.id(req.params.accommodationId);
-    if (!accommodation) {
-      return res.status(404).json({ msg: 'Accommodation not found' });
-    }
+    const accommodation = destination.accommodation.id(accommodationId);
+    if (!accommodation) return res.status(404).send('Accommodation not found');
 
-    accommodation.address = req.body.address;
-    accommodation.startDate = req.body.startDate;
-    accommodation.endDate = req.body.endDate;
-    accommodation.bookingLink = req.body.bookingLink;
-    accommodation.price = req.body.price;
-    accommodation.coordinates = req.body.coordinates;
+    Object.assign(accommodation, req.body);
 
     await trip.save();
 
-    res.json(accommodation);
+    res.status(200).send(accommodation);
   } catch (error) {
-    console.error('Error updating accommodation:', error);
-    res.status(500).json({ message: 'Server error', error: error.message });
+    console.error("Error updating accommodation:", error);
+    res.status(500).send('Internal Server Error');
   }
 });
 

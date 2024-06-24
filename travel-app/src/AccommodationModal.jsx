@@ -47,17 +47,31 @@ export default function AccommodationModal({ tripId, destinationId, accommodatio
     return;
   }
   const coordinates = await fetchCoordinates(address);
-  const accommodationData = { address, startDate, endDate, bookingLink, price, coordinates, _id: accommodation?._id };
-  console.log("Accommodation Modal, handleSave, accomodation data: ", accommodationData);
+  const accommodationData = { 
+    address, 
+    startDate, 
+    endDate, 
+    bookingLink, 
+    price, 
+    coordinates,
+    _id: accommodation?._id // Ensure this is included for updates
+  };
+
+  console.log("tripId:", tripId);
+  console.log("destinationId:", destinationId);
+  console.log("Accommodation Data:", accommodationData);
+
   try {
     let response;
     if (accommodation?._id) {
+      // Use PUT for updating existing accommodation
       response = await axios.put(
-        `http://localhost:5001/api/trips/${tripId}/destinations/${destinationId}/accommodation`,
+        `http://localhost:5001/api/trips/${tripId}/destinations/${destinationId}/accommodation/${accommodation._id}`,
         accommodationData,
         { withCredentials: true }
       );
     } else {
+      // Use POST for creating new accommodation
       response = await axios.post(
         `http://localhost:5001/api/trips/${tripId}/destinations/${destinationId}/accommodation`,
         accommodationData,
@@ -70,6 +84,7 @@ export default function AccommodationModal({ tripId, destinationId, accommodatio
     console.error("Error saving accommodation:", error);
   }
 };
+
 
   return (
     <div className="modal-overlay" onClick={onClose}>
