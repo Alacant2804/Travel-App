@@ -63,7 +63,17 @@ export default function Destination({
 
   const handleDeletePlace = async (index) => {
     await onDeletePlace(index);
-    setPlaces(places.filter((_, idx) => idx !== index));
+    const updatedPlaces = places.filter((_, idx) => idx !== index);
+    console.log("Updated Places to Visit: ", updatedPlaces);
+    setPlaces(updatedPlaces);
+    onSave({
+      city: destination,
+      startDate,
+      endDate,
+      places: updatedPlaces,
+      duration,
+      accommodation
+    });
   };
 
   const handleSaveAccommodation = async (accommodationData) => {
@@ -190,7 +200,7 @@ export default function Destination({
         {showAccommodationModal && (
             <AccommodationModal
                 tripId={tripId}
-                destinationId={initialData._id} // Ensure destinationId is passed down
+                destinationId={initialData._id}
                 accommodation={accommodation}
                 onSave={handleSaveAccommodation}
                 onClose={() => setShowAccommodationModal(false)}
