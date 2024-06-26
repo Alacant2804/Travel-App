@@ -234,7 +234,7 @@ router.post('/:tripId/transportation', auth, async (req, res) => {
   }
 });
 
-router.post('/trips/:tripId/destinations/:destinationId/accommodation', async (req, res) => {
+router.post('/:tripId/destinations/:destinationId/accommodation', async (req, res) => {
   try {
     const { tripId, destinationId } = req.params;
     const trip = await Trip.findById(tripId);
@@ -252,7 +252,6 @@ router.post('/trips/:tripId/destinations/:destinationId/accommodation', async (r
     res.status(500).send('Internal Server Error');
   }
 });
-
 
 // Add a new budget item
 router.post('/:tripId/budget', auth, async (req, res) => {
@@ -277,7 +276,7 @@ router.post('/:tripId/budget', auth, async (req, res) => {
 });
 
 // Update accommodation
-router.put('/trips/:tripId/destinations/:destinationId/accommodation/:accommodationId', async (req, res) => {
+router.put('/:tripId/destinations/:destinationId/accommodation/:accommodationId', async (req, res) => {
   try {
     const { tripId, destinationId, accommodationId } = req.params;
     const trip = await Trip.findById(tripId);
@@ -299,7 +298,6 @@ router.put('/trips/:tripId/destinations/:destinationId/accommodation/:accommodat
     res.status(500).send('Internal Server Error');
   }
 });
-
 
 // Update an existing budget item
 router.put('/:tripId/budget/:budgetId', auth, async (req, res) => {
