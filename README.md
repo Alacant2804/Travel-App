@@ -43,11 +43,11 @@ View the trip details on the interactive map.
 
 ## 🛠️ Technologies Used
 
-💥 Node.js (Express.js)
-⚛️ React
-🛣️ React Router
-🗺️ Leaflet
-🌐 Axios
-⚡ Vite
-🎨 CSS
-🔐 JWT token authentication 
+- 💥 Node.js (Express.js)
+- ⚛️ React
+- 🛣️ React Router
+- 🗺️ Leaflet
+- 🌐 Axios
+- ⚡ Vite
+- 🎨 CSS
+-🔐 JWT Token Authentication 
