@@ -10,14 +10,26 @@ export default function AccommodationModal({ tripId, destinationId, accommodatio
   const [price, setPrice] = useState(accommodation?.price || 0);
 
   useEffect(() => {
-    if (accommodation) {
-      setAddress(accommodation.address);
-      setStartDate(accommodation.startDate);
-      setEndDate(accommodation.endDate);
-      setBookingLink(accommodation.bookingLink);
-      setPrice(accommodation.price || 0);
+    const fetchAccommodation = async () => {
+      try {
+        const response = await axios.get(`http://localhost:5001/api/trips/${tripId}/destinations/${destinationId}/accommodation`, {
+          withCredentials: true
+        });
+        const fetchedAccommodation = response.data;
+        setAddress(fetchedAccommodation.address);
+        setStartDate(fetchedAccommodation.startDate);
+        setEndDate(fetchedAccommodation.endDate);
+        setBookingLink(fetchedAccommodation.bookingLink);
+        setPrice(fetchedAccommodation.price);
+      } catch (error) {
+        console.error("Error fetching accommodation:", error);
+      }
+    };
+
+    if (!accommodation) {
+      fetchAccommodation();
     }
-  }, [accommodation]);
+  }, [tripId, destinationId, accommodation]);
 
   const fetchCoordinates = async (address) => {
     try {
@@ -42,49 +54,48 @@ export default function AccommodationModal({ tripId, destinationId, accommodatio
   };
 
   const handleSave = async () => {
-  if (!tripId || !destinationId) {
-    console.error("Missing tripId or destinationId.");
-    return;
-  }
-  const coordinates = await fetchCoordinates(address);
-  const accommodationData = { 
-    address, 
-    startDate, 
-    endDate, 
-    bookingLink, 
-    price, 
-    coordinates,
-    _id: accommodation?._id
-  };
-
-  console.log("tripId:", tripId);
-  console.log("destinationId:", destinationId);
-  console.log("Accommodation Data:", accommodationData);
-
-  try {
-    let response;
-    if (accommodation?._id) {
-      // Updating existing accommodation
-      response = await axios.put(
-        `http://localhost:5001/api/trips/${tripId}/destinations/${destinationId}/accommodation/${accommodation._id}`,
-        accommodationData,
-        { withCredentials: true }
-      );
-    } else {
-      // Creating new accommodation
-      response = await axios.post(
-        `http://localhost:5001/api/trips/${tripId}/destinations/${destinationId}/accommodation`,
-        accommodationData,
-        { withCredentials: true }
-      );
+    if (!tripId || !destinationId) {
+      console.error("Missing tripId or destinationId.");
+      return;
     }
-    onSave(response.data);
-    onClose();
-  } catch (error) {
-    console.error("Error saving accommodation:", error);
-  }
-};
+    const coordinates = await fetchCoordinates(address);
+    const accommodationData = { 
+      address, 
+      startDate, 
+      endDate, 
+      bookingLink, 
+      price, 
+      coordinates,
+      _id: accommodation?._id
+    };
 
+    console.log("tripId:", tripId);
+    console.log("destinationId:", destinationId);
+    console.log("Accommodation Data:", accommodationData);
+
+    try {
+      let response;
+      if (accommodation?._id) {
+        // Updating existing accommodation
+        response = await axios.put(
+          `http://localhost:5001/api/trips/${tripId}/destinations/${destinationId}/accommodation/${accommodation._id}`,
+          accommodationData,
+          { withCredentials: true }
+        );
+      } else {
+        // Creating new accommodation
+        response = await axios.post(
+          `http://localhost:5001/api/trips/${tripId}/destinations/${destinationId}/accommodation`,
+          accommodationData,
+          { withCredentials: true }
+        );
+      }
+      onSave(response.data);
+      onClose();
+    } catch (error) {
+      console.error("Error saving accommodation:", error);
+    }
+  };
 
   return (
     <div className="modal-overlay" onClick={onClose}>

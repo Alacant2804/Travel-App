@@ -76,6 +76,25 @@ router.get('/:tripId/budget', auth, async (req, res) => {
   }
 });
 
+router.get('/:tripId/destinations/:destinationId/accommodation', async (req, res) => {
+  try {
+    const { tripId, destinationId } = req.params;
+    const trip = await Trip.findById(tripId);
+    if (!trip) return res.status(404).send('Trip not found');
+
+    const destination = trip.destinations.id(destinationId);
+    if (!destination) return res.status(404).send('Destination not found');
+
+    const accommodation = destination.accommodation;
+    if (!accommodation) return res.status(404).send('Accommodation not found');
+
+    res.status(200).send(accommodation);
+  } catch (error) {
+    console.error("Error fetching accommodation:", error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
 // Add a new trip
 router.post('/', auth, async (req, res) => {
   const { tripName, country, destinations } = req.body;
