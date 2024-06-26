@@ -3,9 +3,11 @@ import './AccommodationModal.css';
 import axios from 'axios';
 
 export default function AccommodationModal({ tripId, destinationId, accommodation, onSave, onClose }) {
+  const [loading, setLoading] = useState(true);
+  const [isEditing, setIsEditing] = useState(false);
   const [address, setAddress] = useState(accommodation?.address || '');
-  const [startDate, setStartDate] = useState(accommodation?.startDate || '');
-  const [endDate, setEndDate] = useState(accommodation?.endDate || '');
+  const [startDate, setStartDate] = useState(accommodation?.startDate ? accommodation.startDate.split('T')[0] : '');
+  const [endDate, setEndDate] = useState(accommodation?.endDate ? accommodation.endDate.split('T')[0] : '');
   const [bookingLink, setBookingLink] = useState(accommodation?.bookingLink || '');
   const [price, setPrice] = useState(accommodation?.price || 0);
 
@@ -16,18 +18,27 @@ export default function AccommodationModal({ tripId, destinationId, accommodatio
           withCredentials: true
         });
         const fetchedAccommodation = response.data;
-        setAddress(fetchedAccommodation.address);
-        setStartDate(fetchedAccommodation.startDate);
-        setEndDate(fetchedAccommodation.endDate);
-        setBookingLink(fetchedAccommodation.bookingLink);
-        setPrice(fetchedAccommodation.price);
+        if (fetchedAccommodation) {
+          console.log("GET request, accommodation: ", fetchedAccommodation);
+          setAddress(fetchedAccommodation.address || '');
+          setStartDate(fetchedAccommodation.startDate ? fetchedAccommodation.startDate.split('T')[0] : '');
+          setEndDate(fetchedAccommodation.endDate ? fetchedAccommodation.endDate.split('T')[0] : '');
+          setBookingLink(fetchedAccommodation.bookingLink || '');
+          setPrice(parseFloat(fetchedAccommodation.price) || 0);
+        } else {
+          console.log("No accommodation data received.");
+        }
       } catch (error) {
         console.error("Error fetching accommodation:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
     if (!accommodation) {
       fetchAccommodation();
+    } else {
+      setLoading(false);
     }
   }, [tripId, destinationId, accommodation]);
 
@@ -64,26 +75,22 @@ export default function AccommodationModal({ tripId, destinationId, accommodatio
       startDate, 
       endDate, 
       bookingLink, 
-      price, 
+      price: parseFloat(price), // Ensure price is a number
       coordinates,
-      _id: accommodation?._id
+      _id: accommodation?._id // Ensure this is included for updates
     };
-
-    console.log("tripId:", tripId);
-    console.log("destinationId:", destinationId);
-    console.log("Accommodation Data:", accommodationData);
 
     try {
       let response;
       if (accommodation?._id) {
-        // Updating existing accommodation
+        // Use PUT for updating existing accommodation
         response = await axios.put(
           `http://localhost:5001/api/trips/${tripId}/destinations/${destinationId}/accommodation/${accommodation._id}`,
           accommodationData,
           { withCredentials: true }
         );
       } else {
-        // Creating new accommodation
+        // Use POST for creating new accommodation
         response = await axios.post(
           `http://localhost:5001/api/trips/${tripId}/destinations/${destinationId}/accommodation`,
           accommodationData,
@@ -91,67 +98,85 @@ export default function AccommodationModal({ tripId, destinationId, accommodatio
         );
       }
       onSave(response.data);
-      onClose();
+      setIsEditing(false); // Exit edit mode after saving
     } catch (error) {
       console.error("Error saving accommodation:", error);
     }
   };
 
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <h2>Accommodation Details</h2>
-        <form className="modal-form" onSubmit={(e) => { e.preventDefault(); handleSave(); }}>
-          <label htmlFor="address">Address</label>
-          <input
-            type="text"
-            id="address"
-            placeholder="Address (without country name)"
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
-            className="form-input"
-          />
-          <label htmlFor="startDate">Start Date</label>
-          <input
-            type="date"
-            id="startDate"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-            className="form-input"
-          />
-          <label htmlFor="endDate">End Date</label>
-          <input
-            type="date"
-            id="endDate"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-            className="form-input"
-          />
-          <label htmlFor="price">Price</label>
-          <input
-            type="number"
-            id="price"
-            placeholder="Price"
-            value={price}
-            onChange={(e) => setPrice(parseFloat(e.target.value))}
-            className="form-input"
-            step="0.01"
-            min="0"
-          />
-          <label htmlFor="bookingLink">Booking Link</label>
-          <input
-            type="url"
-            id="bookingLink"
-            placeholder="Booking Link"
-            value={bookingLink}
-            onChange={(e) => setBookingLink(e.target.value)}
-            className="form-input"
-          />
-          <div className="modal-actions">
-            <button type="button" className="modal-btn cancel-btn" onClick={onClose}>Cancel</button>
-            <button type="submit" className="modal-btn submit-btn">Save</button>
+        {isEditing || !accommodation ? (
+          <form className="modal-form" onSubmit={(e) => { e.preventDefault(); handleSave(); }}>
+            <label htmlFor="address">Address</label>
+            <input
+              type="text"
+              id="address"
+              placeholder="Address (without country name)"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              className="form-input"
+            />
+            <label htmlFor="startDate">Start Date</label>
+            <input
+              type="date"
+              id="startDate"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              className="form-input"
+            />
+            <label htmlFor="endDate">End Date</label>
+            <input
+              type="date"
+              id="endDate"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              className="form-input"
+            />
+            <label htmlFor="price">Price</label>
+            <input
+              type="number"
+              id="price"
+              placeholder="Price"
+              value={price}
+              onChange={(e) => setPrice(parseFloat(e.target.value))}
+              className="form-input"
+              step="0.01"
+              min="0"
+            />
+            <label htmlFor="bookingLink">Booking Link</label>
+            <input
+              type="url"
+              id="bookingLink"
+              placeholder="Booking Link"
+              value={bookingLink}
+              onChange={(e) => setBookingLink(e.target.value)}
+              className="form-input"
+            />
+            <div className="modal-actions">
+              <button type="button" className="modal-btn cancel-btn" onClick={onClose}>Cancel</button>
+              <button type="submit" className="modal-btn submit-btn">Save</button>
+            </div>
+          </form>
+        ) : (
+          <div className="accommodation-details">
+            <p><strong>Address:</strong> {address}</p>
+            <p><strong>Start Date:</strong> {startDate}</p>
+            <p><strong>End Date:</strong> {endDate}</p>
+            <p><strong>Booking Link:</strong> <a href={bookingLink} target="_blank" rel="noopener noreferrer">{bookingLink}</a></p>
+            <p><strong>Price:</strong> ${parseFloat(price).toFixed(2)}</p>
+            <div className="modal-actions">
+              <button type="button" className="modal-btn edit-btn" onClick={() => setIsEditing(true)}>Edit</button>
+              <button type="button" className="modal-btn close-btn" onClick={onClose}>Close</button>
+            </div>
           </div>
-        </form>
+        )}
       </div>
     </div>
   );

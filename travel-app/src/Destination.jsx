@@ -77,21 +77,29 @@ export default function Destination({
   };
 
   const handleSaveAccommodation = async (accommodationData) => {
-  console.log("Destination.jsx, accommodation data: ", accommodationData);
-  setAccommodation(accommodationData); // Save the accommodation in local state
-  await onSave({
-    city: destination,
-    startDate,
-    endDate,
-    places,
-    duration,
-    accommodation: accommodationData
-  });
-};
+    console.log("Destination.jsx, accommodation data: ", accommodationData);
+    setAccommodation(accommodationData); // Save the accommodation in local state
+    await onSave({
+      city: destination,
+      startDate,
+      endDate,
+      places,
+      duration,
+      accommodation: accommodationData
+    });
+  };
+
+  const handleOpenModal = () => {
+    setShowAccommodationModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowAccommodationModal(false);
+  };
 
   const totalPlaces = places.length;
   const totalPrice = places.reduce((sum, place) => sum + (parseFloat(place.price) || 0), 0);
- 
+
   return (
     <div className="trip-detail-container">
       <div className="trip-info">
@@ -201,17 +209,17 @@ export default function Destination({
           <p className='total-places'><strong>Total Places to Visit:</strong> {totalPlaces}</p>
           <p className='total-price'><strong>Total Price:</strong> ${totalPrice.toFixed(2)}</p>
         </div>
-        <button className="accommodation-button" data-title="Add Accommodation" onClick={() => setShowAccommodationModal(true)}>
+        <button className="accommodation-button" data-title="Add Accommodation" onClick={handleOpenModal}>
           <img src={accommodationIcon} alt='accommodation' className='accommodation-icon'/>
         </button>
         {showAccommodationModal && (
-            <AccommodationModal
-                tripId={tripId}
-                destinationId={initialData._id}
-                accommodation={accommodation}
-                onSave={handleSaveAccommodation}
-                onClose={() => setShowAccommodationModal(false)}
-            />
+          <AccommodationModal
+            tripId={tripId}
+            destinationId={initialData._id}
+            accommodation={accommodation}
+            onSave={handleSaveAccommodation}
+            onClose={handleCloseModal}
+          />
         )}
       </div>
     </div>

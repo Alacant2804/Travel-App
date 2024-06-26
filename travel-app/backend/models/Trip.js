@@ -52,6 +52,8 @@ const PlaceSchema = new mongoose.Schema({
 
 const AccommodationSchema = new mongoose.Schema({
   address: String,
+  startDate: Date,
+  endDate: Date,
   coordinates: CoordinatesSchema,
   price: Number,
   bookingLink: String
