@@ -144,7 +144,8 @@ export default function TripDetail() {
             duration: calculateDuration(updatedData.startDate, updatedData.endDate),
             };
 
-            try {
+            try {   
+            console.log("Updated DATA: ", updatedData);
             let response;
             if (destinationId) {
                 // Update existing destination

@@ -5,11 +5,11 @@ import axios from 'axios';
 export default function AccommodationModal({ tripId, destinationId, accommodation, onSave, onClose }) {
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
-  const [address, setAddress] = useState(accommodation?.address || '');
-  const [startDate, setStartDate] = useState(accommodation?.startDate ? accommodation.startDate.split('T')[0] : '');
-  const [endDate, setEndDate] = useState(accommodation?.endDate ? accommodation.endDate.split('T')[0] : '');
-  const [bookingLink, setBookingLink] = useState(accommodation?.bookingLink || '');
-  const [price, setPrice] = useState(accommodation?.price || 0);
+  const [address, setAddress] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [bookingLink, setBookingLink] = useState('');
+  const [price, setPrice] = useState(0);
 
   useEffect(() => {
     const fetchAccommodation = async () => {
@@ -18,8 +18,8 @@ export default function AccommodationModal({ tripId, destinationId, accommodatio
           withCredentials: true
         });
         const fetchedAccommodation = response.data;
+        console.log("Fetched accommodation data:", fetchedAccommodation);
         if (fetchedAccommodation) {
-          console.log("GET request, accommodation: ", fetchedAccommodation);
           setAddress(fetchedAccommodation.address || '');
           setStartDate(fetchedAccommodation.startDate ? fetchedAccommodation.startDate.split('T')[0] : '');
           setEndDate(fetchedAccommodation.endDate ? fetchedAccommodation.endDate.split('T')[0] : '');
@@ -35,11 +35,8 @@ export default function AccommodationModal({ tripId, destinationId, accommodatio
       }
     };
 
-    if (!accommodation) {
-      fetchAccommodation();
-    } else {
-      setLoading(false);
-    }
+    console.log("Fetching accommodation data...");
+    fetchAccommodation();
   }, [tripId, destinationId, accommodation]);
 
   const fetchCoordinates = async (address) => {
@@ -97,12 +94,24 @@ export default function AccommodationModal({ tripId, destinationId, accommodatio
           { withCredentials: true }
         );
       }
-      onSave(response.data);
+      console.log("Saved accommodation data:", response.data);
+      onSave(response.data); // Ensure the parent component state is updated
       setIsEditing(false); // Exit edit mode after saving
     } catch (error) {
       console.error("Error saving accommodation:", error);
     }
   };
+
+  useEffect(() => {
+    if (accommodation) {
+      console.log("Updating state with accommodation prop:", accommodation);
+      setAddress(accommodation.address || '');
+      setStartDate(accommodation.startDate ? accommodation.startDate.split('T')[0] : '');
+      setEndDate(accommodation.endDate ? accommodation.endDate.split('T')[0] : '');
+      setBookingLink(accommodation.bookingLink || '');
+      setPrice(parseFloat(accommodation.price) || 0);
+    }
+  }, [accommodation]);
 
   if (loading) {
     return <div>Loading...</div>;

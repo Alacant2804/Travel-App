@@ -64,7 +64,6 @@ export default function Destination({
   const handleDeletePlace = async (index) => {
     await onDeletePlace(index);
     const updatedPlaces = places.filter((_, idx) => idx !== index);
-    console.log("Updated Places to Visit: ", updatedPlaces);
     setPlaces(updatedPlaces);
     onSave({
       city: destination,
@@ -77,7 +76,6 @@ export default function Destination({
   };
 
   const handleSaveAccommodation = async (accommodationData) => {
-    console.log("Destination.jsx, accommodation data: ", accommodationData);
     setAccommodation(accommodationData); // Save the accommodation in local state
     await onSave({
       city: destination,
@@ -85,7 +83,7 @@ export default function Destination({
       endDate,
       places,
       duration,
-      accommodation: accommodationData
+      accommodation: accommodationData // Ensure accommodation data is included
     });
   };
 
