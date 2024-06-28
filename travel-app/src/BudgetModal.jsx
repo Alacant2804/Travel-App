@@ -22,7 +22,7 @@ export default function BudgetModal({ tripId, onSave, onClose }) {
           return sum + destination.places.reduce((placeSum, place) => placeSum + place.price, 0);
         }, 0);
         const accommodationTotal = trip.destinations.reduce((sum, destination) => {
-          return sum + (destination.accommodation ? destination.accommodation.price : 0);
+          return sum + destination.accommodation[0].price
         }, 0);
 
         const defaultItems = [
