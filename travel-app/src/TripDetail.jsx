@@ -145,7 +145,6 @@ export default function TripDetail() {
             };
 
             try {   
-            console.log("Updated DATA: ", updatedData);
             let response;
             if (destinationId) {
                 // Update existing destination

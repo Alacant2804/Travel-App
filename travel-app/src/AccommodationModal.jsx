@@ -20,11 +20,11 @@ export default function AccommodationModal({ tripId, destinationId, accommodatio
         const fetchedAccommodation = response.data;
         console.log("Fetched accommodation data:", fetchedAccommodation);
         if (fetchedAccommodation) {
-          setAddress(fetchedAccommodation.address || '');
-          setStartDate(fetchedAccommodation.startDate ? fetchedAccommodation.startDate.split('T')[0] : '');
-          setEndDate(fetchedAccommodation.endDate ? fetchedAccommodation.endDate.split('T')[0] : '');
-          setBookingLink(fetchedAccommodation.bookingLink || '');
-          setPrice(parseFloat(fetchedAccommodation.price) || 0);
+          setAddress(fetchedAccommodation[0].address || '');
+          setStartDate(fetchedAccommodation[0].startDate ? fetchedAccommodation[0].startDate.split('T')[0] : '');
+          setEndDate(fetchedAccommodation[0].endDate ? fetchedAccommodation[0].endDate.split('T')[0] : '');
+          setBookingLink(fetchedAccommodation[0].bookingLink || '');
+          setPrice(parseFloat(fetchedAccommodation[0].price) || 0);
         } else {
           console.log("No accommodation data received.");
         }
@@ -37,7 +37,7 @@ export default function AccommodationModal({ tripId, destinationId, accommodatio
 
     console.log("Fetching accommodation data...");
     fetchAccommodation();
-  }, [tripId, destinationId, accommodation]);
+  }, [destinationId, accommodation]);
 
   const fetchCoordinates = async (address) => {
     try {
@@ -94,24 +94,12 @@ export default function AccommodationModal({ tripId, destinationId, accommodatio
           { withCredentials: true }
         );
       }
-      console.log("Saved accommodation data:", response.data);
       onSave(response.data); // Ensure the parent component state is updated
       setIsEditing(false); // Exit edit mode after saving
     } catch (error) {
       console.error("Error saving accommodation:", error);
     }
   };
-
-  useEffect(() => {
-    if (accommodation) {
-      console.log("Updating state with accommodation prop:", accommodation);
-      setAddress(accommodation.address || '');
-      setStartDate(accommodation.startDate ? accommodation.startDate.split('T')[0] : '');
-      setEndDate(accommodation.endDate ? accommodation.endDate.split('T')[0] : '');
-      setBookingLink(accommodation.bookingLink || '');
-      setPrice(parseFloat(accommodation.price) || 0);
-    }
-  }, [accommodation]);
 
   if (loading) {
     return <div>Loading...</div>;

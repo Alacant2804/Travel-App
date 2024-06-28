@@ -31,6 +31,10 @@ export default function Destination({
     setDuration(calculateDuration(startDate, endDate));
   }, [startDate, endDate, calculateDuration]);
 
+  useEffect(() => {
+    console.log(accommodation);
+  }, [accommodation]);
+
   const handleAddPlace = async (event) => {
     event.preventDefault();
     const placeInput = event.target.elements.placeInput.value.trim();
