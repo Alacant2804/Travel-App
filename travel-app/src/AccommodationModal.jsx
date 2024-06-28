@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import Loading from './Loading';
 import './AccommodationModal.css';
 import axios from 'axios';
 
@@ -102,7 +103,7 @@ export default function AccommodationModal({ tripId, destinationId, accommodatio
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <Loading />
   }
 
   return (

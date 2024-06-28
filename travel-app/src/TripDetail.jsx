@@ -6,6 +6,7 @@ import FlightModal from './FlightModal';
 import Transportation from './Transportation';
 import MapComponent from './MapComponent';
 import BudgetModal from './BudgetModal';
+import Loading from './Loading';
 import axios from 'axios';
 import './TripDetail.css';
 import budgetIcon from './assets/budget.png';
@@ -344,7 +345,7 @@ export default function TripDetail() {
   };
 
     if (loading) {
-        return <p>Loading...</p>;
+        return <Loading />;
     }
 
     if (!trip) {

@@ -1,5 +1,6 @@
 import { createContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Loading from './Loading';
 import axios from 'axios';
 import authService from './api/auth';
 import { toast } from 'react-toastify';
@@ -69,8 +70,8 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Fetch user function
   const fetchUser = async () => {
+    setLoading(true);
     try {
       const response = await axios.get('http://localhost:5001/api/auth/user', { withCredentials: true });
       setUser(response.data);
@@ -80,6 +81,8 @@ export const AuthProvider = ({ children }) => {
         // Handle the case when user is not authenticated
         logout();
       }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -87,6 +90,10 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     fetchUser();
   }, []);
+
+  if (loading) {
+    <Loading />;
+  }
 
   return (
     <AuthContext.Provider value={{ user, login, register, logout, loading, error }}>

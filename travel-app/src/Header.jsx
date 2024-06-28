@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import { AuthContext } from "./AuthContext";
 import "./Header.css";
@@ -6,10 +6,6 @@ import "./Header.css";
 export default function Header() {
   const { user, logout } = useContext(AuthContext);
   const [isOpen, setIsOpen] = useState(false);
-
-  useEffect(() => {
-    console.log("NavBar user:", user);
-  }, [user]);
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);

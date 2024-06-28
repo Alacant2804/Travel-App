@@ -114,6 +114,7 @@
     max-height: 300px; /* Adjust as needed */
     object-fit: cover;
     border-radius: 10px;
+    margin-bottom: 20px;
 }
 
 .close {

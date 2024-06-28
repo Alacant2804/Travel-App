@@ -5,7 +5,7 @@ export default function MapMain() {
     const steps = [
         {
             title: "Create Your Trip",
-            description: "Begin by providing essential details about your trip, such as the trip name, destination, travel dates, and any other important information to help define the scope of your journey.",
+            description: "Begin by providing essential details about your trip, such as the trip name, destination, travel dates to help define the scope of your journey.",
             icon: <FaMapMarkedAlt className="step-icon" />
         },
         {
@@ -14,8 +14,8 @@ export default function MapMain() {
             icon: <FaRegListAlt className="step-icon" />
         },
         {
-            title: "Select on the Map",
-            description: "Use the interactive map to mark each point of interest, stopover, or location that you'd like to visit. This will visually map out your trip, giving you a comprehensive overview of your travel plans and making it easier to adjust your route.",
+            title: "Plan Your Trip",
+            description: "Utilize our comprehensive tools to plan your trip efficiently. Manage your budget with our budget planner, and keep track of flight and car rental details all in one place. This ensures a smooth and well-organized travel experience.",
             icon: <FaRoute className="step-icon" />
         }
     ];

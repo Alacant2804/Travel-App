@@ -6,7 +6,7 @@ export default function AboutApp() {
         <section className="about-app">
             <div className="about-header">
                 <h2>Discover Your Next Adventure</h2>
-                <p>Explore the world with Travel App! Our app simplifies your travel planning with interactive maps, detailed guides, and user-friendly tools. From bustling cities to serene landscapes, discover and book your perfect trip easily.</p>
+                <p>Explore the world with Travel App! Our app simplifies your travel planning with interactive maps, detailed guides, and user-friendly tools. From bustling cities to serene landscapes, organize your perfect trip with ease. Track your itinerary, manage your destinations, and make the most of your travel experience with Travel App.</p>
             </div>
             <div className="features">
                 <div className="feature-card">
@@ -20,9 +20,9 @@ export default function AboutApp() {
                     <p>Create trip plans that cater to your personal preferences and schedule.</p>
                 </div>
                 <div className="feature-card">
-                    <i className="fas fa-cloud-sun-rain feature-icon"></i>
-                    <h3>Real-time Weather Updates</h3>
-                    <p>Stay prepared with up-to-date weather information at your fingertips.</p>
+                    <i className="fas fa-wallet feature-icon"></i>
+                    <h3>Budget Management</h3>
+                    <p>Keep track of your travel expenses and manage your budget efficiently with our easy-to-use tools.</p>
                 </div>
             </div>
             <Link to='/trips'><button className="start-planning-btn">Start Planning</button></Link>
