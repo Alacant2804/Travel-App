@@ -21,11 +21,11 @@ export default function AccommodationModal({ tripId, destinationId, accommodatio
         const fetchedAccommodation = response.data;
         console.log("Fetched accommodation data:", fetchedAccommodation);
         if (fetchedAccommodation) {
-          setAddress(fetchedAccommodation[0].address || '');
-          setStartDate(fetchedAccommodation[0].startDate ? fetchedAccommodation[0].startDate.split('T')[0] : '');
-          setEndDate(fetchedAccommodation[0].endDate ? fetchedAccommodation[0].endDate.split('T')[0] : '');
-          setBookingLink(fetchedAccommodation[0].bookingLink || '');
-          setPrice(parseFloat(fetchedAccommodation[0].price) || 0);
+          setAddress(fetchedAccommodation[0]?.address || '');
+          setStartDate(fetchedAccommodation[0]?.startDate ? fetchedAccommodation[0].startDate.split('T')[0] : '');
+          setEndDate(fetchedAccommodation[0]?.endDate ? fetchedAccommodation[0].endDate.split('T')[0] : '');
+          setBookingLink(fetchedAccommodation[0]?.bookingLink || '');
+          setPrice(parseFloat(fetchedAccommodation[0]?.price) || 0);
         } else {
           console.log("No accommodation data received.");
         }

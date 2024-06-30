@@ -1,5 +1,5 @@
 import { useState, useCallback, useMemo, useContext, useEffect } from 'react';
-import { Link, useNavigate  } from 'react-router-dom';
+import { useNavigate  } from 'react-router-dom';
 import TripFormModal from './TripFormModal';
 import { toast } from 'react-toastify';
 import axios from 'axios';
@@ -7,6 +7,7 @@ import './Trips.css';
 import { TripsContext } from './TripsContext';
 import { AuthContext } from './AuthContext';
 import Title from './Title';
+import {slugify} from './slugify';
 
 
 export default function Trips() {
@@ -62,7 +63,8 @@ export default function Trips() {
   };
 
   const handleTripClick = (trip) => {
-    navigate(`/trips/${trip._id}`, { state: { tripName: trip.tripName } });
+    const slug = slugify(trip.tripName);
+    navigate(`/trips/${slug}`, { state: { tripId: trip._id, tripName: trip.tripName } });
   };
 
   const renderedTrips = useMemo(() => (

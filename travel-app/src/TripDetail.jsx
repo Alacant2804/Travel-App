@@ -75,8 +75,9 @@ const fetchAllCoordinates = async (trip, setPlaces) => {
 };
 
 export default function TripDetail() {
-    const { tripId } = useParams();
+    const { tripSlug } = useParams();
     const location = useLocation();
+    const [tripId, setTripId] = useState(location.state?.tripId || '');
     const [tripName, setTripName] = useState(location.state?.tripName || '');
     const [trip, setTrip] = useState(null);
     const [destinations, setDestinations] = useState([]);
@@ -109,7 +110,31 @@ export default function TripDetail() {
 
     useEffect(() => {
         fetchTripDetails();
-    }, [tripId]);
+
+        if (!tripId) {
+      // Handle case where tripId is not in state (e.g., user refreshes the page)
+      // You might need a way to map slug back to tripId, e.g., fetch all trips and find by slug
+      const fetchTripBySlug = async () => {
+        try {
+          const response = await axios.get(`http://localhost:5001/api/trips`, { withCredentials: true });
+          const trip = response.data.find(trip => slugify(trip.tripName) === tripSlug);
+          if (trip) {
+            setTripId(trip._id);
+            setTripName(trip.tripName);
+            setTrip(trip);
+            setDestinations(trip.destinations);
+            setLoading(false);
+          }
+        } catch (error) {
+          console.error('Error fetching trip by slug:', error);
+        }
+      };
+      fetchTripBySlug();
+    } else {
+      fetchTripDetails();
+    }
+  }, [tripId, tripSlug]);
+
 
     const handleAddDestination = async () => {
         const startDate = new Date().toISOString().slice(0, 10);

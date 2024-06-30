@@ -15,15 +15,19 @@ export default function BudgetModal({ tripId, onSave, onClose }) {
       try {
         const response = await axios.get(`http://localhost:5001/api/trips/${tripId}`, { withCredentials: true });
         const trip = response.data;
-
+        console.log('Budget Modal: ', trip)
         const flightsTotal = trip.flights.reduce((sum, flight) => sum + flight.price, 0);
         const transportationTotal = trip.transportation.reduce((sum, transport) => sum + transport.price, 0);
         const placesTotal = trip.destinations.reduce((sum, destination) => {
           return sum + destination.places.reduce((placeSum, place) => placeSum + place.price, 0);
         }, 0);
-        const accommodationTotal = trip.destinations.reduce((sum, destination) => {
-          return sum + destination.accommodation[0].price
+        let accommodationTotal = trip.destinations.reduce((sum, destination) => {
+          return sum + destination.accommodation[0]?.price
         }, 0);
+
+        if (isNaN(accommodationTotal)) {
+        accommodationTotal = 0;
+      }
 
         const defaultItems = [
           { category: 'Flights', amount: flightsTotal, type: 'flights', _id: 'default-flights' },
@@ -53,6 +57,7 @@ export default function BudgetModal({ tripId, onSave, onClose }) {
       return;
     }
     setEditItemId(item._id);
+    console.log("Item ID: ", item._id);
     setEditedItem({ category: item.category, amount: item.amount.toString(), _id: item._id });
   };
 
