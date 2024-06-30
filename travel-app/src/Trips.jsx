@@ -68,14 +68,14 @@ export default function Trips() {
   const renderedTrips = useMemo(() => (
     trips.map((trip) => (
       <li key={trip._id}  className="trip-card">
-        <Link to={`/trips/${trip._id}`} className="trip-link" onClick={() => handleTripClick(trip)}>
+        <div className="trip-link" onClick={() => handleTripClick(trip)}>
         <h3>{trip.tripName}</h3>
         <p><strong>Country: </strong> {trip.country}</p>
         <p><strong>City: </strong> {trip.destinations[0].city}</p>
         <p><strong>Start Date: </strong> {trip.destinations[0].startDate.split('T')[0]}</p>
         <p><strong>End Date: </strong> {trip.destinations[0].endDate.split('T')[0]}</p>
         <p><strong>Duration: </strong> {trip.destinations[0]?.duration} days</p>
-        </Link>
+        </div>
         <div className="trip-actions">
           <button className="trip-btn edit" onClick={() => { event.stopPropagation(); setIsModalOpen(true); setEditingTrip(trip); }}>Edit</button>
           <button className="trip-btn delete" onClick={() => handleDeleteTrip(trip._id, event)}>Delete</button>
