@@ -1,8 +1,10 @@
 import './PrivacyPolicy.css';
+import Title from './Title';
 
 const PrivacyPolicy = () => {
   return (
     <div className="privacy-policy-container">
+      <Title title="Privacy Policy" />
       <h1>Privacy Policy</h1>
       <p>Last updated: 6/8/2024</p>
       

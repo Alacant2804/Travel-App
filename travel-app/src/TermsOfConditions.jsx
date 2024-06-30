@@ -1,8 +1,10 @@
 import './TermsOfConditions.css';
+import Title from './Title';
 
 const TermsOfConditions = () => {
   return (
     <div className="terms-of-conditions-container">
+      <Title title="Terms Of Conditions" />
       <h1>Terms of Service</h1>
       <p>Last updated: 6/8/2024</p>
     

@@ -1,11 +1,12 @@
 import { useState, useCallback, useMemo, useContext, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate  } from 'react-router-dom';
 import TripFormModal from './TripFormModal';
 import { toast } from 'react-toastify';
 import axios from 'axios';
 import './Trips.css';
 import { TripsContext } from './TripsContext';
 import { AuthContext } from './AuthContext';
+import Title from './Title';
 
 
 export default function Trips() {
@@ -13,6 +14,11 @@ export default function Trips() {
   const { user } = useContext(AuthContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTrip, setEditingTrip] = useState(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    fetchTrips();
+  }, [fetchTrips]);
 
   const handleCreateTrip = useCallback(async (newTripData) => {
     try {
@@ -35,7 +41,8 @@ export default function Trips() {
     }
   }, [trips, setTrips, addTrip, fetchTrips, editingTrip]);
 
-  const handleDeleteTrip = useCallback(async (tripId) => {
+  const handleDeleteTrip = useCallback(async (tripId, event) => {
+    event.stopPropagation();
     try {
       console.log('Attempting to delete trip with ID:', tripId);
       await deleteTrip(tripId);
@@ -54,10 +61,14 @@ export default function Trips() {
     }
   };
 
+  const handleTripClick = (trip) => {
+    navigate(`/trips/${trip._id}`, { state: { tripName: trip.tripName } });
+  };
+
   const renderedTrips = useMemo(() => (
     trips.map((trip) => (
-      <li key={trip._id} className="trip-card">
-        <Link to={`/trips/${trip._id}`} className="trip-link">
+      <li key={trip._id}  className="trip-card">
+        <Link to={`/trips/${trip._id}`} className="trip-link" onClick={() => handleTripClick(trip)}>
         <h3>{trip.tripName}</h3>
         <p><strong>Country: </strong> {trip.country}</p>
         <p><strong>City: </strong> {trip.destinations[0].city}</p>
@@ -66,8 +77,8 @@ export default function Trips() {
         <p><strong>Duration: </strong> {trip.destinations[0]?.duration} days</p>
         </Link>
         <div className="trip-actions">
-          <button className="trip-btn edit" onClick={() => { setIsModalOpen(true); setEditingTrip(trip); }}>Edit</button>
-          <button className="trip-btn delete" onClick={() => handleDeleteTrip(trip._id)}>Delete</button>
+          <button className="trip-btn edit" onClick={() => { event.stopPropagation(); setIsModalOpen(true); setEditingTrip(trip); }}>Edit</button>
+          <button className="trip-btn delete" onClick={() => handleDeleteTrip(trip._id, event)}>Delete</button>
         </div>
       </li>
     ))
@@ -76,6 +87,7 @@ export default function Trips() {
   return (
     <div className="trips-page">
       <main className="trips-main">
+        <Title title="Trips | Travel App" />
         <h1>Your Trips</h1>
         <button className="create-trip-btn" onClick={handleCreateButtonClick}>
           Create Trip

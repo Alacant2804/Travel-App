@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import Destination from './Destination';
 import FlightModal from './FlightModal';
@@ -8,6 +8,7 @@ import MapComponent from './MapComponent';
 import BudgetModal from './BudgetModal';
 import Loading from './Loading';
 import axios from 'axios';
+import Title from './Title';
 import './TripDetail.css';
 import budgetIcon from './assets/budget.png';
 import carIcon from './assets/car.png';
@@ -75,6 +76,8 @@ const fetchAllCoordinates = async (trip, setPlaces) => {
 
 export default function TripDetail() {
     const { tripId } = useParams();
+    const location = useLocation();
+    const [tripName, setTripName] = useState(location.state?.tripName || '');
     const [trip, setTrip] = useState(null);
     const [destinations, setDestinations] = useState([]);
     const [places, setPlaces] = useState([]);
@@ -354,6 +357,7 @@ export default function TripDetail() {
 
     return (
         <div className="trip-detail-page">
+            <Title title={`${tripName} | Travel App`} />
             <div className='button-section'>
                 <Link to='/trips'><button className='back-button'>Go Back</button></Link>
                 <div className='trip-icons'>

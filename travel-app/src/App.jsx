@@ -14,6 +14,7 @@ import Login from './Login.jsx';
 import SignUp from './SignUp.jsx';
 import PrivacyPolicy from './PrivacyPolicy.jsx';
 import TermsOfConditions from './TermsOfConditions.jsx';
+import Title from './Title.jsx';
 import NotFound from './NotFound.jsx';
 import 'leaflet/dist/leaflet.css';
 import 'react-toastify/dist/ReactToastify.css'
@@ -30,6 +31,7 @@ export default function App() {
           <Routes>
             <Route path="/" element={
               <>
+                <Title title="Travel App" />
                 <MainPhoto />
                 <AboutApp />
                 <BlockMain />

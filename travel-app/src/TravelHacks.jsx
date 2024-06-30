@@ -6,6 +6,7 @@ import safeTravel from './assets/safe-travel.jpg';
 import travelPro from './assets/travel-pro.jpg';
 import culture from './assets/culture.jpg';
 import international from './assets/international.jpg';
+import Title from './Title';
 
 const travelPostData = [
     {
@@ -66,6 +67,7 @@ export default function TravelHacks() {
 
     return (
         <div className="travel-hacks-container">
+            <Title title="Travel Hacks | Travel App" />
             <h2 className='blog-header'>Blog Posts</h2>
             <div className="blog-layout">
                 {travelPostData.map((post) => (
