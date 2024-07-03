@@ -48,14 +48,12 @@
 @media (max-width: 768px) {
     .footer {
         flex-direction: column;
-        /* Change to column direction on smaller screens */
         padding: 15px 0;
         height: auto;
     }
 
     .social-media {
         margin-bottom: 10px;
-        /* Add margin to separate from text */
     }
 
     .social-media a img {
@@ -70,12 +68,10 @@
     .footer p {
         font-size: 14px;
         margin-bottom: 15px;
-        /* Reduce font size */
     }
 
     .footer-links li {
         font-size: 14px;
-        /* Reduce font size */
     }
 }
 
@@ -88,12 +84,10 @@
     .footer p {
         font-size: 12px;
         margin-bottom: 15px;
-        /* Further reduce font size */
     }
 
     .footer-links li {
         font-size: 12px;
-        /* Further reduce font size */
     }
 }
 
@@ -109,11 +103,9 @@
     .footer p {
         font-size: 10px;
         margin-bottom: 15px;
-        /* Further reduce font size */
     }
 
     .footer-links li {
         font-size: 10px;
-        /* Further reduce font size */
     }
 }
