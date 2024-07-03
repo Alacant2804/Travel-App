@@ -66,29 +66,31 @@ export default function TravelHacks() {
     };
 
     return (
-        <div className="travel-hacks-container">
+        <main className="travel-hacks-container">
             <Title title="Travel Hacks | Travel App" />
-            <h2 className='blog-header'>Blog Posts</h2>
-            <div className="blog-layout">
+            <header>
+                <h2 className='blog-header'>Blog Posts</h2>
+            </header>
+            <section  className="blog-layout">
                 {travelPostData.map((post) => (
                     <article className='blog-post' key={post.id}>
                         <img src={post.image} alt={post.title} className="post-image" />
-                        <h2 className="post-title">{post.title}</h2>
+                        <h3 className="post-title">{post.title}</h3>
                         <p className='post-description'>{truncateText(post.description, 100)}</p>
                         <button className='post-button' onClick={() => openModal(post)}>Read more</button>
                     </article>
                 ))}
-            </div>
+            </section >
             {modalContent && (
                 <div className="modal show">
                     <div className="modal-content">
-                        <span className="close" onClick={closeModal}>&times;</span>
+                        <button className="close" onClick={closeModal} aria-label="Close">&times;</button>
                         <img src={modalContent.image} alt={modalContent.title} className="modal-image" />
-                        <h2>{modalContent.title}</h2>
+                        <h3 className='modal-title'>{modalContent.title}</h3>
                         <p>{modalContent.description}</p>
                     </div>
                 </div>
             )}
-        </div>
+        </main>
     );
 }

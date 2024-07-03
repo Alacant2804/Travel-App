@@ -1,9 +1,0 @@
-Icons by Icons8:
-House: "https://icons8.com/icon/LvE6Gd5rG7Zr/house"
-Flights: "https://icons8.com/icon/119528/plane"
-Car: https://img.icons8.com/?size=100&id=fsoiqMUp0O4v&format=png&color=000000
-Budget: "https://icons8.com/icon/64551/accounting"
-Home: "https://icons8.com/icon/12229/home"
-Delete: "https://icons8.com/icon/102350/delete"
-Edit: "https://icons8.com/icon/11926/create"
-Favicon: "https://icons8.com/icon/JxowWafYSEQ6/beach"

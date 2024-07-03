@@ -3,6 +3,8 @@ import { Link } from "react-router-dom";
 import { AuthContext } from "./AuthContext";
 import { toast } from "react-toastify";
 import "./SignUp.css";
+import PasswordRequirements from "./PasswordRequirements";
+
 
 export default function SignUp() {
   const [username, setUsername] = useState("");
@@ -10,12 +12,20 @@ export default function SignUp() {
   const [emailValid, setEmailValid] = useState(true);
   const [password, setPassword] = useState("");
   const [passwordStrength, setPasswordStrength] = useState("");
+  const [isPasswordModalVisible, setIsPasswordModalVisible] = useState(false);
   const { register } = useContext(AuthContext);
 
   const handleSubmitForm = async (e) => {
     e.preventDefault();
     if (!emailValid) {
       toast.error("Invalid email address", {
+        theme: "colored",
+      });
+      return;
+    }
+    console.log(passwordStrength);
+    if (passwordStrength !== "Strong") {
+      toast.error("Password is too weak", {
         theme: "colored",
       });
       return;
@@ -33,7 +43,6 @@ export default function SignUp() {
     let strength = "";
     if (password.length >= 8) {
       strength = "Weak";
-      if (/[A-Z]/.test(password)) strength = "Medium";
       if (/[0-9]/.test(password) && /[^A-Za-z0-9]/.test(password)) strength = "Strong";
     } else {
       strength = "Too short";
@@ -87,7 +96,7 @@ export default function SignUp() {
                 required
               />
             </div>
-            <div className="input-group">
+            <div className="input-group" style={{ position: 'relative' }}>
               <label htmlFor="password">Password</label>
               <input
                 type="password"
@@ -95,11 +104,17 @@ export default function SignUp() {
                 placeholder="********"
                 value={password}
                 onChange={handlePasswordChange}
+                onFocus={() => setIsPasswordModalVisible(true)}
+                onBlur={() => setIsPasswordModalVisible(false)}
                 required
               />
-               <div className={`password-strength ${passwordStrength.toLowerCase().replace(' ', '-')}`}>
+              <div className={`password-strength ${passwordStrength.toLowerCase().replace(' ', '-')}`}>
                 {passwordStrength}
               </div>
+              <PasswordRequirements
+                password={password}
+                isVisible={isPasswordModalVisible}
+              />
             </div>
             <div className="buttons">
               <button type="submit" className="create-account-button">

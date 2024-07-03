@@ -79,7 +79,7 @@ export const AuthProvider = ({ children }) => {
       console.error('Error fetching user:', error);
       if (error.response && error.response.status === 401) {
         // Handle the case when user is not authenticated
-        logout();
+        setUser(null);
       }
     } finally {
       setLoading(false);
