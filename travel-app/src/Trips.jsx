@@ -21,6 +21,12 @@ export default function Trips() {
     fetchTrips();
   }, [fetchTrips]);
 
+  useEffect(() => {
+    if (!user) {
+      setTrips([]);
+    }
+  }, [user])
+
   const handleCreateTrip = useCallback(async (newTripData) => {
     try {
       if (editingTrip) {
