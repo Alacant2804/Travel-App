@@ -6,6 +6,7 @@
     "heroku-postbuild": "cd travel-app/client && npm install && npm run build"
   },
   "engines": {
-    "node": "18.x"
+    "node": "18.x",
+    "npm": "10.8.1"
   }
 }
