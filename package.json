@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "scripts": {
     "start": "node travel-app/backend/server.js",
-    "heroku-postbuild": "cd travel-app/client && npm install && npm run build"
+    "heroku-postbuild": "cd travel-app/client && npm install && npm install vite && npm run build"
   },
   "engines": {
-    "node": "18.x",
+    "node": "18.20.3",
     "npm": "10.8.1"
   }
 }
