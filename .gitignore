@@ -1,1 +1,45 @@
-node_modules
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Node modules
+travel-app/node_modules/
+
+# Build directories
+travel-app/client/dist/
+travel-app/client/dist-ssr/
+*.local
+
+# Editor directories and files
+.vscode/
+!.vscode/extensions.json
+.idea/
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Environment variables
+travel-app/backend/.env
+
+# Debug
+debug.log
+debug/
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# Temporary folders and files
+tmp/
+temp/
+*.tmp
+*.temp
+.cache/

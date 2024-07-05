@@ -9,7 +9,7 @@
     "dev": "nodemon server.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "Alacant2804",
   "license": "ISC",
   "description": "Backend server for the Travel App",
   "dependencies": {
