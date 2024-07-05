@@ -9,6 +9,8 @@ lerna-debug.log*
 
 # Node modules
 travel-app/node_modules/
+travel-app/backend/node_modules/
+travel-app/client/node_modules/
 
 # Build directories
 travel-app/client/dist/
