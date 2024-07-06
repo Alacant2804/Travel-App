@@ -8,15 +8,24 @@ import cookieParser from 'cookie-parser';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-dotenv.config();
+// dotenv.config();
 
-const app = express();
-
-// Get __dirname equivalent in ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-console.log('__dirname:', __dirname);
+// Explicitly specify the path to the .env file
+dotenv.config({ path: path.resolve(__dirname, '.env') });
+
+// Debug logs
+console.log('MONGO_URI:', process.env.MONGO_URI);
+console.log('JWT_SECRET:', process.env.JWT_SECRET);
+console.log('PORT:', process.env.PORT);
+
+if (!process.env.MONGO_URI) {
+  throw new Error('MONGO_URI is not defined');
+}
+
+const app = express();
 
 const corsOptions = {
   origin: 'http://localhost:5173', // Ensure this matches your frontend URL if running separately
