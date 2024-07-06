@@ -8,17 +8,18 @@ import cookieParser from 'cookie-parser';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-// Load environment variables from .env file
-dotenv.config(); 
+dotenv.config();
 
-const app = express(); 
+const app = express();
 
 // Get __dirname equivalent in ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+console.log('__dirname:', __dirname);
+
 const corsOptions = {
-  origin: 'http://localhost:5173',
+  origin: 'http://localhost:5173', // Ensure this matches your frontend URL if running separately
   credentials: true,
   optionsSuccessStatus: 200
 };
@@ -42,13 +43,10 @@ app.use('/api/auth', authRoutes); // Authentication routes
 app.use('/api/trips', tripRoutes); // Trip-related routes
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
+mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('MongoDB connected'))
   .catch((err) => console.error('MongoDB connection error:', err));
 
 // Start the server
-const PORT = process.env.PORT || 5001;
+const PORT = process.env.PORT || 5002; // Changed to port 5002 to avoid conflicts
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
