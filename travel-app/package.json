@@ -2,8 +2,8 @@
   "name": "travel-app",
   "version": "1.0.0",
   "scripts": {
-    "start": "node travel-app/backend/server.js",
-    "heroku-postbuild": "cd travel-app/client && npm install && npm run build"
+    "start": "node backend/server.js",
+    "heroku-postbuild": "cd client && npm install && npm run build"
   },
   "engines": {
     "node": "18.20.3",
