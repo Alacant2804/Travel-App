@@ -6,11 +6,13 @@
 .button-section {
   display: flex;
   justify-content: space-between;
+  flex-wrap: wrap;
 }
 
 .trip-icons {
   display: flex;
   gap: 10px;
+  margin-top: 10px;
 }
 
 .back-button {
@@ -24,7 +26,8 @@
   transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
-.icon, .budget-icon {
+.icon,
+.budget-icon {
   width: 32px;
   height: 32px;
   vertical-align: middle;
@@ -38,7 +41,8 @@
   height: 40px;
 }
 
-.button-icon:hover, .icon {
+.button-icon:hover,
+.icon {
   transform: translateY(-3px);
 }
 
@@ -69,10 +73,11 @@
   display: flex;
   justify-content: space-around;
   margin-bottom: 20px;
+  flex-wrap: wrap;
 }
 
 .trip-info-row p {
-  margin: 0;
+  margin: 10px;
   padding: 10px 20px;
   background-color: #f5f5f5;
   border-radius: 8px;
@@ -96,4 +101,45 @@
 
 .add-destination-button:hover {
   background-color: #0056b3;
+}
+
+/* Media Queries for Responsiveness */
+@media (max-width: 768px) {
+  .trip-info-row {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .trip-info-row p {
+    width: 90%;
+    text-align: center;
+  }
+
+  .button-section {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .trip-icons {
+    justify-content: center;
+  }
+
+  .back-button {
+    margin-bottom: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .trip-title {
+    font-size: 1.5em;
+  }
+
+  .add-destination-button {
+    width: 90%;
+  }
+
+  .trip-info-row p {
+    font-size: 0.9em;
+    padding: 8px 16px;
+  }
 }

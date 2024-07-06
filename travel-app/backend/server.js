@@ -32,15 +32,15 @@ app.use(cookieParser());
 // Serve static files from the React app
 app.use(express.static(path.join(__dirname, '../client/dist')));
 
+// Define base paths for routes
+app.use('/api/auth', authRoutes); // Authentication routes
+app.use('/api/trips', tripRoutes); // Trip-related routes
+
 // The "catchall" handler: for any request that doesn't
 // match one above, send back React's index.html file.
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/dist/index.html'));
 });
-
-// Define base paths for routes
-app.use('/api/auth', authRoutes); // Authentication routes
-app.use('/api/trips', tripRoutes); // Trip-related routes
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI)
@@ -48,5 +48,5 @@ mongoose.connect(process.env.MONGO_URI)
   .catch((err) => console.error('MongoDB connection error:', err));
 
 // Start the server
-const PORT = process.env.PORT || 5002; // Changed to port 5002 to avoid conflicts
+const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

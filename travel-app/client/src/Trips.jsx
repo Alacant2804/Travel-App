@@ -27,6 +27,10 @@ export default function Trips() {
     }
   }, [user])
 
+  useEffect(() => {
+    console.log(trips)
+  }, [trips])
+
   const handleCreateTrip = useCallback(async (newTripData) => {
     try {
       if (editingTrip) {
