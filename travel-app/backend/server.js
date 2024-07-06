@@ -5,9 +5,17 @@ import dotenv from 'dotenv';
 import authRoutes from './routes/auth.js';
 import tripRoutes from './routes/trips.js';
 import cookieParser from 'cookie-parser';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-dotenv.config(); // Load environment variables from .env file
+// Load environment variables from .env file
+dotenv.config(); 
+
 const app = express(); 
+
+// Get __dirname equivalent in ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const corsOptions = {
   origin: 'http://localhost:5173',
