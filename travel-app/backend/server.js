@@ -8,16 +8,27 @@ import cookieParser from 'cookie-parser';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
-dotenv.config();
-console.log('Environment variables loaded.');
+// dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Explicitly specify the path to the .env file
+dotenv.config({ path: path.resolve(__dirname, '.env') });
+
+// Debug logs
+console.log('MONGO_URI:', process.env.MONGO_URI);
+console.log('JWT_SECRET:', process.env.JWT_SECRET);
+console.log('PORT:', process.env.PORT);
+
+if (!process.env.MONGO_URI) {
+  throw new Error('MONGO_URI is not defined');
+}
+
 const app = express();
 
 const corsOptions = {
-  origin: process.env.CLIENT_ORIGIN || 'http://localhost:5173',
+  origin: 'http://localhost:5173', // Ensure this matches your frontend URL if running separately
   credentials: true,
   optionsSuccessStatus: 200
 };
@@ -27,23 +38,26 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+// Serve static files from the React app
 app.use(express.static(path.join(__dirname, '../client/dist')));
 
-app.use('/api/auth', authRoutes);
-app.use('/api/trips', tripRoutes);
+// Define base paths for routes
+app.use('/api/auth', authRoutes); // Authentication routes
+app.use('/api/trips', tripRoutes); // Trip-related routes
 
+// The "catchall" handler: for any request that doesn't
+// match one above, send back React's index.html file.
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/dist/index.html'));
 });
 
-console.log('Attempting to connect to MongoDB...');
-mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => {
-    console.log('MongoDB connected');
-    const PORT = process.env.PORT || 5001;
-    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
-  })
-  .catch((err) => {
-    console.error('MongoDB connection error:', err);
-    process.exit(1);
-  });
+console.log('Starting server...');
+
+// Connect to MongoDB
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log('MongoDB connected'))
+  .catch((err) => console.error('MongoDB connection error:', err));
+
+// Start the server
+const PORT = process.env.PORT || 5001;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
