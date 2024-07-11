@@ -17,7 +17,7 @@ const __dirname = path.dirname(__filename);
 const app = express();
 
 const corsOptions = {
-  origin: process.env.CLIENT_ORIGIN || 'http://localhost:5173',
+  origin: process.env.CLIENT_ORIGIN || 'https://travel-app-ten-omega.vercel.app',
   credentials: true,
   optionsSuccessStatus: 200
 };
