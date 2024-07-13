@@ -3,9 +3,9 @@ import axios from 'axios';
 // Follow a common RESTful API convention. 
 // /api Common base path used to indicate that these routes are part of the application's API
 // /auth specifies that the routes under this path are related to authentication
-
+// import.meta.env.VITE_API_URL;
 // Base URL for the authentication API
-const API_URL = import.meta.env.VITE_API_URL;
+const API_URL = 'https://travel-app-backend-blond.vercel.app/api/auth';
 // Register a new user
 const register = async (userData) => {
   const response = await axios.post(`${API_URL}/sign-up`, userData, { withCredentials: true });
