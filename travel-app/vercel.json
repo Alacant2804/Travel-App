@@ -15,15 +15,19 @@
   ],
   "routes": [
     {
-      "src": "/(.*)",
+      "src": "/api/(.*)",
       "dest": "backend/server.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/client/dist"
     }
   ],
   "env": {
     "MONGO_URI": "mongodb+srv://admin:t7fHpGcQHDWp5enb@travelapp.3mmtzb4.mongodb.net/test?retryWrites=true&w=majority&appName=TravelApp",
     "JWT_SECRET": "supersecretkey123",
-    "CLIENT_ORIGIN": "https://travel-app-ten-omega.vercel.app",
-    "VITE_API_URL": "https://backend-psi-black.vercel.app/api"
+    "CLIENT_ORIGIN": "https://your-frontend-url.vercel.app",
+    "VITE_API_URL": "https://your-backend-url.vercel.app/api/auth"
   },
   "installCommand": "cd client && npm install && cd ../backend && npm install",
   "buildCommand": "cd client && npm run build",
