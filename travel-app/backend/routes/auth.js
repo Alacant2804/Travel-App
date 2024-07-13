@@ -16,6 +16,15 @@ router.get('/user', auth, async (req, res) => {
   }
 });
 
+router.get('/hello', async (req, res) => {
+  try {
+    res.json('Hello World!');
+  }
+  catch (err) {
+    res.status(500).json({message: 'Server Error', error: err.message});
+  }
+})
+
 // Register a new user
 router.post('/sign-up', async (req, res) => {
   const { username, email, password } = req.body;

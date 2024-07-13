@@ -15,11 +15,10 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const app = express();
 const corsOptions = {
-  origin: process.env.CLIENT_ORIGIN,
+  origin: 'process.env.CLIENT_ORIGIN',
   credentials: true,
   optionsSuccessStatus: 200
 };
-
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
