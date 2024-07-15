@@ -6,24 +6,13 @@
 
 ## ✨ Features
 
-📝 Create and edit trips
-📍 Add destinations with start and end dates
-🗺️ Add places to visit within each destination
-🏨 Add and edit accommodation details
-🌐 Display trip details on an interactive map
-💸 Set and manage trip budgets
-🔐 Secure user authentication
-
-## 🚀 Usage
-
-You can access the deployed application [here](https://travel-app-client-tau.vercel.app/).
-
-1. Open the application in your browser.
-2. Register or log in using the authentication system.
-3. Create a new trip by clicking on the "Create Trip" button.
-4. Add destinations and places to visit within each destination.
-5. Add accommodation details for each destination.
-6. View the trip details on the interactive map.
+- 📝 Create and edit trips
+- 📍 Add destinations with start and end dates
+- 🗺️ Add places to visit within each destination
+- 🏨 Add and edit accommodation details
+- 🌐 Display trip details on an interactive map
+- 💸 Set and manage trip budgets
+- 🔐 Secure user authentication
 
 ## 🧰 Toolbox
 
@@ -35,6 +24,17 @@ You can access the deployed application [here](https://travel-app-client-tau.ver
 * Vite: For the development server and build tooling.
 * CSS: For styling the components.
 * JWT Token Authentication: For secure user login and registration.
+
+## 🚀 Usage
+
+You can access the deployed application [here](https://travel-app-client-tau.vercel.app/).
+
+1. Open the application in your browser.
+2. Register or log in using the authentication system.
+3. Create a new trip by clicking on the "Create Trip" button.
+4. Add destinations and places to visit within each destination.
+5. Add accommodation details for each destination.
+6. View the trip details on the interactive map.
 
 ## 🎓 What I Learned
 
