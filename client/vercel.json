@@ -12,11 +12,11 @@
   "rewrites": [
     {
       "source": "/api/auth/(.*)",
-      "destination": "https://your-backend-url/api/auth/$1"
+      "destination": "https://travel-app-backend-delta.vercel.app/api/auth/$1"
     },
     {
       "source": "/api/(.*)",
-      "destination": "https://your-backend-url/api/$1"
+      "destination": "https://travel-app-backend-delta.vercel.app/api/$1"
     }
   ]
 }
