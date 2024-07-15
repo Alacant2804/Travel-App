@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import './TransportationForm.css'; // Ensure to import your CSS
+import './TransportationForm.css';
 
 export default function TransportationForm({ details, onSave, onClose }) {
   const [pickupPlace, setPickupPlace] = useState('');

@@ -7,6 +7,8 @@ import { toast } from 'react-toastify';
 
 export const AuthContext = createContext();
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -73,7 +75,7 @@ export const AuthProvider = ({ children }) => {
   const fetchUser = async () => {
     setLoading(true);
     try {
-      const response = await axios.get('http://localhost:5001/api/auth/user', { withCredentials: true });
+      const response = await axios.get(`${API_URL}/auth/user`, { withCredentials: true });
       setUser(response.data);
     } catch (error) {
       console.error('Error fetching user:', error);

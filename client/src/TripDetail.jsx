@@ -14,6 +14,8 @@ import budgetIcon from './assets/budget.png';
 import carIcon from './assets/car.png';
 import planeIcon from './assets/plane.png';
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 const getAndSetCoordinates = async (query, setState = null) => {
     try {
         const response = await axios.get('https://nominatim.openstreetmap.org/search', {
@@ -92,7 +94,7 @@ export default function TripDetail() {
 
     const fetchTripDetails = async () => {
         try {
-            const response = await axios.get(`http://localhost:5001/api/trips/${tripId}`, { withCredentials: true });
+            const response = await axios.get(`${API_URL}/trips/${tripId}`, { withCredentials: true });
             setTrip(response.data);
             setDestinations(response.data.destinations || []);
 
@@ -116,7 +118,7 @@ export default function TripDetail() {
       // You might need a way to map slug back to tripId, e.g., fetch all trips and find by slug
       const fetchTripBySlug = async () => {
         try {
-          const response = await axios.get(`http://localhost:5001/api/trips`, { withCredentials: true });
+          const response = await axios.get(`${API_URL}/trips`, { withCredentials: true });
           const trip = response.data.find(trip => slugify(trip.tripName) === tripSlug);
           if (trip) {
             setTripId(trip._id);
@@ -150,7 +152,7 @@ export default function TripDetail() {
         };
 
         try {
-            const response = await axios.post(`http://localhost:5001/api/trips/${tripId}/destinations`, newDestination, { withCredentials: true });
+            const response = await axios.post(`${API_URL}/trips/${tripId}/destinations`, newDestination, { withCredentials: true });
             setDestinations(response.data.destinations);
         } catch (error) {
             console.error('Error adding destination:', error);
@@ -178,14 +180,14 @@ export default function TripDetail() {
             if (destinationId) {
                 // Update existing destination
                 response = await axios.put(
-                `http://localhost:5001/api/trips/${tripId}/destinations/${destinationId}`,
+                `${API_URL}/trips/${tripId}/destinations/${destinationId}`,
                 updatedDestination,
                 { withCredentials: true }
                 );
             } else {
                 // Create new destination
                 response = await axios.post(
-                `http://localhost:5001/api/trips/${tripId}/destinations`,
+                `${API_URL}/trips/${tripId}/destinations`,
                 updatedDestination,
                 { withCredentials: true }
                 );
@@ -230,7 +232,7 @@ export default function TripDetail() {
         }
         try {
             const response = await axios.post(
-                `http://localhost:5001/api/trips/${tripId}/destinations/${destinationId}/places`,
+                `${API_URL}/trips/${tripId}/destinations/${destinationId}/places`,
                 newPlace,
                 { withCredentials: true }
             );
@@ -257,7 +259,7 @@ export default function TripDetail() {
         const placeId = destinations[destinationIndex].places[placeIndex]._id;
         try {
             const response = await axios.put(
-                `http://localhost:5001/api/trips/${tripId}/destinations/${destinationId}/places/${placeId}`,
+                `${API_URL}/trips/${tripId}/destinations/${destinationId}/places/${placeId}`,
                 updatedPlace,
                 { withCredentials: true }
             );
@@ -277,7 +279,7 @@ export default function TripDetail() {
             return;
         }
         try {
-            const response = await axios.delete(`http://localhost:5001/api/trips/${tripId}/destinations/${destinationId}/places/${placeId}`, { withCredentials: true });
+            const response = await axios.delete(`${API_URL}/trips/${tripId}/destinations/${destinationId}/places/${placeId}`, { withCredentials: true });
             setDestinations(response.data.destinations);
         } catch (error) {
             console.error('Error deleting place:', error);
@@ -296,7 +298,7 @@ export default function TripDetail() {
         if (destinationIndex === 0) return;
         const updatedDestinations = destinations.filter((_, idx) => idx !== destinationIndex);
         try {
-            const response = await axios.put(`http://localhost:5001/api/trips/${tripId}`, { ...trip, destinations: updatedDestinations }, { withCredentials: true });
+            const response = await axios.put(`${API_URL}/trips/${tripId}`, { ...trip, destinations: updatedDestinations }, { withCredentials: true });
             setDestinations(response.data.destinations);
         } catch (error) {
             console.error('Error deleting destination:', error);
@@ -307,14 +309,14 @@ export default function TripDetail() {
         try {
             if (flightData._id) {
                 const response = await axios.put(
-                    `http://localhost:5001/api/trips/${tripId}/flights/${flightData._id}`,
+                    `${API_URL}/trips/${tripId}/flights/${flightData._id}`,
                     flightData,
                     { withCredentials: true }
                 );
                 setCurrentFlight(response.data);
             } else {
                 const response = await axios.post(
-                    `http://localhost:5001/api/trips/${tripId}/flights`,
+                    `${API_URL}/trips/${tripId}/flights`,
                     flightData,
                     { withCredentials: true }
                 );
@@ -336,13 +338,13 @@ export default function TripDetail() {
         try {
             if (transportationData._id) {
                 await axios.put(
-                    `http://localhost:5001/api/trips/${tripId}/transportation/${transportationData._id}`,
+                    `${API_URL}/trips/${tripId}/transportation/${transportationData._id}`,
                     transportationData,
                     { withCredentials: true }
                 );
             } else {
                 await axios.post(
-                    `http://localhost:5001/api/trips/${tripId}/transportation`,
+                    `${API_URL}/trips/${tripId}/transportation`,
                     transportationData,
                     { withCredentials: true }
                 );
@@ -369,8 +371,8 @@ export default function TripDetail() {
     };
 
     const handleSaveBudget = async () => {
-    fetchTripDetails(); // Refresh trip details after budget is saved
-  };
+        fetchTripDetails();
+    };
 
     if (loading) {
         return <Loading />;

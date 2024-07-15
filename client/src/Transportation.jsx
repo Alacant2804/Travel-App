@@ -3,6 +3,8 @@ import axios from 'axios';
 import TransportationForm from './TransportationForm';
 import './Transportation.css';
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export default function TransportationModal({ tripId, transportation, onSave, onClose }) {
   const [transportationDetails, setTransportationDetails] = useState({
     pickupPlace: '',
@@ -19,10 +21,10 @@ export default function TransportationModal({ tripId, transportation, onSave, on
     const fetchTransportationData = async () => {
       try {
         if (transportation && transportation._id) {
-          const response = await axios.get(`http://localhost:5001/api/trips/${tripId}/transportation/${transportation._id}`, { withCredentials: true });
+          const response = await axios.get(`${API_URL}/trips/${tripId}/transportation/${transportation._id}`, { withCredentials: true });
           setTransportationDetails(response.data);
         } else {
-          const response = await axios.get(`http://localhost:5001/api/trips/${tripId}/transportation`, { withCredentials: true });
+          const response = await axios.get(`${API_URL}/trips/${tripId}/transportation`, { withCredentials: true });
           setTransportationDetails(response.data[0] || {});
         }
       } catch (error) {
@@ -37,13 +39,13 @@ export default function TransportationModal({ tripId, transportation, onSave, on
     try {
       if (transportationData._id) {
         await axios.put(
-          `http://localhost:5001/api/trips/${tripId}/transportation/${transportationData._id}`,
+          `${API_URL}/trips/${tripId}/transportation/${transportationData._id}`,
           transportationData,
           { withCredentials: true }
         );
       } else {
         await axios.post(
-          `http://localhost:5001/api/trips/${tripId}/transportation`,
+          `${API_URL}/trips/${tripId}/transportation`,
           transportationData,
           { withCredentials: true }
         );

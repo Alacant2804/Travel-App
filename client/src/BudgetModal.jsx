@@ -4,6 +4,8 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import './BudgetModal.css';
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export default function BudgetModal({ tripId, onSave, onClose }) {
   const [budgetItems, setBudgetItems] = useState([]);
   const [editItemId, setEditItemId] = useState(null);
@@ -13,7 +15,7 @@ export default function BudgetModal({ tripId, onSave, onClose }) {
   useEffect(() => {
     const fetchBudgetData = async () => {
       try {
-        const response = await axios.get(`http://localhost:5001/api/trips/${tripId}`, { withCredentials: true });
+        const response = await axios.get(`${API_URL}/trips/${tripId}`, { withCredentials: true });
         const trip = response.data;
         console.log('Budget Modal: ', trip)
         const flightsTotal = trip.flights.reduce((sum, flight) => sum + flight.price, 0);
@@ -36,7 +38,7 @@ export default function BudgetModal({ tripId, onSave, onClose }) {
           { category: 'Accommodation', amount: accommodationTotal, type: 'accommodation', _id: 'default-accommodation' }
         ];
 
-        const responseBudget = await axios.get(`http://localhost:5001/api/trips/${tripId}/budget`, { withCredentials: true });
+        const responseBudget = await axios.get(`${API_URL}/trips/${tripId}/budget`, { withCredentials: true });
         const additionalItems = responseBudget.data.map(item => ({
           ...item,
           amount: parseFloat(item.amount),
@@ -67,14 +69,14 @@ export default function BudgetModal({ tripId, onSave, onClose }) {
 
       if (updatedItem._id && !['default-flights', 'default-transportation', 'default-places', 'default-accommodation'].includes(updatedItem._id)) {
         await axios.put(
-          `http://localhost:5001/api/trips/${tripId}/budget/${updatedItem._id}`,
+          `${API_URL}/trips/${tripId}/budget/${updatedItem._id}`,
           updatedItem,
           { withCredentials: true }
         );
       }
 
       // Refetch the budget items to synchronize state
-      const responseBudget = await axios.get(`http://localhost:5001/api/trips/${tripId}/budget`, { withCredentials: true });
+      const responseBudget = await axios.get(`${API_URL}/trips/${tripId}/budget`, { withCredentials: true });
       const additionalItems = responseBudget.data.map(item => ({
         ...item,
         amount: parseFloat(item.amount),
@@ -97,10 +99,10 @@ export default function BudgetModal({ tripId, onSave, onClose }) {
         const newBudgetItem = { ...newItem, amount: parseFloat(newItem.amount) };
 
         if (newBudgetItem.category && newBudgetItem.amount) {
-            await axios.post(`http://localhost:5001/api/trips/${tripId}/budget`, newBudgetItem, { withCredentials: true });
+            await axios.post(`${API_URL}/trips/${tripId}/budget`, newBudgetItem, { withCredentials: true });
 
             // Refetch the budget items to synchronize state
-            const responseBudget = await axios.get(`http://localhost:5001/api/trips/${tripId}/budget`, { withCredentials: true });
+            const responseBudget = await axios.get(`${API_URL}/trips/${tripId}/budget`, { withCredentials: true });
             const additionalItems = responseBudget.data.map(item => ({
                 ...item,
                 amount: parseFloat(item.amount),
@@ -127,10 +129,10 @@ export default function BudgetModal({ tripId, onSave, onClose }) {
     }
 
     try {
-      await axios.delete(`http://localhost:5001/api/trips/${tripId}/budget/${id}`, { withCredentials: true });
+      await axios.delete(`${API_URL}/trips/${tripId}/budget/${id}`, { withCredentials: true });
 
       // Refetch the budget items to synchronize state
-      const responseBudget = await axios.get(`http://localhost:5001/api/trips/${tripId}/budget`, { withCredentials: true });
+      const responseBudget = await axios.get(`${API_URL}/trips/${tripId}/budget`, { withCredentials: true });
       const additionalItems = responseBudget.data.map(item => ({
         ...item,
         amount: parseFloat(item.amount),

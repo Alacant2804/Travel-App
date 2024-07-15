@@ -3,6 +3,8 @@ import Loading from './Loading';
 import './AccommodationModal.css';
 import axios from 'axios';
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export default function AccommodationModal({ tripId, destinationId, accommodation, onSave, onClose }) {
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
@@ -15,7 +17,7 @@ export default function AccommodationModal({ tripId, destinationId, accommodatio
   useEffect(() => {
     const fetchAccommodation = async () => {
       try {
-        const response = await axios.get(`http://localhost:5001/api/trips/${tripId}/destinations/${destinationId}/accommodation`, {
+        const response = await axios.get(`${API_URL}/trips/${tripId}/destinations/${destinationId}/accommodation`, {
           withCredentials: true
         });
         const fetchedAccommodation = response.data;
@@ -73,9 +75,9 @@ export default function AccommodationModal({ tripId, destinationId, accommodatio
       startDate, 
       endDate, 
       bookingLink, 
-      price: parseFloat(price), // Ensure price is a number
+      price: parseFloat(price),
       coordinates,
-      _id: accommodation?._id // Ensure this is included for updates
+      _id: accommodation?._id
     };
 
     try {
@@ -83,20 +85,20 @@ export default function AccommodationModal({ tripId, destinationId, accommodatio
       if (accommodation?._id) {
         // Use PUT for updating existing accommodation
         response = await axios.put(
-          `http://localhost:5001/api/trips/${tripId}/destinations/${destinationId}/accommodation/${accommodation._id}`,
+          `${API_URL}/trips/${tripId}/destinations/${destinationId}/accommodation/${accommodation._id}`,
           accommodationData,
           { withCredentials: true }
         );
       } else {
         // Use POST for creating new accommodation
         response = await axios.post(
-          `http://localhost:5001/api/trips/${tripId}/destinations/${destinationId}/accommodation`,
+          `${API_URL}/trips/${tripId}/destinations/${destinationId}/accommodation`,
           accommodationData,
           { withCredentials: true }
         );
       }
-      onSave(response.data); // Ensure the parent component state is updated
-      setIsEditing(false); // Exit edit mode after saving
+      onSave(response.data);
+      setIsEditing(false);
     } catch (error) {
       console.error("Error saving accommodation:", error);
     }

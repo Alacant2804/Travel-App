@@ -9,6 +9,7 @@ import { AuthContext } from './AuthContext';
 import Title from './Title';
 import {slugify} from './slugify';
 
+const API_URL = import.meta.env.VITE_API_URL;
 
 export default function Trips() {
   const { trips, setTrips, fetchTrips, addTrip, deleteTrip } = useContext(TripsContext);
@@ -35,7 +36,7 @@ export default function Trips() {
     try {
       if (editingTrip) {
         // Editing existing trip
-        const response = await axios.put(`http://localhost:5001/api/trips/${editingTrip._id}`, newTripData, {withCredentials: true});
+        const response = await axios.put(`${API_URL}/trips/${editingTrip._id}`, newTripData, {withCredentials: true});
         const updatedTrips = trips.map(trip => trip._id === editingTrip._id ? response.data : trip);
         setTrips(updatedTrips);
         localStorage.setItem('trips', JSON.stringify(updatedTrips));
@@ -89,8 +90,8 @@ export default function Trips() {
         <p><strong>Duration: </strong> {trip.destinations[0]?.duration} days</p>
         </div>
         <div className="trip-actions">
-          <button className="trip-btn edit" onClick={() => { event.stopPropagation(); setIsModalOpen(true); setEditingTrip(trip); }}>Edit</button>
-          <button className="trip-btn delete" onClick={() => handleDeleteTrip(trip._id, event)}>Delete</button>
+          <button className="trip-btn edit" onClick={(event) => { event.stopPropagation(); setIsModalOpen(true); setEditingTrip(trip); }}>Edit</button>
+          <button className="trip-btn delete" onClick={(event) => handleDeleteTrip(trip._id, event)}>Delete</button>
         </div>
       </li>
     ))

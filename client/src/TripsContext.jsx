@@ -5,6 +5,8 @@ import { toast } from 'react-toastify';
 
 export const TripsContext = createContext();
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export const TripsProvider = ({ children }) => {
   const [trips, setTrips] = useState([]);
   const { user } = useContext(AuthContext);
@@ -12,7 +14,7 @@ export const TripsProvider = ({ children }) => {
   const fetchTrips = useCallback(async () => {
     if (!user) return;
     try {
-      const response = await axios.get('http://localhost:5001/api/trips', { withCredentials: true });
+      const response = await axios.get(`${API_URL}/trips`, { withCredentials: true });
       setTrips(response.data);
       console.log('Fetched trips:', response.data);
     } catch (error) {
@@ -26,7 +28,7 @@ export const TripsProvider = ({ children }) => {
 
   const addTrip = async (tripData) => {
     try {
-      const response = await axios.post('http://localhost:5001/api/trips', tripData, { withCredentials: true })
+      const response = await axios.post(`${API_URL}/trips`, tripData, { withCredentials: true })
       setTrips([...trips, response.data]);
       toast.success('Trip added successfully!', {
         theme: "colored"
@@ -40,13 +42,10 @@ export const TripsProvider = ({ children }) => {
 
   const deleteTrip = async (tripId) => {
     try {
-      const url = `http://localhost:5001/api/trips/${tripId}`;
-      console.log('DELETE request URL:', url); // Log the URL
-
-      const response = await axios.delete(url, { withCredentials: true });
+      const response = await axios.delete(`${API_URL}/trips/${tripId}`, { withCredentials: true });
       
       if (response.status === 200) {
-        const updatedTrips = trips.filter(trip => { trip._id !== tripId});
+        const updatedTrips = trips.filter(trip => trip._id !== tripId);
         setTrips(updatedTrips);
         toast.success('Trip deleted successfully!', {
           theme: 'colored'

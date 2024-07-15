@@ -80,14 +80,14 @@ export default function Destination({
   };
 
   const handleSaveAccommodation = async (accommodationData) => {
-    setAccommodation(accommodationData); // Save the accommodation in local state
+    setAccommodation(accommodationData);
     await onSave({
       city: destination,
       startDate,
       endDate,
       places,
       duration,
-      accommodation: accommodationData // Ensure accommodation data is included
+      accommodation: accommodationData
     });
   };
 

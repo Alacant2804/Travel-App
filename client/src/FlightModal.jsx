@@ -3,16 +3,18 @@ import axios from 'axios';
 import './FlightModal.css';
 import FlightForm from './FlightForm';
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export default function FlightModal({ tripId, onSave, onClose }) {
   const [outboundFlight, setOutboundFlight] = useState({});
   const [inboundFlight, setInboundFlight] = useState({});
   const [isEditingOutbound, setIsEditingOutbound] = useState(true);
-  const [isEditing, setIsEditing] = useState(false); // State to track if editing
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     const fetchFlightData = async () => {
       try {
-        const response = await axios.get(`http://localhost:5001/api/trips/${tripId}/flights`, { withCredentials: true });
+        const response = await axios.get(`${API_URL}/trips/${tripId}/flights`, { withCredentials: true });
         const flights = response.data;
 
         const outbound = flights.find(f => f.type === 'outbound') || {};
@@ -35,19 +37,19 @@ export default function FlightModal({ tripId, onSave, onClose }) {
     try {
       if (flightData._id) {
         await axios.put(
-          `http://localhost:5001/api/trips/${tripId}/flights/${flightData._id}`,
+          `${API_URL}/trips/${tripId}/flights/${flightData._id}`,
           flightData,
           { withCredentials: true }
         );
       } else {
         await axios.post(
-          `http://localhost:5001/api/trips/${tripId}/flights`,
+          `${API_URL}/trips/${tripId}/flights`,
           { ...flightData, type: isEditingOutbound ? 'outbound' : 'inbound' },
           { withCredentials: true }
         );
       }
       
-      const response = await axios.get(`http://localhost:5001/api/trips/${tripId}/flights`, { withCredentials: true });
+      const response = await axios.get(`${API_URL}/trips/${tripId}/flights`, { withCredentials: true });
       const flights = response.data;
 
       setOutboundFlight(flights.find(f => f.type === 'outbound') || {});
