@@ -2,7 +2,7 @@
 
 ## 🌟 Introduction
 
-🌍 **Travel App** is a web application that helps users plan their trips. Users can create trips, add destinations, places to visit, and accommodation details. The app also integrates a map to visualize the trip details. Basically the user can plan the whole trip from flight details to places to visit. There is even a budget for each trip to plan beforehand.
+🌍 **Travel App** is an intuitive and comprehensive web application designed to assist users in planning their trips seamlessly. With Travel App, users can effortlessly create and manage trips, add multiple destinations, pinpoint places to visit, and organize accommodation details. The app features an interactive map for visualizing trip details, enabling users to plan every aspect of their journey, from flight details to local attractions. Additionally, users can set and track budgets for each trip, ensuring a well-organized and budget-friendly travel experience.
 
 ## ✨ Features
 
@@ -36,7 +36,7 @@ You can access the deployed application [here](https://travel-app-client-tau.ver
 * CSS: For styling the components.
 * JWT Token Authentication: For secure user login and registration.
 
-## What I Learned
+## 🎓 What I Learned
 
 While building Travel App, I gained valuable insights and improved my skills in the following areas:
 
