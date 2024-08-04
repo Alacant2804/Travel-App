@@ -143,7 +143,7 @@ export default function Destination({
             />
           </p>
           <p>
-            <strong>Duration:</strong> {duration} days
+            <strong>Duration:</strong> {duration === 1 ? duration + " day" : duration + " days"}
           </p>
         </div>
       </div>

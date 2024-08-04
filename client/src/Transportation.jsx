@@ -91,7 +91,7 @@ export default function TransportationModal({ tripId, transportation, onSave, on
                 </tr>
                 <tr>
                   <td><strong>Duration:</strong></td>
-                  <td>{transportationDetails.duration} days</td>
+                  <td>{transportationDetails.duration === 1 ? transportationDetails.duration + " day" : transportationDetails.duration + " days"} </td>
                 </tr>
                 <tr>
                   <td><strong>Price:</strong></td>

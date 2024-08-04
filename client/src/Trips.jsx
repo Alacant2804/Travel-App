@@ -87,7 +87,7 @@ export default function Trips() {
         <p><strong>City: </strong> {trip.destinations[0].city}</p>
         <p><strong>Start Date: </strong> {trip.destinations[0].startDate.split('T')[0]}</p>
         <p><strong>End Date: </strong> {trip.destinations[0].endDate.split('T')[0]}</p>
-        <p><strong>Duration: </strong> {trip.destinations[0]?.duration} days</p>
+        <p><strong>Duration: </strong> {trip.destinations[0]?.duration === 1 ? trip.destinations[0]?.duration + " day" : trip.destinations[0]?.duration + " days"}</p>
         </div>
         <div className="trip-actions">
           <button className="trip-btn edit" onClick={(event) => { event.stopPropagation(); setIsModalOpen(true); setEditingTrip(trip); }}>Edit</button>

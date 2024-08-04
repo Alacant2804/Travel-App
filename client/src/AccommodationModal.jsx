@@ -11,6 +11,7 @@ export default function AccommodationModal({ tripId, destinationId, accommodatio
   const [address, setAddress] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  const [duration, setDuration] = useState(0);
   const [bookingLink, setBookingLink] = useState('');
   const [price, setPrice] = useState(0);
 
@@ -28,6 +29,10 @@ export default function AccommodationModal({ tripId, destinationId, accommodatio
           setEndDate(fetchedAccommodation[0]?.endDate ? fetchedAccommodation[0].endDate.split('T')[0] : '');
           setBookingLink(fetchedAccommodation[0]?.bookingLink || '');
           setPrice(parseFloat(fetchedAccommodation[0]?.price) || 0);
+          calculateDuration(startDate, endDate);
+          if (startDate && endDate) {
+            setDuration(calculateDuration(startDate, endDate));
+          }
         } else {
           console.log("No accommodation data received.");
         }
@@ -41,6 +46,13 @@ export default function AccommodationModal({ tripId, destinationId, accommodatio
     console.log("Fetching accommodation data...");
     fetchAccommodation();
   }, [destinationId, accommodation]);
+
+  const calculateDuration = (startDate, endDate) => {
+    const start = new Date(startDate); // Convert startDate string to Date object
+    const end = new Date(endDate); // Convert endDate string to Date object
+    const durationInMilliseconds = end - start; // Calculate the difference in milliseconds
+    return Math.ceil(durationInMilliseconds / (1000 * 60 * 60 * 24)); // Convert to days and round up
+  };
 
   const fetchCoordinates = async (address) => {
     try {
@@ -169,6 +181,7 @@ export default function AccommodationModal({ tripId, destinationId, accommodatio
             <p><strong>Address:</strong> {address}</p>
             <p><strong>Start Date:</strong> {startDate}</p>
             <p><strong>End Date:</strong> {endDate}</p>
+            <p><strong>Duration:</strong> {duration === 1 ? duration + " day" : duration + " days"}</p>
             <p><strong>Booking Link:</strong> <a href={bookingLink} target="_blank" rel="noopener noreferrer">{bookingLink}</a></p>
             <p><strong>Price:</strong> ${parseFloat(price).toFixed(2)}</p>
             <div className="modal-actions">
