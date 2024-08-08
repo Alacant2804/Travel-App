@@ -29,10 +29,6 @@ export default function AccommodationModal({ tripId, destinationId, accommodatio
           setEndDate(fetchedAccommodation[0]?.endDate ? fetchedAccommodation[0].endDate.split('T')[0] : '');
           setBookingLink(fetchedAccommodation[0]?.bookingLink || '');
           setPrice(parseFloat(fetchedAccommodation[0]?.price) || 0);
-          calculateDuration(startDate, endDate);
-          if (startDate && endDate) {
-            setDuration(calculateDuration(startDate, endDate));
-          }
         } else {
           console.log("No accommodation data received.");
         }
@@ -46,6 +42,12 @@ export default function AccommodationModal({ tripId, destinationId, accommodatio
     console.log("Fetching accommodation data...");
     fetchAccommodation();
   }, [destinationId, accommodation]);
+
+  useEffect(() => {
+    if (startDate && endDate) {
+      setDuration(calculateDuration(startDate, endDate));
+    }
+  }, [startDate, endDate]);
 
   const calculateDuration = (startDate, endDate) => {
     const start = new Date(startDate); // Convert startDate string to Date object
