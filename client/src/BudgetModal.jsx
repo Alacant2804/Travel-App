@@ -24,12 +24,13 @@ export default function BudgetModal({ tripId, onSave, onClose }) {
           return sum + destination.places.reduce((placeSum, place) => placeSum + place.price, 0);
         }, 0);
         let accommodationTotal = trip.destinations.reduce((sum, destination) => {
-          return sum + destination.accommodation[0]?.price
+          if (destination.accommodation[0]) {
+            return sum + destination.accommodation[0]?.price
+          } else {
+            return sum + 0;
+          }
+          
         }, 0);
-
-        if (isNaN(accommodationTotal)) {
-        accommodationTotal = 0;
-      }
 
         const defaultItems = [
           { category: 'Flights', amount: flightsTotal, type: 'flights', _id: 'default-flights' },

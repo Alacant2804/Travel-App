@@ -115,7 +115,6 @@ export default function TripDetail() {
 
         if (!tripId) {
       // Handle case where tripId is not in state (e.g., user refreshes the page)
-      // You might need a way to map slug back to tripId, e.g., fetch all trips and find by slug
       const fetchTripBySlug = async () => {
         try {
           const response = await axios.get(`${API_URL}/trips`, { withCredentials: true });
