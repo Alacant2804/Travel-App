@@ -25,7 +25,7 @@ export default function Header() {
       <button className="hamburger" onClick={toggleMenu}>
         ☰
       </button>
-      <nav className={isOpen ? "nav-open" : ""}>
+      <nav className={`nav-menu ${isOpen ? "nav-open" : ""}`}>
         <ul className="main-nav-links">
           <li>
             <Link to="/" onClick={closeMenu}>
