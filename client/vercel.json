@@ -17,6 +17,10 @@
     {
       "source": "/api/(.*)",
       "destination": "https://travel-app-backend-delta.vercel.app/api/$1"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }
