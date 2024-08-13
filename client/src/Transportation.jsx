@@ -20,11 +20,18 @@ export default function TransportationModal({ tripId, transportation, onSave, on
   useEffect(() => {
     const fetchTransportationData = async () => {
       try {
+        const token = localStorage.getItem('token');
         if (transportation && transportation._id) {
-          const response = await axios.get(`${API_URL}/trips/${tripId}/transportation/${transportation._id}`, { withCredentials: true });
+          const response = await axios.get(`${API_URL}/trips/${tripId}/transportation/${transportation._id}`,  { 
+            headers: {
+            'Authorization': `Bearer ${token}`
+          } });
           setTransportationDetails(response.data);
         } else {
-          const response = await axios.get(`${API_URL}/trips/${tripId}/transportation`, { withCredentials: true });
+          const response = await axios.get(`${API_URL}/trips/${tripId}/transportation`,  { 
+            headers: {
+            'Authorization': `Bearer ${token}`
+          } });
           setTransportationDetails(response.data[0] || {});
         }
       } catch (error) {
@@ -37,17 +44,24 @@ export default function TransportationModal({ tripId, transportation, onSave, on
 
   const handleSaveTransportation = async (transportationData) => {
     try {
+      const token = localStorage.getItem('token');
       if (transportationData._id) {
         await axios.put(
           `${API_URL}/trips/${tripId}/transportation/${transportationData._id}`,
           transportationData,
-          { withCredentials: true }
+          { 
+            headers: {
+            'Authorization': `Bearer ${token}`
+          } }
         );
       } else {
         await axios.post(
           `${API_URL}/trips/${tripId}/transportation`,
           transportationData,
-          { withCredentials: true }
+          { 
+            headers: {
+            'Authorization': `Bearer ${token}`
+          } }
         );
       }
       

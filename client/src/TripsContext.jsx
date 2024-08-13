@@ -14,7 +14,11 @@ export const TripsProvider = ({ children }) => {
   const fetchTrips = useCallback(async () => {
     if (!user) return;
     try {
-      const response = await axios.get(`${API_URL}/trips`, { withCredentials: true });
+      const token = localStorage.getItem('token');
+      const response = await axios.get(`${API_URL}/trips`, { 
+        headers: {
+        'Authorization': `Bearer ${token}`
+      } });
       setTrips(response.data);
       console.log('Fetched trips:', response.data);
     } catch (error) {
@@ -28,7 +32,11 @@ export const TripsProvider = ({ children }) => {
 
   const addTrip = async (tripData) => {
     try {
-      const response = await axios.post(`${API_URL}/trips`, tripData, { withCredentials: true })
+      const token = localStorage.getItem('token');
+      const response = await axios.post(`${API_URL}/trips`, tripData,  { 
+        headers: {
+        'Authorization': `Bearer ${token}`
+      } })
       setTrips([...trips, response.data]);
       toast.success('Trip added successfully!', {
         theme: "colored"
@@ -42,7 +50,11 @@ export const TripsProvider = ({ children }) => {
 
   const deleteTrip = async (tripId) => {
     try {
-      const response = await axios.delete(`${API_URL}/trips/${tripId}`, { withCredentials: true });
+      const token = localStorage.getItem('token');
+      const response = await axios.delete(`${API_URL}/trips/${tripId}`,  { 
+        headers: {
+        'Authorization': `Bearer ${token}`
+      } });
       
       if (response.status === 200) {
         const updatedTrips = trips.filter(trip => trip._id !== tripId);

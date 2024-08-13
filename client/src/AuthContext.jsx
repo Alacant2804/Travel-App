@@ -11,20 +11,24 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   // Login function
   const login = async (email, password) => {
+    console.log('Login function called');
     setLoading(true);
     setError(null);
     try {
+      console.log('Try block started');
       const response = await authService.login({ email, password });
+      console.log('Token:', response.token);
+      localStorage.setItem('token', response.token);
       setUser(response.user);
       toast.success('Login successful!', {
         theme: "colored"
-      });
+      }); 
       navigate('/');
     } catch (error) {
       setError(error.response ? error.response.data.message : 'Login failed');
@@ -59,7 +63,7 @@ export const AuthProvider = ({ children }) => {
   // Logout function
   const logout = async () => {
     try {
-      await authService.logout({ withCredentials: true });
+      localStorage.removeItem('token');
       setUser(null);
       navigate('/');
       toast.success('Logged out!', {
@@ -75,7 +79,20 @@ export const AuthProvider = ({ children }) => {
   const fetchUser = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`${API_URL}/auth/user`, { withCredentials: true });
+      const token = localStorage.getItem('token');
+
+      // If there's no token, the user is not logged in
+    if (!token) {
+      setUser(null);
+      setLoading(false);
+      return;
+    }
+
+      const response = await axios.get(`${API_URL}/auth/user`, { 
+        headers: {
+        'Authorization': `Bearer ${token}`
+      } });
+      
       setUser(response.data);
     } catch (error) {
       console.error('Error fetching user:', error);
@@ -94,7 +111,7 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   if (loading) {
-    <Loading />;
+    return <Loading />;
   }
 
   return (

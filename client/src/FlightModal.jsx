@@ -14,7 +14,11 @@ export default function FlightModal({ tripId, onSave, onClose }) {
   useEffect(() => {
     const fetchFlightData = async () => {
       try {
-        const response = await axios.get(`${API_URL}/trips/${tripId}/flights`, { withCredentials: true });
+        const token = localStorage.getItem('token');
+        const response = await axios.get(`${API_URL}/trips/${tripId}/flights`, { 
+          headers: {
+          'Authorization': `Bearer ${token}`
+        } });
         const flights = response.data;
 
         const outbound = flights.find(f => f.type === 'outbound') || {};
@@ -35,21 +39,31 @@ export default function FlightModal({ tripId, onSave, onClose }) {
 
   const handleSaveFlight = async (flightData) => {
     try {
+      const token = localStorage.getItem('token');
       if (flightData._id) {
         await axios.put(
           `${API_URL}/trips/${tripId}/flights/${flightData._id}`,
           flightData,
-          { withCredentials: true }
+          { 
+            headers: {
+            'Authorization': `Bearer ${token}`
+          } }
         );
       } else {
         await axios.post(
           `${API_URL}/trips/${tripId}/flights`,
           { ...flightData, type: isEditingOutbound ? 'outbound' : 'inbound' },
-          { withCredentials: true }
+          { 
+            headers: {
+            'Authorization': `Bearer ${token}`
+          } }
         );
       }
       
-      const response = await axios.get(`${API_URL}/trips/${tripId}/flights`, { withCredentials: true });
+      const response = await axios.get(`${API_URL}/trips/${tripId}/flights`,  { 
+        headers: {
+        'Authorization': `Bearer ${token}`
+      } });
       const flights = response.data;
 
       setOutboundFlight(flights.find(f => f.type === 'outbound') || {});

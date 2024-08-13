@@ -16,15 +16,6 @@ router.get('/user', auth, async (req, res) => {
   }
 });
 
-router.get('/hello', async (req, res) => {
-  try {
-    res.json('Hello World!');
-  }
-  catch (err) {
-    res.status(500).json({message: 'Server Error', error: err.message});
-  }
-})
-
 // Register a new user
 router.post('/sign-up', async (req, res) => {
   const { username, email, password } = req.body;
@@ -95,15 +86,7 @@ router.post('/login', async (req, res) => {
       (err, token) => {
         if (err) throw err;
 
-        // Set token as cookie
-        res.cookie('token', token, {
-          httpOnly: true, // Make the cookie inaccessible to JavaScript on the client side
-          secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
-          sameSite: 'None', // Ensure the cookie is only sent with same-site requests
-          maxAge: 3600000 // Cookie expires in 1 hour (same as the token)
-        });
-
-        res.json({ user: payload.user }); // Send user details without token
+        res.json({ token, user: payload.user });
       }
     );
   } catch (error) {

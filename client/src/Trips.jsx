@@ -34,9 +34,13 @@ export default function Trips() {
 
   const handleCreateTrip = useCallback(async (newTripData) => {
     try {
+      const token = localStorage.getItem('token');
       if (editingTrip) {
         // Editing existing trip
-        const response = await axios.put(`${API_URL}/trips/${editingTrip._id}`, newTripData, {withCredentials: true});
+        const response = await axios.put(`${API_URL}/trips/${editingTrip._id}`, newTripData, { 
+          headers: {
+          'Authorization': `Bearer ${token}`
+        } });
         const updatedTrips = trips.map(trip => trip._id === editingTrip._id ? response.data : trip);
         setTrips(updatedTrips);
         localStorage.setItem('trips', JSON.stringify(updatedTrips));

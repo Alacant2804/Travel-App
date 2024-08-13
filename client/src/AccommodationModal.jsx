@@ -18,9 +18,11 @@ export default function AccommodationModal({ tripId, destinationId, accommodatio
   useEffect(() => {
     const fetchAccommodation = async () => {
       try {
-        const response = await axios.get(`${API_URL}/trips/${tripId}/destinations/${destinationId}/accommodation`, {
-          withCredentials: true
-        });
+        const token = localStorage.getItem('token');
+        const response = await axios.get(`${API_URL}/trips/${tripId}/destinations/${destinationId}/accommodation`,  { 
+          headers: {
+          'Authorization': `Bearer ${token}`
+        } });
         const fetchedAccommodation = response.data;
         console.log("Fetched accommodation data:", fetchedAccommodation);
         if (fetchedAccommodation) {
@@ -95,21 +97,22 @@ export default function AccommodationModal({ tripId, destinationId, accommodatio
     };
 
     try {
+      const token = localStorage.getItem('token');
       let response;
       if (accommodation?._id) {
         // Use PUT for updating existing accommodation
         response = await axios.put(
-          `${API_URL}/trips/${tripId}/destinations/${destinationId}/accommodation/${accommodation._id}`,
-          accommodationData,
-          { withCredentials: true }
-        );
+          `${API_URL}/trips/${tripId}/destinations/${destinationId}/accommodation/${accommodation._id}`, accommodationData,  { 
+            headers: {
+            'Authorization': `Bearer ${token}`
+          } });
       } else {
         // Use POST for creating new accommodation
         response = await axios.post(
-          `${API_URL}/trips/${tripId}/destinations/${destinationId}/accommodation`,
-          accommodationData,
-          { withCredentials: true }
-        );
+          `${API_URL}/trips/${tripId}/destinations/${destinationId}/accommodation`, accommodationData,  { 
+            headers: {
+            'Authorization': `Bearer ${token}`
+          } });
       }
       onSave(response.data);
       setIsEditing(false);

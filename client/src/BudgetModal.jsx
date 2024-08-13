@@ -15,7 +15,11 @@ export default function BudgetModal({ tripId, onSave, onClose }) {
   useEffect(() => {
     const fetchBudgetData = async () => {
       try {
-        const response = await axios.get(`${API_URL}/trips/${tripId}`, { withCredentials: true });
+        const token = localStorage.getItem('token');
+        const response = await axios.get(`${API_URL}/trips/${tripId}`,  { 
+          headers: {
+          'Authorization': `Bearer ${token}`
+        } });
         const trip = response.data;
         console.log('Budget Modal: ', trip)
         const flightsTotal = trip.flights.reduce((sum, flight) => sum + flight.price, 0);
@@ -39,7 +43,10 @@ export default function BudgetModal({ tripId, onSave, onClose }) {
           { category: 'Accommodation', amount: accommodationTotal, type: 'accommodation', _id: 'default-accommodation' }
         ];
 
-        const responseBudget = await axios.get(`${API_URL}/trips/${tripId}/budget`, { withCredentials: true });
+        const responseBudget = await axios.get(`${API_URL}/trips/${tripId}/budget`,  { 
+          headers: {
+          'Authorization': `Bearer ${token}`
+        } });
         const additionalItems = responseBudget.data.map(item => ({
           ...item,
           amount: parseFloat(item.amount),
@@ -66,18 +73,22 @@ export default function BudgetModal({ tripId, onSave, onClose }) {
 
   const handleSaveEdit = async () => {
     try {
+      const token = localStorage.getItem('token');
       const updatedItem = { ...editedItem, amount: parseFloat(editedItem.amount) };
 
       if (updatedItem._id && !['default-flights', 'default-transportation', 'default-places', 'default-accommodation'].includes(updatedItem._id)) {
         await axios.put(
-          `${API_URL}/trips/${tripId}/budget/${updatedItem._id}`,
-          updatedItem,
-          { withCredentials: true }
-        );
+          `${API_URL}/trips/${tripId}/budget/${updatedItem._id}`, updatedItem, { 
+            headers: {
+            'Authorization': `Bearer ${token}`
+          } });
       }
 
       // Refetch the budget items to synchronize state
-      const responseBudget = await axios.get(`${API_URL}/trips/${tripId}/budget`, { withCredentials: true });
+      const responseBudget = await axios.get(`${API_URL}/trips/${tripId}/budget`, { 
+        headers: {
+        'Authorization': `Bearer ${token}`
+      } });
       const additionalItems = responseBudget.data.map(item => ({
         ...item,
         amount: parseFloat(item.amount),
@@ -97,26 +108,33 @@ export default function BudgetModal({ tripId, onSave, onClose }) {
 
   const handleSaveNew = async () => {
     try {
-        const newBudgetItem = { ...newItem, amount: parseFloat(newItem.amount) };
+      const token = localStorage.getItem('token');
+      const newBudgetItem = { ...newItem, amount: parseFloat(newItem.amount) };
 
-        if (newBudgetItem.category && newBudgetItem.amount) {
-            await axios.post(`${API_URL}/trips/${tripId}/budget`, newBudgetItem, { withCredentials: true });
+      if (newBudgetItem.category && newBudgetItem.amount) {
+        await axios.post(`${API_URL}/trips/${tripId}/budget`, newBudgetItem, { 
+          headers: {
+          'Authorization': `Bearer ${token}`
+        } });
 
-            // Refetch the budget items to synchronize state
-            const responseBudget = await axios.get(`${API_URL}/trips/${tripId}/budget`, { withCredentials: true });
-            const additionalItems = responseBudget.data.map(item => ({
-                ...item,
-                amount: parseFloat(item.amount),
-            }));
+        // Refetch the budget items to synchronize state
+        const responseBudget = await axios.get(`${API_URL}/trips/${tripId}/budget`, { 
+          headers: {
+          'Authorization': `Bearer ${token}`
+        } });
+        const additionalItems = responseBudget.data.map(item => ({
+            ...item,
+            amount: parseFloat(item.amount),
+        }));
 
-            setBudgetItems(prevItems => [
-                ...prevItems.filter(item => ['default-flights', 'default-transportation', 'default-places', 'default-accommodation'].includes(item._id)),
-                ...additionalItems
-            ]);
+        setBudgetItems(prevItems => [
+            ...prevItems.filter(item => ['default-flights', 'default-transportation', 'default-places', 'default-accommodation'].includes(item._id)),
+            ...additionalItems
+        ]);
 
-            setNewItem({ category: '', amount: '' });
-            onSave();
-        }
+        setNewItem({ category: '', amount: '' });
+        onSave();
+      }
     } catch (error) {
         console.error("Error saving budget item:", error);
     }
@@ -130,10 +148,16 @@ export default function BudgetModal({ tripId, onSave, onClose }) {
     }
 
     try {
-      await axios.delete(`${API_URL}/trips/${tripId}/budget/${id}`, { withCredentials: true });
+      await axios.delete(`${API_URL}/trips/${tripId}/budget/${id}`, { 
+        headers: {
+        'Authorization': `Bearer ${token}`
+      } });
 
       // Refetch the budget items to synchronize state
-      const responseBudget = await axios.get(`${API_URL}/trips/${tripId}/budget`, { withCredentials: true });
+      const responseBudget = await axios.get(`${API_URL}/trips/${tripId}/budget`, { 
+        headers: {
+        'Authorization': `Bearer ${token}`
+      } });
       const additionalItems = responseBudget.data.map(item => ({
         ...item,
         amount: parseFloat(item.amount),

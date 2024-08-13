@@ -14,16 +14,19 @@ console.log("Client origin: ", process.env.CLIENT_ORIGIN);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
 const app = express();
+
 const corsOptions = {
   origin: process.env.CLIENT_ORIGIN,
   credentials: true,
-  optionsSuccessStatus: 200
+  optionsSuccessStatus: 200,
+  allowedHeaders: ['Authorization', 'Content-Type']
 };
+
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
 
 app.use(express.static(path.join(__dirname, '../client/dist')));
 
