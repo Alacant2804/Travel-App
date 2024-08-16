@@ -50,3 +50,6 @@ While building Travel App, I gained valuable insights and improved my skills in 
 
 ## Demo
 ...
+
+## Improvements
+1. Improve the logic for places placement so that the user can input the whole address with zip codes and it would be displayed on the map
