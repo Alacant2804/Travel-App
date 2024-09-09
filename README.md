@@ -10,6 +10,7 @@
 - 📍 Add destinations with start and end dates
 - 🗺️ Add places to visit within each destination
 - 🏨 Add and edit accommodation details
+- ✈️ Add transportation details
 - 🌐 Display trip details on an interactive map
 - 💸 Set and manage trip budgets
 - 🔐 Secure user authentication
