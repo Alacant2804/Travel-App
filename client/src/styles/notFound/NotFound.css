@@ -1,0 +1,38 @@
+.not-found-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 80vh;
+}
+
+.not-found-container {
+  text-align: center;
+  width: 80%;
+  max-width: 500px;
+}
+
+.not-found-container h1 {
+  font-size: 3em;
+  color: #f05b0b;
+}
+
+.not-found-container p {
+  font-size: 1.2em;
+  margin: 20px 0;
+}
+
+.go-home-link {
+  display: inline-block;
+  background-color: #f05b0b;
+  color: white;
+  text-decoration: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  margin-top: 15px;
+  transition: background-color 0.3s ease;
+  font-size: 1.1em;
+}
+
+.go-home-link:hover {
+  background-color: #d94c09;
+}

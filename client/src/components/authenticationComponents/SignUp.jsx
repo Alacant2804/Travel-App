@@ -1,10 +1,9 @@
 import { useContext, useState } from "react";
 import { Link } from "react-router-dom";
-import { AuthContext } from "./AuthContext";
+import { AuthContext } from "../../context/AuthContext";
 import { toast } from "react-toastify";
 import "./SignUp.css";
 import PasswordRequirements from "./PasswordRequirements";
-
 
 export default function SignUp() {
   const [username, setUsername] = useState("");
@@ -43,7 +42,8 @@ export default function SignUp() {
     let strength = "";
     if (password.length >= 8) {
       strength = "Weak";
-      if (/[0-9]/.test(password) && /[^A-Za-z0-9]/.test(password)) strength = "Strong";
+      if (/[0-9]/.test(password) && /[^A-Za-z0-9]/.test(password))
+        strength = "Strong";
     } else {
       strength = "Too short";
     }
@@ -96,7 +96,7 @@ export default function SignUp() {
                 required
               />
             </div>
-            <div className="input-group" style={{ position: 'relative' }}>
+            <div className="input-group" style={{ position: "relative" }}>
               <label htmlFor="password">Password</label>
               <input
                 type="password"
@@ -108,7 +108,11 @@ export default function SignUp() {
                 onBlur={() => setIsPasswordModalVisible(false)}
                 required
               />
-              <div className={`password-strength ${passwordStrength.toLowerCase().replace(' ', '-')}`}>
+              <div
+                className={`password-strength ${passwordStrength
+                  .toLowerCase()
+                  .replace(" ", "-")}`}
+              >
                 {passwordStrength}
               </div>
               <PasswordRequirements
