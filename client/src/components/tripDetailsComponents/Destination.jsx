@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-
 import AccommodationModal from "./AccommodationModal";
 import accommodationIcon from "../../assets/accommodation-icon.png";
 import deleteIcon from "../../assets/delete-icon.png";
@@ -41,10 +40,6 @@ export default function Destination({
   useEffect(() => {
     setDuration(calculateDuration(startDate, endDate));
   }, [startDate, endDate, calculateDuration]);
-
-  useEffect(() => {
-    console.log(accommodation);
-  }, [accommodation]);
 
   const handleAddPlace = async (event) => {
     event.preventDefault();

@@ -1,78 +1,70 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { toast } from 'react-toastify'; 
 import './FlightModal.css';
 import FlightForm from './FlightForm';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-export default function FlightModal({ tripId, onSave, onClose }) {
+export default function FlightModal({ tripId, onClose }) {
   const [outboundFlight, setOutboundFlight] = useState({});
   const [inboundFlight, setInboundFlight] = useState({});
   const [isEditingOutbound, setIsEditingOutbound] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
-    const fetchFlightData = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        const response = await axios.get(`${API_URL}/trips/${tripId}/flights`, { 
-          headers: {
-          'Authorization': `Bearer ${token}`
-        } });
-        const flights = response.data;
-
-        const outbound = flights.find(f => f.type === 'outbound') || {};
-        const inbound = flights.find(f => f.type === 'inbound') || {};
-
-        console.log("Fetched Outbound Flight: ", outbound);
-        console.log("Fetched Inbound Flight: ", inbound);
-
-        setOutboundFlight(outbound);
-        setInboundFlight(inbound);
-      } catch (error) {
-        console.error('Error fetching flight data:', error);
+    const fetchData = async () => {
+      if (tripId) { // Only fetch if tripId is available
+        try {
+          const token = localStorage.getItem('token');
+          const response = await axios.get(`${API_URL}/trips/${tripId}/flights`, { 
+            headers: {
+            'Authorization': `Bearer ${token}`
+          } });
+          const flights = response.data;
+  
+          const outbound = flights.find(f => f.type === 'outbound') || {};
+          const inbound = flights.find(f => f.type === 'inbound') || {};
+  
+          setOutboundFlight(outbound);
+          setInboundFlight(inbound);
+        } catch (error) {
+          console.error('Error fetching flight data:', error);
+          toast.error("Couldn't fetch the flight data. Please try again later.", {theme: 'colored'}); 
+        }
       }
     };
+  
+    fetchData();
+  }, [tripId]); // Fetch only if tripId changes
 
-    fetchFlightData();
-  }, [tripId]);
-
+  // Save flight details
   const handleSaveFlight = async (flightData) => {
     try {
-      const token = localStorage.getItem('token');
-      if (flightData._id) {
-        await axios.put(
-          `${API_URL}/trips/${tripId}/flights/${flightData._id}`,
-          flightData,
-          { 
-            headers: {
-            'Authorization': `Bearer ${token}`
-          } }
-        );
-      } else {
-        await axios.post(
-          `${API_URL}/trips/${tripId}/flights`,
-          { ...flightData, type: isEditingOutbound ? 'outbound' : 'inbound' },
-          { 
-            headers: {
-            'Authorization': `Bearer ${token}`
-          } }
-        );
-      }
-      
-      const response = await axios.get(`${API_URL}/trips/${tripId}/flights`,  { 
+      const token = getToken();
+      const url = `${API_URL}/trips/${tripId}/flights/${flightData._id || ''}`;
+  
+      const method = flightData._id ? 'put' : 'post';  // PUT for updates, POST for new flights
+      const response = await axios({
+        method,
+        url,
+        data: flightData,
         headers: {
-        'Authorization': `Bearer ${token}`
-      } });
-      const flights = response.data;
-
-      setOutboundFlight(flights.find(f => f.type === 'outbound') || {});
-      setInboundFlight(flights.find(f => f.type === 'inbound') || {});
-
-      onSave(flightData);
-      onClose();
+          'Authorization': `Bearer ${token}`
+        }
+      });
+  
+      // Update specific flight state based on type
+      if (flightData.type === 'outbound') {
+        setOutboundFlight(response.data);
+      } else {
+        setInboundFlight(response.data);
+      }
+  
+      onClose(); // Close the modal after successful save
     } catch (error) {
       console.error("Error saving flight:", error);
+      toast.error("Couldn't save the flight. Please try again later.", {theme: 'colored'}); 
     }
   };
 

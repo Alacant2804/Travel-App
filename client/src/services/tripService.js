@@ -1,4 +1,5 @@
 import axios from "axios";
+import { getToken } from "../util/util";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -64,31 +65,37 @@ const fetchAccommodationCoordinates = async (destination, tripCountry) => {
   return coordinates; // Return coordinates or null if the fetch fails
 };
 
-const fetchTripDetails = async () => {
+const fetchTripDetails = async (tripId) => {
   try {
-    const token = localStorage.getItem("token");
+    const token = getToken();
     const response = await axios.get(`${API_URL}/trips/${tripId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
-    setTrip(response.data);
-    setDestinations(response.data.destinations || []);
-
-    if (
-      Array.isArray(response.data.destinations) &&
-      response.data.destinations.length > 0
-    ) {
-      await fetchAllCoordinates(response.data, setPlaces);
-      await getAndSetCoordinates(
-        `${response.data.destinations[0].city}, ${response.data.country}`,
-        setMapCenter
-      );
-    }
-
-    setLoading(false);
+    return response.data; // return trip data
   } catch (error) {
     console.error("Error fetching trip details:", error);
-    setLoading(false);
+    throw error; // Re-throw the error to be handled by the component
   }
 };
+
+const fetchTripBySlug = async () => {
+  try {
+    const token = getToken();
+    const response = await axios.get(`${API_URL}/trips`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const trip = response.data.find(
+      (trip) => slugify(trip.tripName) === tripSlug
+    );
+
+    return trip;
+  } catch (error) {
+    console.error("Error fetching trip by slug:", error);
+  }
+};
+
+export {getCoordinates, fetchPlacesCoordinates, fetchAccommodationCoordinates, fetchTripDetails, fetchTripBySlug}

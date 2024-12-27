@@ -7,12 +7,15 @@ import Transportation from "./Transportation";
 import MapComponent from "./MapComponent";
 import BudgetModal from "./BudgetModal";
 import Loading from "../../styles/loader/Loading";
+import { getCoordinates, fetchPlacesCoordinates, fetchAccommodationCoordinates, fetchTripDetails, fetchTripBySlug } from "../../services/tripService";
+import {calculateDuration, getToken} from "../../util/util";
 import axios from "axios";
 import Title from "../common/Title";
 import "./TripDetail.css";
 import budgetIcon from "../../assets/budget.png";
 import carIcon from "../../assets/car.png";
 import planeIcon from "../../assets/plane.png";
+import { toast } from "react-toastify";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -33,35 +36,25 @@ export default function TripDetail() {
   const [showBudgetModal, setShowBudgetModal] = useState(false);
 
   useEffect(() => {
-    fetchTripDetails();
-
+    fetchTripDetails(tripId);
+  
     if (!tripId) {
-      // Handle case where tripId is not in state (e.g., user refreshes the page)
-      const fetchTripBySlug = async () => {
-        try {
-          const token = localStorage.getItem("token");
-          const response = await axios.get(`${API_URL}/trips`, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          });
-          const trip = response.data.find(
-            (trip) => slugify(trip.tripName) === tripSlug
-          );
-          if (trip) {
-            setTripId(trip._id);
-            setTripName(trip.tripName);
-            setTrip(trip);
-            setDestinations(trip.destinations);
+      fetchTripBySlug()
+        .then((slugTrip) => {
+          if (slugTrip) {
+            setTripId(slugTrip._id);
+            setTripName(slugTrip.tripName);
+            setTrip(slugTrip);
+            setDestinations(slugTrip.destinations);
             setLoading(false);
+          } else {
+            toast.error("Trip not found.", { theme: 'colored' }); 
           }
-        } catch (error) {
+        })
+        .catch((error) => {
           console.error("Error fetching trip by slug:", error);
-        }
-      };
-      fetchTripBySlug();
-    } else {
-      fetchTripDetails();
+          toast.error("An error occurred while fetching trip details. Please try again later.", { theme: 'colored' }); 
+        });
     }
   }, [tripId, tripSlug]);
 
@@ -79,7 +72,7 @@ export default function TripDetail() {
     };
 
     try {
-      const token = localStorage.getItem("token");
+      const token = getToken();
       const response = await axios.post(
         `${API_URL}/trips/${tripId}/destinations`,
         newDestination,
@@ -92,15 +85,9 @@ export default function TripDetail() {
       setDestinations(response.data.destinations);
     } catch (error) {
       console.error("Error adding destination:", error);
+      toast.error("Couldn't create new destination, please try again later", { theme: 'colored'});
     }
-  };
-
-  const calculateDuration = (startDate, endDate) => {
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-    const durationInMilliseconds = end - start;
-    return Math.ceil(durationInMilliseconds / (1000 * 60 * 60 * 24));
-  };
+  };  
 
   const handleSaveDestination = useCallback(
     async (updatedData, index) => {
@@ -112,7 +99,7 @@ export default function TripDetail() {
       };
 
       try {
-        const token = localStorage.getItem("token");
+        const token = getToken();
         let response;
         if (destinationId) {
           // Update existing destination
@@ -142,13 +129,14 @@ export default function TripDetail() {
         setDestinations(updatedDestinations);
 
         // Update places and accommodations if needed
-        const updatedPlaces = await fetchPlacesAndAccommodationsCoordinates(
+        const updatedPlaces = await fetchPlacesCoordinates(
           updatedDestination,
           trip.country
         );
         setPlaces(updatedPlaces);
       } catch (error) {
         console.error("Error saving destination:", error);
+        toast.error("Couldn't save new destination, please try again later", { theme: 'colored'});
       }
     },
     [destinations, tripId, trip?.country]
@@ -164,7 +152,7 @@ export default function TripDetail() {
       console.error("Invalid place price:", placePrice);
       return;
     }
-    const coordinates = await getAndSetCoordinates(
+    const coordinates = await getCoordinates(
       `${placeName}, ${destinations[destinationIndex].city}, ${trip.country}`
     );
     if (
@@ -186,7 +174,7 @@ export default function TripDetail() {
       return;
     }
     try {
-      const token = localStorage.getItem("token");
+      const token = getToken();
       const response = await axios.post(
         `${API_URL}/trips/${tripId}/destinations/${destinationId}/places`,
         newPlace,
@@ -206,7 +194,7 @@ export default function TripDetail() {
         : dest
     );
     setDestinations(updatedDestinations);
-    const updatedPlaces = await fetchPlacesAndAccommodationsCoordinates(
+    const updatedPlaces = await fetchPlacesCoordinates(
       updatedDestinations,
       trip.country
     );
@@ -218,7 +206,7 @@ export default function TripDetail() {
     placeIndex,
     updatedPlace
   ) => {
-    const coordinates = await getAndSetCoordinates(
+    const coordinates = await getCoordinates(
       `${updatedPlace.name}, ${destinations[destinationIndex].city}, ${trip.country}`
     );
     if (
@@ -233,7 +221,7 @@ export default function TripDetail() {
     const destinationId = destinations[destinationIndex]._id;
     const placeId = destinations[destinationIndex].places[placeIndex]._id;
     try {
-      const token = localStorage.getItem("token");
+      const token = getToken();
       const response = await axios.put(
         `${API_URL}/trips/${tripId}/destinations/${destinationId}/places/${placeId}`,
         updatedPlace,
@@ -247,7 +235,7 @@ export default function TripDetail() {
     } catch (error) {
       console.error("Error editing place:", error);
     }
-    const updatedPlaces = await fetchPlacesAndAccommodationsCoordinates(
+    const updatedPlaces = await fetchPlacesCoordinates(
       destinations,
       trip.country
     );
@@ -262,7 +250,7 @@ export default function TripDetail() {
       return;
     }
     try {
-      const token = localStorage.getItem("token");
+      const token = getToken();
       const response = await axios.delete(
         `${API_URL}/trips/${tripId}/destinations/${destinationId}/places/${placeId}`,
         {
@@ -299,7 +287,7 @@ export default function TripDetail() {
       (_, idx) => idx !== destinationIndex
     );
     try {
-      const token = localStorage.getItem("token");
+      const token = getToken();
       const response = await axios.put(
         `${API_URL}/trips/${tripId}`,
         { ...trip, destinations: updatedDestinations },
@@ -315,74 +303,9 @@ export default function TripDetail() {
     }
   };
 
-  const handleSaveFlight = async (flightData) => {
-    try {
-      const token = localStorage.getItem("token");
-      if (flightData._id) {
-        const response = await axios.put(
-          `${API_URL}/trips/${tripId}/flights/${flightData._id}`,
-          flightData,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        setCurrentFlight(response.data);
-      } else {
-        const response = await axios.post(
-          `${API_URL}/trips/${tripId}/flights`,
-          flightData,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        setCurrentFlight(response.data);
-      }
-      setShowFlightModal(false);
-      fetchTripDetails();
-    } catch (error) {
-      console.error("Error saving flight:", error);
-    }
-  };
-
   const handleOpenFlightModal = (flight = null) => {
     setCurrentFlight(flight);
     setShowFlightModal(true);
-  };
-
-  const handleSaveTransportation = async (transportationData) => {
-    try {
-      const token = localStorage.getItem("token");
-      if (transportationData._id) {
-        await axios.put(
-          `${API_URL}/trips/${tripId}/transportation/${transportationData._id}`,
-          transportationData,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-      } else {
-        await axios.post(
-          `${API_URL}/trips/${tripId}/transportation`,
-          transportationData,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-      }
-      setCurrentTransportation(transportationData);
-      setShowTransportationModal(false);
-      fetchTripDetails();
-    } catch (error) {
-      console.error("Error saving transportation:", error);
-    }
   };
 
   const handleOpenTransportationModal = (transportationData = null) => {
@@ -477,7 +400,6 @@ export default function TripDetail() {
         <FlightModal
           tripId={tripId}
           flight={currentFlight}
-          onSave={handleSaveFlight}
           onClose={() => setShowFlightModal(false)}
         />
       )}
@@ -485,7 +407,6 @@ export default function TripDetail() {
         <Transportation
           tripId={tripId}
           transportation={currentTransportation}
-          onSave={handleSaveTransportation}
           onClose={() => setShowTransportationModal(false)}
         />
       )}

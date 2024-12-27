@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
+import { getToken } from '../../util/util';
 import TransportationForm from './TransportationForm';
 import './Transportation.css';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-export default function TransportationModal({ tripId, transportation, onSave, onClose }) {
+export default function TransportationModal({ tripId, transportation, onClose }) {
   const [transportationDetails, setTransportationDetails] = useState({
     pickupPlace: '',
     dropoffPlace: '',
@@ -19,55 +20,48 @@ export default function TransportationModal({ tripId, transportation, onSave, on
 
   useEffect(() => {
     const fetchTransportationData = async () => {
+      let url;
       try {
-        const token = localStorage.getItem('token');
+        const token = getToken();
+        url = `${API_URL}/trips/${tripId}/transportation`;
+  
         if (transportation && transportation._id) {
-          const response = await axios.get(`${API_URL}/trips/${tripId}/transportation/${transportation._id}`,  { 
-            headers: {
-            'Authorization': `Bearer ${token}`
-          } });
-          setTransportationDetails(response.data);
-        } else {
-          const response = await axios.get(`${API_URL}/trips/${tripId}/transportation`,  { 
-            headers: {
-            'Authorization': `Bearer ${token}`
-          } });
-          setTransportationDetails(response.data[0] || {});
+          url = `${API_URL}/trips/${tripId}/transportation/${transportation._id}`; // Specific URL for existing transportation
         }
+  
+        const response = await axios.get(url, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+  
+        setTransportationDetails(response.data);
       } catch (error) {
         console.error('Error fetching transportation data:', error);
       }
     };
-
+  
     fetchTransportationData();
-  }, [tripId, transportation]);
+  }, [tripId]);
 
   const handleSaveTransportation = async (transportationData) => {
     try {
-      const token = localStorage.getItem('token');
-      if (transportationData._id) {
-        await axios.put(
-          `${API_URL}/trips/${tripId}/transportation/${transportationData._id}`,
-          transportationData,
-          { 
-            headers: {
-            'Authorization': `Bearer ${token}`
-          } }
-        );
-      } else {
-        await axios.post(
-          `${API_URL}/trips/${tripId}/transportation`,
-          transportationData,
-          { 
-            headers: {
-            'Authorization': `Bearer ${token}`
-          } }
-        );
-      }
+      const token = getToken();
+      const url = `${API_URL}/trips/${tripId}/transportation/${transportationData._id} || ''}`;
+      const method = transportationData._id ? 'put' : 'post'; // PUT for updates, POST for new flights
+
+      const response = await axios({
+        method,
+        url,
+        data: transportationData,
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       
-      setTransportationDetails(transportationData);
-      onSave(transportationData);
+      setTransportationDetails(response.data);
       setIsEditing(false);
+      onClose();
     } catch (error) {
       console.error("Error saving transportation:", error);
     }
