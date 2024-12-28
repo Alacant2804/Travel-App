@@ -1,25 +1,20 @@
 import express from "express";
 import auth from "../middleware/auth.js";
 import Trip from "../models/Trip.js";
+import { checkAccess } from "../middleware/checkAccess.js";
 
 const router = express.Router();
 
-router.get("/:tripId/flights", auth, async (req, res) => {
+router.get("/:tripId/flights", auth, checkAccess, async (req, res, next) => {
   try {
-    const trip = await Trip.findById(req.params.tripId);
-    if (!trip) {
-      return res.status(404).json({ msg: "Trip not found" });
-    }
-
-    res.json(trip.flights);
+    res.status(200).json({ success: true, message: 'Flight details retrieved successfully', data: req.trip.flights });
   } catch (error) {
-    console.error("Error fetching flights:", error);
-    res.status(500).send("Server Error");
+    next(error);
   }
 });
 
-router.post("/:tripId/flights", auth, async (req, res) => {
-  const { tripId } = req.params;
+// Create flight details
+router.post("/:tripId/flights", auth, checkAccess, async (req, res, next) => {
   const {
     departureAirport,
     arrivalAirport,
@@ -30,11 +25,6 @@ router.post("/:tripId/flights", auth, async (req, res) => {
   } = req.body;
 
   try {
-    const trip = await Trip.findById(tripId);
-    if (!trip) {
-      return res.status(404).json({ msg: "Trip not found" });
-    }
-
     const newFlight = {
       departureAirport,
       arrivalAirport,
@@ -44,18 +34,23 @@ router.post("/:tripId/flights", auth, async (req, res) => {
       type,
     };
 
-    trip.flights.push(newFlight);
-    await trip.save();
+    // Add new flight in the array of flights
+    req.trip.flights.push(newFlight);
+    await req.trip.save();
 
-    res.status(201).json(newFlight);
+    res.status(201).json({
+      success: true,
+      message: "Flight details added successfully",
+      data: newFlight,
+    });
   } catch (error) {
-    console.error("Error saving flight:", error);
-    res.status(500).json({ message: "Server error", error: error.message });
+    next(error);
   }
 });
 
-router.put("/:tripId/flights/:flightId", auth, async (req, res) => {
-  const { tripId, flightId } = req.params;
+// Update flight details
+router.put("/:tripId/flights/:type", auth, checkAccess, async (req, res, next) => {
+  const { type } = req.params;
   const {
     departureAirport,
     arrivalAirport,
@@ -65,27 +60,29 @@ router.put("/:tripId/flights/:flightId", auth, async (req, res) => {
   } = req.body;
 
   try {
-    const trip = await Trip.findById(tripId);
-    if (!trip) {
-      return res.status(404).json({ msg: "Trip not found" });
-    }
-
-    const flight = trip.flights.id(flightId);
+    // Find flight based on type
+    const flight = req.trip.flights.find((flight) => flight.type === type);
     if (!flight) {
-      return res.status(404).json({ msg: "Flight not found" });
+      return res.status(404).json({ success: false, message: "Flight not found" });
     }
 
+    // Update flight details
     flight.departureAirport = departureAirport;
     flight.arrivalAirport = arrivalAirport;
     flight.departureDate = departureDate;
     flight.bookingLink = bookingLink;
     flight.price = parseFloat(price);
 
-    await trip.save();
+    await req.trip.save();
 
-    res.json(flight);
+    res.status(200).json({
+      success: true,
+      message: "Flight details updated successfully",
+      data: flight,
+    });
   } catch (error) {
-    console.error("Error updating flight:", error);
-    res.status(500).json({ message: "Server error", error: error.message });
+    next(error);
   }
 });
+
+export default router;

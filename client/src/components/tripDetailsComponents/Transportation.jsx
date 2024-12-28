@@ -20,10 +20,9 @@ export default function TransportationModal({ tripId, transportation, onClose })
 
   useEffect(() => {
     const fetchTransportationData = async () => {
-      let url;
       try {
         const token = getToken();
-        url = `${API_URL}/trips/${tripId}/transportation`;
+        let url = `${API_URL}/trips/${tripId}/transportation`;
   
         if (transportation && transportation._id) {
           url = `${API_URL}/trips/${tripId}/transportation/${transportation._id}`; // Specific URL for existing transportation

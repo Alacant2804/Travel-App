@@ -1,27 +1,20 @@
 import express from "express";
 import auth from "../middleware/auth.js";
-import Trip from "../models/Trip.js";
+import { checkAccess } from "../middleware/checkAccess.js";
 
 const router = express.Router();
 
 // Get transportation details
-router.get("/:tripId/transportation", auth, async (req, res) => {
+router.get("/:tripId/transportation", auth, checkAccess, async (req, res, next) => {
   try {
-    const trip = await Trip.findById(req.params.tripId);
-    if (!trip) {
-      return res.status(404).json({ msg: "Trip not found" });
-    }
-
-    res.json(trip.transportation);
+    res.status(200).json( { success: true, message: "Transportation details retrieved successfully", data: req.trip.transportation });
   } catch (error) {
-    console.error("Error fetching transportation:", error);
-    res.status(500).send("Server Error");
+    next(error)
   }
 });
 
 // Add transportation details
-router.post("/:tripId/transportation", auth, async (req, res) => {
-  const { tripId } = req.params;
+router.post("/:tripId/transportation", auth, checkAccess, async (req, res, next) => {
   const {
     pickupPlace,
     dropoffPlace,
@@ -33,11 +26,6 @@ router.post("/:tripId/transportation", auth, async (req, res) => {
   } = req.body;
 
   try {
-    const trip = await Trip.findById(tripId);
-    if (!trip) {
-      return res.status(404).json({ msg: "Trip not found" });
-    }
-
     const newTransportation = {
       pickupPlace,
       dropoffPlace,
@@ -48,22 +36,25 @@ router.post("/:tripId/transportation", auth, async (req, res) => {
       bookingLink,
     };
 
-    trip.transportation = newTransportation;
-    await trip.save();
+    // Create new transportation
+    req.trip.transportation = newTransportation; 
+    await req.trip.save();
 
-    res.status(201).json(newTransportation);
+    res.status(201).json({
+      success: true,
+      message: "Transportation details added successfully",
+      data: newTransportation,
+    });
   } catch (error) {
-    console.error("Error saving transportation:", error);
-    res.status(500).json({ message: "Server error", error: error.message });
+    next(error)
   }
 });
 
 // Update transportation details
 router.put(
-  "/:tripId/transportation/:transportationId",
-  auth,
-  async (req, res) => {
-    const { tripId, transportationId } = req.params;
+  "/:tripId/transportation",
+  auth, checkAccess,
+  async (req, res, next) => {
     const {
       pickupPlace,
       dropoffPlace,
@@ -75,16 +66,10 @@ router.put(
     } = req.body;
 
     try {
-      const trip = await Trip.findById(tripId);
-      if (!trip) {
-        return res.status(404).json({ msg: "Trip not found" });
-      }
+      // Access the single transportation object
+      const transportation = req.trip.transportation
 
-      const transportation = trip.transportation.id(transportationId);
-      if (!transportation) {
-        return res.status(404).json({ msg: "Transportation not found" });
-      }
-
+      // Update transportation details
       transportation.pickupPlace = pickupPlace;
       transportation.dropoffPlace = dropoffPlace;
       transportation.pickupDate = pickupDate;
@@ -93,12 +78,17 @@ router.put(
       transportation.price = parseFloat(price);
       transportation.bookingLink = bookingLink;
 
-      await trip.save();
+      await req.trip.save();
 
-      res.json(transportation);
+      res.status(200).json({
+        success: true,
+        message: "Transportation details updated successfully",
+        data: transportation,
+      });
     } catch (error) {
-      console.error("Error updating transportation:", error);
-      res.status(500).json({ message: "Server error", error: error.message });
+      next(error)
     }
   }
 );
+
+export default router;

@@ -15,7 +15,7 @@ function auth(req, res, next) {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = decoded.user; // Set req.user to decoded user
-    next();
+    next(); // Pass controll to the next middleware / route handler
   } catch (err) {
     res.status(401).json({ msg: 'Authorization denied' });
   }

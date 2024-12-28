@@ -102,3 +102,5 @@ router.delete("/:tripId/budget/:budgetId", auth, async (req, res) => {
     });
   }
 });
+
+export default router;

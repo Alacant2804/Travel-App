@@ -3,10 +3,15 @@ import mongoose from 'mongoose';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import authRoutes from './routes/auth.js';
+import accommodationRoutes from './routes/accommodation.js';
+import budgetRoutes from './routes/budget.js';
+import destinationRoutes from './routes/destination.js';
+import flightRoutes from './routes/flights.js';
+import transportationRoutes from './routes/transportation.js';
 import tripRoutes from './routes/trips.js';
-import cookieParser from 'cookie-parser';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { errorHandler } from './middleware/errorHandler.js';
 
 dotenv.config();
 console.log('Environment variables loaded.');
@@ -18,7 +23,7 @@ const __dirname = path.dirname(__filename);
 const app = express();
 
 const corsOptions = {
-  origin: process.env.CLIENT_ORIGIN,
+  origin: process.env.CLIENT_ORIGIN || 'http://localhost:5173',
   credentials: true,
   optionsSuccessStatus: 200,
   allowedHeaders: ['Authorization', 'Content-Type']
@@ -32,13 +37,19 @@ app.use(express.static(path.join(__dirname, '../client/dist')));
 
 app.use('/api/auth', authRoutes);
 app.use('/api/trips', tripRoutes);
+app.use('/api/trips/accommodation', accommodationRoutes);
+app.use('/api/trips/budget', budgetRoutes);
+app.use('/api/trips/transportation', transportationRoutes);
+app.use('/api/trips/destination', destinationRoutes);
+
+app.use(errorHandler);
 
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/dist/index.html'));
 });
 
 console.log('Attempting to connect to MongoDB...');
-mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(process.env.MONGO_URI)
   .then(() => {
     console.log('MongoDB connected');
     const PORT = process.env.PORT || 5001;

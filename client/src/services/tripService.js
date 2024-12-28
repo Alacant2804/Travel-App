@@ -76,7 +76,6 @@ const fetchTripDetails = async (tripId) => {
     return response.data; // return trip data
   } catch (error) {
     console.error("Error fetching trip details:", error);
-    throw error; // Re-throw the error to be handled by the component
   }
 };
 

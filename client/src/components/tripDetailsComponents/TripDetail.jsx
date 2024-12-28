@@ -36,8 +36,6 @@ export default function TripDetail() {
   const [showBudgetModal, setShowBudgetModal] = useState(false);
 
   useEffect(() => {
-    fetchTripDetails(tripId);
-  
     if (!tripId) {
       fetchTripBySlug()
         .then((slugTrip) => {
@@ -55,6 +53,15 @@ export default function TripDetail() {
           console.error("Error fetching trip by slug:", error);
           toast.error("An error occurred while fetching trip details. Please try again later.", { theme: 'colored' }); 
         });
+    } else {
+      fetchTripDetails(tripId)
+        .then((tripData) => {
+          setTrip(tripData);
+        })
+        .catch((error) => {
+          console.error("Error fetching trip details:", error);
+          toast.error("An error occurred while fetching trip details. Please try again later.", { theme: 'colored' });
+        })
     }
   }, [tripId, tripSlug]);
 
@@ -274,7 +281,7 @@ export default function TripDetail() {
     setDestinations(updatedDestinations);
 
     // Update the places immediately after deletion
-    const updatedPlaces = await fetchPlacesAndAccommodationsCoordinates(
+    const updatedPlaces = await fetchPlacesCoordinates(
       updatedDestinations,
       trip.country
     );

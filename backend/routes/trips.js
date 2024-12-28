@@ -1,40 +1,40 @@
 import express from "express";
 import auth from "../middleware/auth.js";
 import Trip from "../models/Trip.js";
+import { calculateDurationForDestinations } from "../utils/calculateDuration.js";
+import { checkAccess } from "../middleware/checkAccess.js";
+
 
 const router = express.Router();
 
 // Get all trips for a user
-router.get("/", auth, async (req, res) => {
+router.get("/", auth, async (req, res, next) => {
   try {
+    // Fetch trips from the database for the authenticated user
     const trips = await Trip.find({ userId: req.user.id });
+
+    // If no trips are found, throw a 404 error
     if (!trips.length) {
-      console.log("No trips found for user:", req.user.id);
-    } else {
-      console.log("Trips retrieved for user:", req.user.id, trips);
+      const error = new Error('Trip not found');
+      error.statusCode = 404;
+      throw error;
     }
-    res.json(trips);
-  } catch (err) {
-    console.error("Error fetching trips:", err);
-    res.status(500).send("Server Error");
+
+    // Respond with the found trips
+    res.status(200).json({ success: true, message: "Trips retrieved successfully", data: trips });
+  } catch (error) {
+    next(error); // Pass any unexpected errors to the errorHandler middleware
   }
 });
 
 // Add a new trip
-router.post("/", auth, async (req, res) => {
+router.post("/", auth, async (req, res, next) => {
+  // Destructure variables from request
   const { tripName, country, destinations } = req.body;
-  console.log("Received trip data:", req.body);
-  console.log("User ID from middleware:", req.user.id);
 
-  destinations.forEach((destination) => {
-    const start = new Date(destination.startDate);
-    const end = new Date(destination.endDate);
-    const durationInMilliseconds = end - start;
-    destination.duration = Math.ceil(
-      durationInMilliseconds / (1000 * 60 * 60 * 24)
-    ); // Convert to days
-  });
+  calculateDurationForDestinations(destinations);
 
+  // Create and save new trip in database
   try {
     const newTrip = new Trip({
       userId: req.user.id,
@@ -43,71 +43,41 @@ router.post("/", auth, async (req, res) => {
       destinations,
     });
 
-    console.log("Saving trip to database...");
     const trip = await newTrip.save();
-    console.log("Trip saved:", trip);
-    res.status(201).json(trip); // Respond with the newly created trip including its ID
-  } catch (err) {
-    console.error("Error saving trip:", err.message, err.stack);
-    res.status(500).json({ message: "Server Error", error: err.message });
+    res.status(201).json({ success: true, message: "Trip created successfully", data: trip });
+  } catch (error) {
+    next(error);
   }
 });
 
 // Update an existing trip
-router.put("/:id", auth, async (req, res) => {
+router.put("/:tripId", auth, checkAccess, async (req, res, next) => {
   const { tripName, country, destinations } = req.body;
 
-  destinations.forEach((destination) => {
-    const start = new Date(destination.startDate);
-    const end = new Date(destination.endDate);
-    const durationInMilliseconds = end - start;
-    destination.duration = Math.ceil(
-      durationInMilliseconds / (1000 * 60 * 60 * 24)
-    ); // Convert to days
-  });
+  calculateDurationForDestinations(destinations);
 
   try {
-    const trip = await Trip.findById(req.params.id);
-
-    if (!trip) {
-      return res.status(404).json({ msg: "Trip not found" });
-    }
-
-    if (trip.userId.toString() !== req.user.id) {
-      return res.status(401).json({ msg: "User not authorized" });
-    }
-
+    // Update trip information
+    const trip = req.trip; // Access the trip from checkTripAccess middleware
     trip.tripName = tripName;
     trip.country = country;
     trip.destinations = destinations;
 
     await trip.save();
-    res.json(trip); // Respond with the updated trip
-  } catch (err) {
-    console.error("Error updating trip:", err);
-    res.status(500).json({ message: "Server Error", error: err.message });
+    res.status(200).json({ success: true, message: "Trip updated successfully", data: trip });
+  } catch (error) {
+    next(error);
   }
 });
 
 // Delete a trip
-router.delete("/:id", auth, async (req, res) => {
+router.delete("/:tripId", auth, checkAccess, async (req, res, next) => {
   try {
-    const trip = await Trip.findById(req.params.id);
-
-    if (!trip) {
-      return res.status(404).json({ msg: "Trip not found" });
-    }
-
-    // Check user
-    if (trip.userId.toString() !== req.user.id) {
-      return res.status(401).json({ msg: "User not authorized" });
-    }
-
+    const trip = req.trip;
     await trip.deleteOne();
-    res.json({ msg: "Trip removed" });
-  } catch (err) {
-    console.error("Error deleting trip:", err);
-    res.status(500).send("Server Error");
+    res.status(200).json({ success: true, message: "Trip deleted successfully" });
+  } catch (error) {
+    next(error);
   }
 });
 
