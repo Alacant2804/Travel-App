@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
+import { calculateDuration, getToken } from "../../util/util";
 import Loading from "../../styles/loader/Loading";
-import "./AccommodationModal.css";
 import axios from "axios";
+import "./AccommodationModal.css";
+
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -24,29 +26,24 @@ export default function AccommodationModal({
   useEffect(() => {
     const fetchAccommodation = async () => {
       try {
-        const token = localStorage.getItem("token");
+        const token = getToken();
         const response = await axios.get(
-          `${API_URL}/trips/${tripId}/destinations/${destinationId}/accommodation`,
+          `${API_URL}/trips/accommodation/${tripId}/destinations/${destinationId}/accommodation`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
             },
           }
         );
+
         const fetchedAccommodation = response.data;
-        console.log("Fetched accommodation data:", fetchedAccommodation);
+
+        console.log("Fetch accommodation data: ", fetchAccommodation);
+
         if (fetchedAccommodation) {
           setAddress(fetchedAccommodation[0]?.address || "");
-          setStartDate(
-            fetchedAccommodation[0]?.startDate
-              ? fetchedAccommodation[0].startDate.split("T")[0]
-              : ""
-          );
-          setEndDate(
-            fetchedAccommodation[0]?.endDate
-              ? fetchedAccommodation[0].endDate.split("T")[0]
-              : ""
-          );
+          setStartDate(fetchedAccommodation[0]?.startDate ? fetchedAccommodation[0].startDate.split("T")[0] : "");
+          setEndDate(fetchedAccommodation[0]?.endDate ? fetchedAccommodation[0].endDate.split("T")[0] : "");
           setBookingLink(fetchedAccommodation[0]?.bookingLink || "");
           setPrice(parseFloat(fetchedAccommodation[0]?.price) || 0);
         } else {
@@ -59,7 +56,6 @@ export default function AccommodationModal({
       }
     };
 
-    console.log("Fetching accommodation data...");
     fetchAccommodation();
   }, [destinationId, accommodation]);
 
@@ -68,13 +64,6 @@ export default function AccommodationModal({
       setDuration(calculateDuration(startDate, endDate));
     }
   }, [startDate, endDate]);
-
-  const calculateDuration = (startDate, endDate) => {
-    const start = new Date(startDate); // Convert startDate string to Date object
-    const end = new Date(endDate); // Convert endDate string to Date object
-    const durationInMilliseconds = end - start; // Calculate the difference in milliseconds
-    return Math.ceil(durationInMilliseconds / (1000 * 60 * 60 * 24)); // Convert to days and round up
-  };
 
   const fetchCoordinates = async (address) => {
     try {
@@ -88,6 +77,7 @@ export default function AccommodationModal({
           },
         }
       );
+
       if (response.data.length > 0) {
         const { lat, lon } = response.data[0];
         return { lat: parseFloat(lat), lon: parseFloat(lon) };
@@ -106,6 +96,7 @@ export default function AccommodationModal({
       console.error("Missing tripId or destinationId.");
       return;
     }
+    
     const coordinates = await fetchCoordinates(address);
     const accommodationData = {
       address,
@@ -118,12 +109,12 @@ export default function AccommodationModal({
     };
 
     try {
-      const token = localStorage.getItem("token");
+      const token = getToken();
       let response;
       if (accommodation?._id) {
         // Use PUT for updating existing accommodation
         response = await axios.put(
-          `${API_URL}/trips/${tripId}/destinations/${destinationId}/accommodation/${accommodation._id}`,
+          `${API_URL}/trips/accommodation/${tripId}/destinations/${destinationId}/accommodation/${accommodation._id}`,
           accommodationData,
           {
             headers: {
@@ -134,7 +125,7 @@ export default function AccommodationModal({
       } else {
         // Use POST for creating new accommodation
         response = await axios.post(
-          `${API_URL}/trips/${tripId}/destinations/${destinationId}/accommodation`,
+          `${API_URL}/trips/accommodation/${tripId}/destinations/${destinationId}/accommodation`,
           accommodationData,
           {
             headers: {

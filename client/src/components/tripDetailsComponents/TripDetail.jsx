@@ -81,7 +81,7 @@ export default function TripDetail() {
     try {
       const token = getToken();
       const response = await axios.post(
-        `${API_URL}/trips/${tripId}/destinations`,
+        `${API_URL}/trips/destination/${tripId}/destinations`,
         newDestination,
         {
           headers: {
@@ -111,7 +111,7 @@ export default function TripDetail() {
         if (destinationId) {
           // Update existing destination
           response = await axios.put(
-            `${API_URL}/trips/${tripId}/destinations/${destinationId}`,
+            `${API_URL}/trips/destination/${tripId}/destinations/${destinationId}`,
             updatedDestination,
             {
               headers: {
@@ -122,7 +122,7 @@ export default function TripDetail() {
         } else {
           // Create new destination
           response = await axios.post(
-            `${API_URL}/trips/${tripId}/destinations`,
+            `${API_URL}/trips/destination/${tripId}/destinations`,
             updatedDestination,
             {
               headers: {
@@ -183,7 +183,7 @@ export default function TripDetail() {
     try {
       const token = getToken();
       const response = await axios.post(
-        `${API_URL}/trips/${tripId}/destinations/${destinationId}/places`,
+        `${API_URL}/trips/destination/${tripId}/destinations/${destinationId}/places`,
         newPlace,
         {
           headers: {
@@ -230,7 +230,7 @@ export default function TripDetail() {
     try {
       const token = getToken();
       const response = await axios.put(
-        `${API_URL}/trips/${tripId}/destinations/${destinationId}/places/${placeId}`,
+        `${API_URL}/trips/destination/${tripId}/destinations/${destinationId}/places/${placeId}`,
         updatedPlace,
         {
           headers: {
@@ -259,7 +259,7 @@ export default function TripDetail() {
     try {
       const token = getToken();
       const response = await axios.delete(
-        `${API_URL}/trips/${tripId}/destinations/${destinationId}/places/${placeId}`,
+        `${API_URL}/trips/destination/${tripId}/destinations/${destinationId}/places/${placeId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -296,7 +296,7 @@ export default function TripDetail() {
     try {
       const token = getToken();
       const response = await axios.put(
-        `${API_URL}/trips/${tripId}`,
+        `${API_URL}/trips/destination/${tripId}`,
         { ...trip, destinations: updatedDestinations },
         {
           headers: {

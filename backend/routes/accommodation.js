@@ -1,78 +1,77 @@
 import express from "express";
-import auth from "../middleware/auth.js";
-import Trip from "../models/Trip.js";
+import auth from '../middleware/auth.js';
+import { validateAccommodationInput } from "../middleware/validateInput.js";
 
 const router = express.Router();
 
 router.get(
-  "/:tripId/destinations/:destinationId/accommodation",
-  async (req, res) => {
+  "/:tripId/destinations/:destinationId/accommodation", 
+  auth, 
+  async (req, res, next) => {
     try {
-      const { tripId, destinationId } = req.params;
-      const trip = await Trip.findById(tripId);
-      if (!trip) return res.status(404).send("Trip not found");
-
-      const destination = trip.destinations.id(destinationId);
-      if (!destination) return res.status(404).send("Destination not found");
+      const { destination } = await findTripAndDestination(req.params.tripId, req.params.destinationId);
 
       const accommodation = destination.accommodation;
-      if (!accommodation)
-        return res.status(404).send("Accommodation not found");
+      if (!accommodation) {
+        return res.status(404).json({ success: false, message: "Accommodation not found" });
+      }
 
-      res.status(200).send(accommodation);
+      res.status(200).json({ success: true, message: "Accommodation retrieved successfully", data: accommodation });
     } catch (error) {
-      console.error("Error fetching accommodation:", error);
-      res.status(500).send("Internal Server Error");
+      next(error)
     }
   }
 );
 
 router.post(
   "/:tripId/destinations/:destinationId/accommodation",
-  async (req, res) => {
-    try {
-      const { tripId, destinationId } = req.params;
-      const trip = await Trip.findById(tripId);
-      if (!trip) return res.status(404).send("Trip not found");
-
-      const destination = trip.destinations.id(destinationId);
-      if (!destination) return res.status(404).send("Destination not found");
+  auth, 
+  validateAccommodationInput,
+  async (req, res, next) => {
+    try {      
+      const { trip, destination } = await findTripAndDestination(req.params.tripId, req.params.destinationId);
 
       destination.accommodation = req.body;
+
+      if (destination.accommodation) {
+        return res.status(400).json({ success: false, message: "Accommodation already exists" });
+      }
+      
       await trip.save();
 
-      res.status(200).send(destination.accommodation);
+      res.status(200).json({ success: true, message: "Accommodation created successfully", data: destination.accommodation });
     } catch (error) {
-      console.error("Error saving accommodation:", error);
-      res.status(500).send("Internal Server Error");
+      next(error)
     }
   }
 );
 
-// Update accommodation
 router.put(
   "/:tripId/destinations/:destinationId/accommodation/:accommodationId",
-  async (req, res) => {
+  auth, 
+  validateAccommodationInput,
+  async (req, res, next) => {
     try {
-      const { tripId, destinationId, accommodationId } = req.params;
-      const trip = await Trip.findById(tripId);
-      if (!trip) return res.status(404).send("Trip not found");
+      const { trip, destination } = await findTripAndDestination(req.params.tripId, req.params.destinationId);
 
-      const destination = trip.destinations.id(destinationId);
-      if (!destination) return res.status(404).send("Destination not found");
+      const accommodation = destination.accommodation.id(req.params.accommodationId);
+      if (!accommodation) {
+        return res.status(404).json({ success: false, message: "Accommodation not found" });
+      }
 
-      const accommodation = destination.accommodation.id(accommodationId);
-      if (!accommodation)
-        return res.status(404).send("Accommodation not found");
-
-      Object.assign(accommodation, req.body);
+      accommodation.address = req.body.address,
+      accommodation.startDate = req.body.startDate,
+      accommodation.endDate = req.body.endDate,
+      accommodation.price = parseFloat(req.body.price),
+      accommodation.bookingLink = req.body.bookingLink
 
       await trip.save();
 
-      res.status(200).send(accommodation);
+      res.status(200).json({ success: true, message: "Accommodation updated successfully", data: destination.accommodation });
     } catch (error) {
-      console.error("Error updating accommodation:", error);
-      res.status(500).send("Internal Server Error");
+      next(error);
     }
   }
 );
+
+export default router;

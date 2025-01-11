@@ -1,7 +1,7 @@
 import express from "express";
 import auth from "../middleware/auth.js";
 import Trip from "../models/Trip.js";
-import { calculateDurationForDestinations } from "../utils/calculateDuration.js";
+import { calculateDurationInDays } from "../utils/calculateDuration.js";
 import { checkAccess } from "../middleware/checkAccess.js";
 
 
@@ -32,7 +32,7 @@ router.post("/", auth, async (req, res, next) => {
   // Destructure variables from request
   const { tripName, country, destinations } = req.body;
 
-  calculateDurationForDestinations(destinations);
+  calculateDurationInDays(destinations);
 
   // Create and save new trip in database
   try {
@@ -54,7 +54,7 @@ router.post("/", auth, async (req, res, next) => {
 router.put("/:tripId", auth, checkAccess, async (req, res, next) => {
   const { tripName, country, destinations } = req.body;
 
-  calculateDurationForDestinations(destinations);
+  calculateDurationInDays(destinations);
 
   try {
     // Update trip information

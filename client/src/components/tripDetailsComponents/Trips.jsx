@@ -7,16 +7,18 @@ import { slugify } from "../../util/slugify";
 import TripFormModal from "./TripFormModal";
 import { TripsContext } from "../../context/TripsContext";
 import { AuthContext } from "../../context/AuthContext";
+import { getToken } from "../../util/util";
+import Loading from "../../styles/loader/Loading";
 import "./Trips.css";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
 export default function Trips() {
-  const { trips, setTrips, fetchTrips, addTrip, deleteTrip } =
-    useContext(TripsContext);
+  const { trips, setTrips, fetchTrips } = useContext(TripsContext);
   const { user } = useContext(AuthContext);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingTrip, setEditingTrip] = useState(null);
+  const [ isModalOpen, setIsModalOpen ] = useState(false);
+  const [ editingTrip, setEditingTrip ] = useState(null);
+  const [ loading, setLoading ] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -29,34 +31,29 @@ export default function Trips() {
     }
   }, [user]);
 
-  useEffect(() => {
-    console.log(trips);
-  }, [trips]);
-
-  const handleCreateTrip = useCallback(
-    async (newTripData) => {
+  const addTrip = useCallback(async (newTrip) => {
+    const response = await axios.post(`${API_URL}/trips`, newTrip);
+    return response.data;
+  }, []);
+  
+  const handleCreateTrip = useCallback(async (newTripData) => {
       try {
-        const token = localStorage.getItem("token");
+        const token = getToken();
         if (editingTrip) {
-          // Editing existing trip
-          const response = await axios.put(
-            `${API_URL}/trips/${editingTrip._id}`,
-            newTripData,
+          // Edit existing trip
+          const response = await axios.put(`${API_URL}/trips/${editingTrip._id}`, newTripData,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
               },
             }
           );
-          const updatedTrips = trips.map((trip) =>
-            trip._id === editingTrip._id ? response.data : trip
-          );
-          setTrips(updatedTrips);
-          localStorage.setItem("trips", JSON.stringify(updatedTrips));
+          // Update specific trip in the trips array
+          setTrips((prevTrips) => prevTrips.map((trip) => trip._id === editingTrip._id ? response.data : trip));
         } else {
-          // Creating new trip
-          await addTrip(newTripData);
-          fetchTrips(); // Fetch trips after adding a new trip
+          // Create new trip
+          const newTrip = await addTrip(newTripData);
+          setTrips((prevTrips) => [...prevTrips, newTrip]);
         }
       } catch (error) {
         toast.error("Error saving trip. Please try again.", {
@@ -65,21 +62,38 @@ export default function Trips() {
         console.error("Error saving trip:", error);
       }
     },
-    [trips, setTrips, addTrip, fetchTrips, editingTrip]
+    [setTrips, addTrip, editingTrip]
   );
 
-  const handleDeleteTrip = useCallback(
-    async (tripId, event) => {
+  const handleDeleteTrip = useCallback(async (tripId, event) => {
       event.stopPropagation();
       try {
-        console.log("Attempting to delete trip with ID:", tripId);
-        await deleteTrip(tripId);
-        fetchTrips(); // Fetch trips after deleting a trip
-      } catch (error) {
+        const token = getToken();
+        const response = await axios.delete(`${API_URL}/trips/${tripId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (response.status === 200) {
+          // Remove the trip from the list
+          setTrips((prevTrips) => prevTrips.filter((trip) => trip._id !== tripId));
+          toast.success("Trip deleted successfully!", {
+            theme: "colored",
+          });
+        } else {
+          toast.error("Error deleting trip. Please try again.", {
+            theme: "colored",
+          });
+        }
+     } catch (error) {
+        toast.error("Error deleting trip. Please try again.", {
+          theme: "colored",
+        });
         console.error("Error deleting trip:", error);
       }
     },
-    [deleteTrip, fetchTrips]
+    [setTrips]
   );
 
   const handleCreateButtonClick = () => {
@@ -98,55 +112,59 @@ export default function Trips() {
     });
   };
 
-  const renderedTrips = useMemo(
-    () =>
-      trips.map((trip) => (
-        <li key={trip._id} className="trip-card">
-          <div className="trip-link" onClick={() => handleTripClick(trip)}>
-            <h3>{trip.tripName}</h3>
-            <p>
-              <strong>Country: </strong> {trip.country}
-            </p>
-            <p>
-              <strong>City: </strong> {trip.destinations[0].city}
-            </p>
-            <p>
-              <strong>Start Date: </strong>{" "}
-              {trip.destinations[0].startDate.split("T")[0]}
-            </p>
-            <p>
-              <strong>End Date: </strong>{" "}
-              {trip.destinations[0].endDate.split("T")[0]}
-            </p>
-            <p>
-              <strong>Duration: </strong>{" "}
-              {trip.destinations[0]?.duration === 1
-                ? trip.destinations[0]?.duration + " day"
-                : trip.destinations[0]?.duration + " days"}
-            </p>
-          </div>
-          <div className="trip-actions">
-            <button
-              className="trip-btn edit"
-              onClick={(event) => {
-                event.stopPropagation();
-                setIsModalOpen(true);
-                setEditingTrip(trip);
-              }}
-            >
-              Edit
-            </button>
-            <button
-              className="trip-btn delete"
-              onClick={(event) => handleDeleteTrip(trip._id, event)}
-            >
-              Delete
-            </button>
-          </div>
-        </li>
-      )),
-    [trips, handleDeleteTrip]
-  );
+  const renderedTrips = useMemo(() => {
+    if (!Array.isArray(trips)) {
+      console.error("Trips is not an array:", trips);
+      return [];
+    }
+  
+    return trips.map((trip) => (
+      <li key={trip._id} className="trip-card">
+        <div className="trip-link" onClick={() => handleTripClick(trip)}>
+          <h3>{trip.tripName}</h3>
+          <p>
+            <strong>Country: </strong> {trip.country}
+          </p>
+          <p>
+            <strong>City: </strong> {trip.destinations[0].city}
+          </p>
+          <p>
+            <strong>Start Date: </strong>{" "}
+            {trip.destinations[0].startDate.split("T")[0]}
+          </p>
+          <p>
+            <strong>End Date: </strong>{" "}
+            {trip.destinations[0].endDate.split("T")[0]}
+          </p>
+          <p>
+            <strong>Duration: </strong>{" "}
+            {trip.destinations[0]?.duration === 1
+              ? trip.destinations[0]?.duration + " day"
+              : trip.destinations[0]?.duration + " days"}
+          </p>
+        </div>
+        <div className="trip-actions">
+          <button
+            className="trip-btn edit"
+            onClick={(event) => {
+              event.stopPropagation();
+              setIsModalOpen(true);
+              setEditingTrip(trip);
+            }}
+          >
+            Edit
+          </button>
+          <button
+            className="trip-btn delete"
+            onClick={(event) => handleDeleteTrip(trip._id, event)}
+          >
+            Delete
+          </button>
+        </div>
+      </li>
+    ));
+  }, [trips, handleDeleteTrip]);
+
 
   return (
     <div className="trips-page">

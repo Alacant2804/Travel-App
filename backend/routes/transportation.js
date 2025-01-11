@@ -1,6 +1,7 @@
 import express from "express";
 import auth from "../middleware/auth.js";
 import { checkAccess } from "../middleware/checkAccess.js";
+import { validateTransportationInput } from "../middleware/validateInput.js";
 
 const router = express.Router();
 
@@ -14,7 +15,7 @@ router.get("/:tripId/transportation", auth, checkAccess, async (req, res, next) 
 });
 
 // Add transportation details
-router.post("/:tripId/transportation", auth, checkAccess, async (req, res, next) => {
+router.post("/:tripId/transportation", auth, checkAccess, validateTransportationInput, async (req, res, next) => {
   const {
     pickupPlace,
     dropoffPlace,
@@ -51,10 +52,7 @@ router.post("/:tripId/transportation", auth, checkAccess, async (req, res, next)
 });
 
 // Update transportation details
-router.put(
-  "/:tripId/transportation",
-  auth, checkAccess,
-  async (req, res, next) => {
+router.put("/:tripId/transportation", auth, checkAccess, validateTransportationInput, async (req, res, next) => {
     const {
       pickupPlace,
       dropoffPlace,
@@ -68,6 +66,14 @@ router.put(
     try {
       // Access the single transportation object
       const transportation = req.trip.transportation
+
+      if (!transportation) {
+        return res.status(404).json({ success: false, message: 'Transportation not found' })
+      }
+
+      if (req.body.price < 0 && isNaN(req.body.price)) {
+        return res.status(400).json({ success: false, message: "Price is not valid" })
+      }
 
       // Update transportation details
       transportation.pickupPlace = pickupPlace;

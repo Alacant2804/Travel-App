@@ -2,6 +2,7 @@ import Trip from "../models/Trip.js";
 
 export const checkAccess = async (req, res, next) => {
   try {
+    // Fetch trips from the database for the authenticated user
     const trip = await Trip.findById(req.params.tripId);
 
     // Check if trip is found

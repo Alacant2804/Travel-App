@@ -2,6 +2,11 @@ import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { errorHandler } from './middleware/errorHandler.js';
+
+// Routes import
 import authRoutes from './routes/auth.js';
 import accommodationRoutes from './routes/accommodation.js';
 import budgetRoutes from './routes/budget.js';
@@ -9,9 +14,6 @@ import destinationRoutes from './routes/destination.js';
 import flightRoutes from './routes/flights.js';
 import transportationRoutes from './routes/transportation.js';
 import tripRoutes from './routes/trips.js';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { errorHandler } from './middleware/errorHandler.js';
 
 dotenv.config();
 console.log('Environment variables loaded.');
@@ -37,10 +39,11 @@ app.use(express.static(path.join(__dirname, '../client/dist')));
 
 app.use('/api/auth', authRoutes);
 app.use('/api/trips', tripRoutes);
-app.use('/api/trips/accommodation', accommodationRoutes);
+app.use('/api/trips/destination', destinationRoutes);
 app.use('/api/trips/budget', budgetRoutes);
 app.use('/api/trips/transportation', transportationRoutes);
-app.use('/api/trips/destination', destinationRoutes);
+app.use('/api/trips/flights', flightRoutes);
+app.use('/api/trips/accommodation', accommodationRoutes);
 
 app.use(errorHandler);
 

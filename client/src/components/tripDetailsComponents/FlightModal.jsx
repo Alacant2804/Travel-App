@@ -3,6 +3,7 @@ import axios from 'axios';
 import { toast } from 'react-toastify'; 
 import './FlightModal.css';
 import FlightForm from './FlightForm';
+import { getToken } from '../../util/util';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -16,8 +17,8 @@ export default function FlightModal({ tripId, onClose }) {
     const fetchData = async () => {
       if (tripId) { // Only fetch if tripId is available
         try {
-          const token = localStorage.getItem('token');
-          const response = await axios.get(`${API_URL}/trips/${tripId}/flights`, { 
+          const token = getToken();
+          const response = await axios.get(`${API_URL}/trips/flights/${tripId}/flights`, { 
             headers: {
             'Authorization': `Bearer ${token}`
           } });
@@ -42,7 +43,7 @@ export default function FlightModal({ tripId, onClose }) {
   const handleSaveFlight = async (flightData) => {
     try {
       const token = getToken();
-      const url = `${API_URL}/trips/${tripId}/flights/${flightData._id || ''}`;
+      const url = `${API_URL}/trips/flights/${tripId}/flights/${flightData._id || ''}`;
   
       const method = flightData._id ? 'put' : 'post';  // PUT for updates, POST for new flights
       const response = await axios({

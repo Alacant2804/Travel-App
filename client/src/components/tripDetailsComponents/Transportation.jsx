@@ -22,11 +22,7 @@ export default function TransportationModal({ tripId, transportation, onClose })
     const fetchTransportationData = async () => {
       try {
         const token = getToken();
-        let url = `${API_URL}/trips/${tripId}/transportation`;
-  
-        if (transportation && transportation._id) {
-          url = `${API_URL}/trips/${tripId}/transportation/${transportation._id}`; // Specific URL for existing transportation
-        }
+        let url = `${API_URL}/trips/transportation/${tripId}/transportation`;
   
         const response = await axios.get(url, {
           headers: {
@@ -46,7 +42,7 @@ export default function TransportationModal({ tripId, transportation, onClose })
   const handleSaveTransportation = async (transportationData) => {
     try {
       const token = getToken();
-      const url = `${API_URL}/trips/${tripId}/transportation/${transportationData._id} || ''}`;
+      const url = `${API_URL}/trips/transportation/${tripId}/transportation/${transportationData._id} || ''}`;
       const method = transportationData._id ? 'put' : 'post'; // PUT for updates, POST for new flights
 
       const response = await axios({

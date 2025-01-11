@@ -1,7 +1,7 @@
 import express from "express";
 import auth from "../middleware/auth.js";
-import Trip from "../models/Trip.js";
 import { checkAccess } from "../middleware/checkAccess.js";
+import { validateFlightInput } from "../middleware/validateInput.js";
 
 const router = express.Router();
 
@@ -14,7 +14,7 @@ router.get("/:tripId/flights", auth, checkAccess, async (req, res, next) => {
 });
 
 // Create flight details
-router.post("/:tripId/flights", auth, checkAccess, async (req, res, next) => {
+router.post("/:tripId/flights", auth, checkAccess, validateFlightInput, async (req, res, next) => {
   const {
     departureAirport,
     arrivalAirport,
@@ -34,7 +34,7 @@ router.post("/:tripId/flights", auth, checkAccess, async (req, res, next) => {
       type,
     };
 
-    // Add new flight in the array of flights
+    // Immutably add new flight
     req.trip.flights.push(newFlight);
     await req.trip.save();
 
@@ -49,7 +49,7 @@ router.post("/:tripId/flights", auth, checkAccess, async (req, res, next) => {
 });
 
 // Update flight details
-router.put("/:tripId/flights/:type", auth, checkAccess, async (req, res, next) => {
+router.put("/:tripId/flights/:type", auth, checkAccess, validateFlightInput, async (req, res, next) => {
   const { type } = req.params;
   const {
     departureAirport,
@@ -63,7 +63,7 @@ router.put("/:tripId/flights/:type", auth, checkAccess, async (req, res, next) =
     // Find flight based on type
     const flight = req.trip.flights.find((flight) => flight.type === type);
     if (!flight) {
-      return res.status(404).json({ success: false, message: "Flight not found" });
+      return res.status(404).json({ success: false, message: "Flight detail wasn't found" });
     }
 
     // Update flight details
