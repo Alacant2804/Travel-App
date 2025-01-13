@@ -16,9 +16,9 @@ const API_URL = import.meta.env.VITE_API_URL;
 export default function Trips() {
   const { trips, setTrips, fetchTrips } = useContext(TripsContext);
   const { user } = useContext(AuthContext);
-  const [ isModalOpen, setIsModalOpen ] = useState(false);
-  const [ editingTrip, setEditingTrip ] = useState(null);
-  const [ loading, setLoading ] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingTrip, setEditingTrip] = useState(null);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -29,19 +29,28 @@ export default function Trips() {
     if (!user) {
       setTrips([]);
     }
-  }, [user]);
+  }, [user, setTrips]);
 
   const addTrip = useCallback(async (newTrip) => {
-    const response = await axios.post(`${API_URL}/trips`, newTrip);
-    return response.data;
+    const token = getToken();
+    const response = await axios.post(`${API_URL}/trips`, newTrip, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data.data;
   }, []);
-  
-  const handleCreateTrip = useCallback(async (newTripData) => {
+
+  const handleCreateTrip = useCallback(
+    async (newTripData) => {
       try {
+        setLoading(true);
         const token = getToken();
         if (editingTrip) {
           // Edit existing trip
-          const response = await axios.put(`${API_URL}/trips/${editingTrip._id}`, newTripData,
+          const response = await axios.put(
+            `${API_URL}/trips/${editingTrip._id}`,
+            newTripData,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -49,23 +58,37 @@ export default function Trips() {
             }
           );
           // Update specific trip in the trips array
-          setTrips((prevTrips) => prevTrips.map((trip) => trip._id === editingTrip._id ? response.data : trip));
+          setTrips((prevTrips) =>
+            prevTrips.map((trip) =>
+              trip._id === editingTrip._id ? response.data.data : trip
+            )
+          );
+          toast.success("Trip updated successfully!", {
+            theme: "colored",
+          });
         } else {
           // Create new trip
           const newTrip = await addTrip(newTripData);
           setTrips((prevTrips) => [...prevTrips, newTrip]);
+          toast.success("Trip created successfully!", {
+            theme: "colored",
+          });
         }
       } catch (error) {
         toast.error("Error saving trip. Please try again.", {
           theme: "colored",
         });
         console.error("Error saving trip:", error);
+      } finally {
+        setLoading(false);
       }
     },
     [setTrips, addTrip, editingTrip]
   );
 
-  const handleDeleteTrip = useCallback(async (tripId, event) => {
+  const handleDeleteTrip = useCallback(
+    async (tripId, event) => {
+      setLoading(true);
       event.stopPropagation();
       try {
         const token = getToken();
@@ -77,7 +100,9 @@ export default function Trips() {
 
         if (response.status === 200) {
           // Remove the trip from the list
-          setTrips((prevTrips) => prevTrips.filter((trip) => trip._id !== tripId));
+          setTrips((prevTrips) =>
+            prevTrips.filter((trip) => trip._id !== tripId)
+          );
           toast.success("Trip deleted successfully!", {
             theme: "colored",
           });
@@ -86,11 +111,13 @@ export default function Trips() {
             theme: "colored",
           });
         }
-     } catch (error) {
+      } catch (error) {
         toast.error("Error deleting trip. Please try again.", {
           theme: "colored",
         });
         console.error("Error deleting trip:", error);
+      } finally {
+        setLoading(false);
       }
     },
     [setTrips]
@@ -105,19 +132,22 @@ export default function Trips() {
     }
   };
 
-  const handleTripClick = (trip) => {
-    const slug = slugify(trip.tripName);
-    navigate(`/trips/${slug}`, {
-      state: { tripId: trip._id, tripName: trip.tripName },
-    });
-  };
+  const handleTripClick = useCallback(
+    (trip) => {
+      const slug = slugify(trip.tripName);
+      navigate(`/trips/${slug}`, {
+        state: { tripId: trip._id, tripName: trip.tripName },
+      });
+    },
+    [navigate]
+  );
 
   const renderedTrips = useMemo(() => {
     if (!Array.isArray(trips)) {
       console.error("Trips is not an array:", trips);
       return [];
     }
-  
+
     return trips.map((trip) => (
       <li key={trip._id} className="trip-card">
         <div className="trip-link" onClick={() => handleTripClick(trip)}>
@@ -163,8 +193,11 @@ export default function Trips() {
         </div>
       </li>
     ));
-  }, [trips, handleDeleteTrip]);
+  }, [trips, handleDeleteTrip, handleTripClick]);
 
+  if (loading) {
+    return <Loading />;
+  }
 
   return (
     <div className="trips-page">

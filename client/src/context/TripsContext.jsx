@@ -1,7 +1,13 @@
-import { createContext, useState, useContext, useEffect, useCallback } from "react";
+import {
+  createContext,
+  useState,
+  useContext,
+  useEffect,
+  useCallback,
+} from "react";
 import axios from "axios";
 import { AuthContext } from "./AuthContext";
-import { getToken } from '../util/util';
+import { getToken } from "../util/util";
 
 export const TripsContext = createContext();
 
@@ -31,9 +37,7 @@ export const TripsProvider = ({ children }) => {
   }, [fetchTrips]);
 
   return (
-    <TripsContext.Provider
-      value={{ trips, setTrips, fetchTrips }}
-    >
+    <TripsContext.Provider value={{ trips, setTrips, fetchTrips }}>
       {children}
     </TripsContext.Provider>
   );

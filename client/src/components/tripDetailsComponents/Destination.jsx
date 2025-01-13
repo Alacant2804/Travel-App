@@ -1,25 +1,24 @@
 import { useState, useEffect } from "react";
+import { calculateDuration } from "../../util/util";
 import AccommodationModal from "./AccommodationModal";
 import accommodationIcon from "../../assets/accommodation-icon.png";
 import deleteIcon from "../../assets/delete-icon.png";
 import editIcon from "../../assets/edit-icon.png";
 import Xicon from "../../assets/x-icon.png";
 import "./Destination.css";
+import { toast } from "react-toastify";
 
 export default function Destination({
   tripId,
   initialData = {},
-  onSave,
-  calculateDuration,
+  saveDestination,
   onAddPlace,
   onEditPlace,
   onDeletePlace,
   onDeleteDestination,
   index,
 }) {
-  const [destination, setDestination] = useState(
-    initialData.city || "New Destination"
-  );
+  const [city, setCity] = useState(initialData.city || "New Destination");
   const [startDate, setStartDate] = useState(
     initialData.startDate ? initialData.startDate.split("T")[0] : ""
   );
@@ -39,20 +38,23 @@ export default function Destination({
 
   useEffect(() => {
     setDuration(calculateDuration(startDate, endDate));
-  }, [startDate, endDate, calculateDuration]);
+  }, [startDate, endDate]);
 
   const handleAddPlace = async (event) => {
     event.preventDefault();
     const placeInput = event.target.elements.placeInput.value.trim();
     const priceInput = event.target.elements.priceInput.value.trim();
+
     if (!placeInput) {
-      console.error("Place name is empty");
+      toast.error("Place name is empty", { theme: "colored" });
       return;
     }
+
     if (isNaN(parseFloat(priceInput))) {
-      console.error("Invalid price input");
+      toast.error("Place name is empty", { theme: "colored" });
       return;
     }
+
     await onAddPlace(placeInput, priceInput);
     setPlaces((prev) => [
       ...prev,
@@ -87,8 +89,8 @@ export default function Destination({
     await onDeletePlace(index);
     const updatedPlaces = places.filter((_, idx) => idx !== index);
     setPlaces(updatedPlaces);
-    onSave({
-      city: destination,
+    saveDestination({
+      city,
       startDate,
       endDate,
       places: updatedPlaces,
@@ -99,8 +101,8 @@ export default function Destination({
 
   const handleSaveAccommodation = async (accommodationData) => {
     setAccommodation(accommodationData);
-    await onSave({
-      city: destination,
+    await saveDestination({
+      city,
       startDate,
       endDate,
       places,
@@ -130,11 +132,11 @@ export default function Destination({
           <input
             type="text"
             className="destination-input"
-            value={destination}
-            onChange={(e) => setDestination(e.target.value)}
+            value={city}
+            onChange={(e) => setCity(e.target.value)}
             onBlur={() =>
-              onSave({
-                city: destination,
+              saveDestination({
+                city,
                 startDate,
                 endDate,
                 places,
@@ -161,8 +163,8 @@ export default function Destination({
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
               onBlur={() =>
-                onSave({
-                  city: destination,
+                saveDestination({
+                  city,
                   startDate,
                   endDate,
                   places,
@@ -179,8 +181,8 @@ export default function Destination({
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
               onBlur={() =>
-                onSave({
-                  city: destination,
+                saveDestination({
+                  city,
                   startDate,
                   endDate,
                   places,

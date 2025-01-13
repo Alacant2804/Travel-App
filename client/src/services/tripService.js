@@ -1,5 +1,6 @@
 import axios from "axios";
 import { getToken } from "../util/util";
+import { slugify } from "../util/slugify";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -68,18 +69,19 @@ const fetchAccommodationCoordinates = async (destination, tripCountry) => {
 const fetchTripDetails = async (tripId) => {
   try {
     const token = getToken();
-    const response = await axios.get(`${API_URL}/trips/${tripId}`, {
+    const response = await axios.get(`${API_URL}/trips/destination/${tripId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
-    return response.data; // return trip data
+    console.log("Fetching trip details: ", response.data.data);
+    return response.data.data; // return trip data
   } catch (error) {
     console.error("Error fetching trip details:", error);
   }
 };
 
-const fetchTripBySlug = async () => {
+const fetchTripBySlug = async (tripSlug) => {
   try {
     const token = getToken();
     const response = await axios.get(`${API_URL}/trips`, {
@@ -87,7 +89,7 @@ const fetchTripBySlug = async () => {
         Authorization: `Bearer ${token}`,
       },
     });
-    const trip = response.data.find(
+    const trip = response.data.data.find(
       (trip) => slugify(trip.tripName) === tripSlug
     );
 
@@ -97,4 +99,10 @@ const fetchTripBySlug = async () => {
   }
 };
 
-export {getCoordinates, fetchPlacesCoordinates, fetchAccommodationCoordinates, fetchTripDetails, fetchTripBySlug}
+export {
+  getCoordinates,
+  fetchPlacesCoordinates,
+  fetchAccommodationCoordinates,
+  fetchTripDetails,
+  fetchTripBySlug,
+};

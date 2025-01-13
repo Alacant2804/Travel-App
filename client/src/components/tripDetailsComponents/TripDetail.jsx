@@ -7,8 +7,14 @@ import Transportation from "./Transportation";
 import MapComponent from "./MapComponent";
 import BudgetModal from "./BudgetModal";
 import Loading from "../../styles/loader/Loading";
-import { getCoordinates, fetchPlacesCoordinates, fetchAccommodationCoordinates, fetchTripDetails, fetchTripBySlug } from "../../services/tripService";
-import {calculateDuration, getToken} from "../../util/util";
+import {
+  getCoordinates,
+  fetchPlacesCoordinates,
+  fetchAccommodationCoordinates,
+  fetchTripDetails,
+  fetchTripBySlug,
+} from "../../services/tripService";
+import { calculateDuration, getToken } from "../../util/util";
 import axios from "axios";
 import Title from "../common/Title";
 import "./TripDetail.css";
@@ -26,18 +32,19 @@ export default function TripDetail() {
   const [tripName, setTripName] = useState(location.state?.tripName || "");
   const [trip, setTrip] = useState(null);
   const [destinations, setDestinations] = useState([]);
-  const [places, setPlaces] = useState([]);
   const [mapCenter, setMapCenter] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [showFlightModal, setShowFlightModal] = useState(false);
   const [currentFlight, setCurrentFlight] = useState(null);
   const [showTransportationModal, setShowTransportationModal] = useState(false);
   const [currentTransportation, setCurrentTransportation] = useState(null);
   const [showBudgetModal, setShowBudgetModal] = useState(false);
 
+  // Fetching specified trip via ID or slug
   useEffect(() => {
+    setLoading(true);
     if (!tripId) {
-      fetchTripBySlug()
+      fetchTripBySlug(tripSlug)
         .then((slugTrip) => {
           if (slugTrip) {
             setTripId(slugTrip._id);
@@ -46,25 +53,35 @@ export default function TripDetail() {
             setDestinations(slugTrip.destinations);
             setLoading(false);
           } else {
-            toast.error("Trip not found.", { theme: 'colored' }); 
+            toast.error("Trip not found.", { theme: "colored" });
+            setLoading(false);
           }
         })
-        .catch((error) => {
-          console.error("Error fetching trip by slug:", error);
-          toast.error("An error occurred while fetching trip details. Please try again later.", { theme: 'colored' }); 
+        .catch(() => {
+          toast.error(
+            "An error occurred while fetching trip details. Please try again later.",
+            { theme: "colored" }
+          );
+          setLoading(false);
         });
     } else {
       fetchTripDetails(tripId)
         .then((tripData) => {
           setTrip(tripData);
+          setDestinations(tripData.destinations || []);
+          setLoading(false);
         })
-        .catch((error) => {
-          console.error("Error fetching trip details:", error);
-          toast.error("An error occurred while fetching trip details. Please try again later.", { theme: 'colored' });
-        })
+        .catch(() => {
+          toast.error(
+            "An error occurred while fetching trip details. Please try again later.",
+            { theme: "colored" }
+          );
+        });
+      setLoading(false);
     }
   }, [tripId, tripSlug]);
 
+  // Add new destination in the trip
   const handleAddDestination = async () => {
     const startDate = new Date().toISOString().slice(0, 10);
     const endDate = new Date().toISOString().slice(0, 10);
@@ -81,7 +98,7 @@ export default function TripDetail() {
     try {
       const token = getToken();
       const response = await axios.post(
-        `${API_URL}/trips/destination/${tripId}/destinations`,
+        `${API_URL}/trips/destination/${tripId}`,
         newDestination,
         {
           headers: {
@@ -89,40 +106,60 @@ export default function TripDetail() {
           },
         }
       );
-      setDestinations(response.data.destinations);
+      setDestinations((prevDestinations) => [
+        ...prevDestinations,
+        response.data.data,
+      ]);
     } catch (error) {
       console.error("Error adding destination:", error);
-      toast.error("Couldn't create new destination, please try again later", { theme: 'colored'});
+      toast.error("Couldn't create new destination, please try again later", {
+        theme: "colored",
+      });
     }
-  };  
+  };
 
+  // Save new destination information
   const handleSaveDestination = useCallback(
     async (updatedData, index) => {
       const destinationId = destinations[index]?._id; // Check if destinationId exists
+
+      // Create updated destination object which contains new data
+      // ...updatedData overwrites the same properties from old destination
       const updatedDestination = {
         ...destinations[index],
-        ...updatedData,
+        ...updatedData, // Overwrites current destination
         duration: calculateDuration(updatedData.startDate, updatedData.endDate),
       };
 
       try {
         const token = getToken();
         let response;
+        let savedDestination;
         if (destinationId) {
           // Update existing destination
           response = await axios.put(
-            `${API_URL}/trips/destination/${tripId}/destinations/${destinationId}`,
+            `${API_URL}/trips/destination/${tripId}/${destinationId}`,
             updatedDestination,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
               },
             }
+          );
+
+          // Return updated destination object and update destination array
+          savedDestination = response.data.data;
+          setDestinations((prevDestinations) =>
+            prevDestinations.map((destination) =>
+              destination._id === updatedDestination._id
+                ? savedDestination
+                : destination
+            )
           );
         } else {
           // Create new destination
           response = await axios.post(
-            `${API_URL}/trips/destination/${tripId}/destinations`,
+            `${API_URL}/trips/destination/${tripId}`,
             updatedDestination,
             {
               headers: {
@@ -130,60 +167,70 @@ export default function TripDetail() {
               },
             }
           );
+
+          // Return created destination object and add to destination array
+          savedDestination = response.data.data;
+          setDestinations((prevDestinations) => [
+            ...prevDestinations,
+            savedDestination,
+          ]);
         }
-
-        const updatedDestinations = response.data.destinations || [];
-        setDestinations(updatedDestinations);
-
-        // Update places and accommodations if needed
-        const updatedPlaces = await fetchPlacesCoordinates(
-          updatedDestination,
-          trip.country
-        );
-        setPlaces(updatedPlaces);
       } catch (error) {
         console.error("Error saving destination:", error);
-        toast.error("Couldn't save new destination, please try again later", { theme: 'colored'});
+        toast.error("Couldn't save new destination, please try again later", {
+          theme: "colored",
+        });
       }
     },
-    [destinations, tripId, trip?.country]
+    [destinations, tripId]
   );
 
   const handleAddPlace = async (destinationIndex, placeName, placePrice) => {
+    // Validate place name
     if (typeof placeName !== "string" || !placeName.trim()) {
       console.error("Invalid place name:", placeName);
       return;
     }
+
+    // Validate price
     const parsedPrice = parseFloat(placePrice);
     if (isNaN(parsedPrice)) {
       console.error("Invalid place price:", placePrice);
       return;
     }
-    const coordinates = await getCoordinates(
-      `${placeName}, ${destinations[destinationIndex].city}, ${trip.country}`
-    );
-    if (
-      !coordinates ||
-      typeof coordinates.lat !== "number" ||
-      typeof coordinates.lon !== "number"
-    ) {
-      console.error("Invalid coordinates:", coordinates);
+
+    // Get destination and validate
+    const destination = destinations[destinationIndex];
+    if (!destination || !destination._id) {
+      toast.error("Invalid destination selected.", { theme: "colored" });
       return;
     }
+
+    // Get coordinates for provided place
+    const address = `${placeName}, ${destination.city}, ${trip.country}`;
+    const coordinates = await getCoordinates(address);
+
+    // Validate coordinates
+    if (!coordinates) {
+      toast.error(
+        "We couldn't fetch the coordinates for the address you provided. Please check it and try again.",
+        { theme: "colored" }
+      );
+      return;
+    }
+
+    // Create object with place data and coordinates
     const newPlace = {
       name: placeName.trim(),
       price: parsedPrice,
       coordinates,
     };
-    const destinationId = destinations[destinationIndex]._id;
-    if (!destinationId) {
-      console.error("Invalid destination ID");
-      return;
-    }
+
+    // Send places to the server
     try {
       const token = getToken();
       const response = await axios.post(
-        `${API_URL}/trips/destination/${tripId}/destinations/${destinationId}/places`,
+        `${API_URL}/trips/destination/${tripId}/${destination._id}/places`,
         newPlace,
         {
           headers: {
@@ -191,21 +238,23 @@ export default function TripDetail() {
           },
         }
       );
-      setDestinations(response.data.destinations);
+
+      const createdPlace = response.data.data;
+      // Add new place to the places array in destination
+      setDestinations((prevDestinations) =>
+        prevDestinations.map((destination, index) =>
+          index === destinationIndex
+            ? { ...destination, places: [...destination.places, createdPlace] }
+            : destination
+        )
+      );
+      toast.success("Place added successfully!", { theme: "colored" });
     } catch (error) {
       console.error("Error adding place:", error);
+      toast.error("Couldn't add place. Please try again later.", {
+        theme: "colored",
+      });
     }
-    const updatedDestinations = destinations.map((dest, idx) =>
-      idx === destinationIndex
-        ? { ...dest, places: [...dest.places, newPlace] }
-        : dest
-    );
-    setDestinations(updatedDestinations);
-    const updatedPlaces = await fetchPlacesCoordinates(
-      updatedDestinations,
-      trip.country
-    );
-    setPlaces(updatedPlaces);
   };
 
   const handleEditPlace = async (
@@ -213,9 +262,15 @@ export default function TripDetail() {
     placeIndex,
     updatedPlace
   ) => {
+    const destination = destinations[destinationIndex];
+    const place = destinations[destinationIndex].places[placeIndex];
+
+    // Get coordinates
     const coordinates = await getCoordinates(
-      `${updatedPlace.name}, ${destinations[destinationIndex].city}, ${trip.country}`
+      `${updatedPlace.name}, ${destination.city}, ${trip.country}`
     );
+
+    // Validate coordinates
     if (
       !coordinates ||
       typeof coordinates.lat !== "number" ||
@@ -224,13 +279,15 @@ export default function TripDetail() {
       console.error("Invalid coordinates:", coordinates);
       return;
     }
+
+    // Updated place object
     updatedPlace = { ...updatedPlace, coordinates };
-    const destinationId = destinations[destinationIndex]._id;
-    const placeId = destinations[destinationIndex].places[placeIndex]._id;
+
+    // Send updated place to the server
     try {
       const token = getToken();
       const response = await axios.put(
-        `${API_URL}/trips/destination/${tripId}/destinations/${destinationId}/places/${placeId}`,
+        `${API_URL}/trips/destination/${tripId}/${destination._id}/places/${place._id}`,
         updatedPlace,
         {
           headers: {
@@ -238,54 +295,71 @@ export default function TripDetail() {
           },
         }
       );
-      setDestinations(response.data.destinations);
+
+      const newPlace = response.data.data;
+
+      // Update the destinations state with the modified place in the correct destination
+      setDestinations((prevDestinations) => {
+        // Create a copy of the previous destinations
+        const updatedDestinations = [...prevDestinations];
+        // Update destination with new place
+        updatedDestinations[destinationIndex] = {
+          ...destination, // Copy the existing destination
+          places: destination.places.map((place, index) =>
+            index === placeIndex ? { ...place, ...newPlace } : place
+          ), // Update the specified place in the places array
+        };
+        return updatedDestinations; // Return the updated array
+      });
+      toast.success("Place updated successfully!", { theme: "colored" });
     } catch (error) {
       console.error("Error editing place:", error);
+      toast.error("Couldn't update place. Please try again later.", {
+        theme: "colored",
+      });
     }
-    const updatedPlaces = await fetchPlacesCoordinates(
-      destinations,
-      trip.country
-    );
-    setPlaces(updatedPlaces);
   };
 
   const handleDeletePlace = async (destinationIndex, placeIndex) => {
     const placeId = destinations[destinationIndex].places[placeIndex]._id;
     const destinationId = destinations[destinationIndex]._id;
+
+    // Check if place or destination exists
     if (!placeId || !destinationId) {
       console.error("Invalid placeId or destinationId");
       return;
     }
+
+    // Send delete request
     try {
       const token = getToken();
-      const response = await axios.delete(
-        `${API_URL}/trips/destination/${tripId}/destinations/${destinationId}/places/${placeId}`,
+      await axios.delete(
+        `${API_URL}/trips/destination/${tripId}/${destinationId}/places/${placeId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
       );
-      setDestinations(response.data.destinations);
+
+      // Delete place from frontend
+      setDestinations((prevDestinations) => {
+        return prevDestinations.map((dest, idx) =>
+          idx === destinationIndex
+            ? {
+                ...dest,
+                places: dest.places.filter((_, pIdx) => pIdx !== placeIndex),
+              }
+            : dest
+        );
+      });
+      toast.success("Place deleted successfully!", { theme: "colored" });
     } catch (error) {
       console.error("Error deleting place:", error);
+      toast.error("Couldn't delete place. Please try again later.", {
+        theme: "colored",
+      });
     }
-    const updatedDestinations = destinations.map((dest, idx) =>
-      idx === destinationIndex
-        ? {
-            ...dest,
-            places: dest.places.filter((_, pIdx) => pIdx !== placeIndex),
-          }
-        : dest
-    );
-    setDestinations(updatedDestinations);
-
-    // Update the places immediately after deletion
-    const updatedPlaces = await fetchPlacesCoordinates(
-      updatedDestinations,
-      trip.country
-    );
-    setPlaces(updatedPlaces);
   };
 
   const handleDeleteDestination = async (destinationIndex) => {
@@ -304,7 +378,7 @@ export default function TripDetail() {
           },
         }
       );
-      setDestinations(response.data.destinations);
+      setDestinations(response.data.data.destinations);
     } catch (error) {
       console.error("Error deleting destination:", error);
     }
@@ -384,8 +458,9 @@ export default function TripDetail() {
           <Destination
             key={index}
             initialData={destination}
-            calculateDuration={calculateDuration}
-            onSave={(updatedData) => handleSaveDestination(updatedData, index)}
+            saveDestination={(updatedData) =>
+              handleSaveDestination(updatedData, index)
+            }
             onAddPlace={(placeName, placePrice) =>
               handleAddPlace(index, placeName, placePrice)
             }
