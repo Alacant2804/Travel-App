@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useParams, useLocation } from "react-router-dom";
 import { Link } from "react-router-dom";
 import Destination from "./Destination";
@@ -10,7 +10,6 @@ import Loading from "../../styles/loader/Loading";
 import {
   getCoordinates,
   fetchPlacesCoordinates,
-  fetchAccommodationCoordinates,
   fetchTripDetails,
   fetchTripBySlug,
 } from "../../services/tripService";
@@ -185,20 +184,8 @@ export default function TripDetail() {
     [destinations, tripId]
   );
 
+  // Add place to visit to destination
   const handleAddPlace = async (destinationIndex, placeName, placePrice) => {
-    // Validate place name
-    if (typeof placeName !== "string" || !placeName.trim()) {
-      console.error("Invalid place name:", placeName);
-      return;
-    }
-
-    // Validate price
-    const parsedPrice = parseFloat(placePrice);
-    if (isNaN(parsedPrice)) {
-      console.error("Invalid place price:", placePrice);
-      return;
-    }
-
     // Get destination and validate
     const destination = destinations[destinationIndex];
     if (!destination || !destination._id) {
@@ -222,7 +209,7 @@ export default function TripDetail() {
     // Create object with place data and coordinates
     const newPlace = {
       name: placeName.trim(),
-      price: parsedPrice,
+      price: placePrice,
       coordinates,
     };
 
@@ -257,6 +244,7 @@ export default function TripDetail() {
     }
   };
 
+  // Edit place to visit in the destination
   const handleEditPlace = async (
     destinationIndex,
     placeIndex,
@@ -320,6 +308,7 @@ export default function TripDetail() {
     }
   };
 
+  // Delete place from destination
   const handleDeletePlace = async (destinationIndex, placeIndex) => {
     const placeId = destinations[destinationIndex].places[placeIndex]._id;
     const destinationId = destinations[destinationIndex]._id;
@@ -362,25 +351,41 @@ export default function TripDetail() {
     }
   };
 
+  // Delete destination
   const handleDeleteDestination = async (destinationIndex) => {
-    if (destinationIndex === 0) return;
-    const updatedDestinations = destinations.filter(
-      (_, idx) => idx !== destinationIndex
-    );
+    if (
+      destinationIndex < 0 ||
+      destinationIndex >= destinations.length ||
+      !destinations[destinationIndex]
+    ) {
+      console.error("Invalid destination index");
+      return;
+    }
+
+    const destinationId = destinations[destinationIndex]._id;
+
     try {
       const token = getToken();
-      const response = await axios.put(
-        `${API_URL}/trips/destination/${tripId}`,
-        { ...trip, destinations: updatedDestinations },
+      await axios.delete(
+        `${API_URL}/trips/destination/${tripId}/${destinationId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
       );
-      setDestinations(response.data.data.destinations);
+
+      setDestinations((prevDestinations) =>
+        prevDestinations.filter(
+          (destination) => destination._id !== destinationId
+        )
+      );
+      toast.success("Destination deleted successfully!", { theme: "colored" });
     } catch (error) {
       console.error("Error deleting destination:", error);
+      toast.error("Couldn't delete destination. Please try again later.", {
+        theme: "colored",
+      });
     }
   };
 
@@ -405,6 +410,15 @@ export default function TripDetail() {
   const handleSaveBudget = async () => {
     fetchTripDetails();
   };
+
+  const places = useMemo(() => {
+    return destinations.reduce((acc, destination) => {
+      if (destination.places) {
+        acc.push(...destination.places);
+      }
+      return acc;
+    }, []);
+  }, [destinations]);
 
   if (loading) {
     return <Loading />;
@@ -457,7 +471,9 @@ export default function TripDetail() {
         {destinations.map((destination, index) => (
           <Destination
             key={index}
-            initialData={destination}
+            destination={destination}
+            destinationIndex={index}
+            tripId={tripId}
             saveDestination={(updatedData) =>
               handleSaveDestination(updatedData, index)
             }
@@ -469,8 +485,6 @@ export default function TripDetail() {
             }
             onDeletePlace={(placeIndex) => handleDeletePlace(index, placeIndex)}
             onDeleteDestination={() => handleDeleteDestination(index)}
-            index={index}
-            tripId={tripId}
           />
         ))}
       </div>

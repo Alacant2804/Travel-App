@@ -10,22 +10,22 @@ import { toast } from "react-toastify";
 
 export default function Destination({
   tripId,
-  initialData = {},
+  destination = {},
+  destinationIndex,
   saveDestination,
   onAddPlace,
   onEditPlace,
   onDeletePlace,
   onDeleteDestination,
-  index,
 }) {
-  const [city, setCity] = useState(initialData.city || "New Destination");
+  const [city, setCity] = useState(destination.city || "New Destination");
   const [startDate, setStartDate] = useState(
-    initialData.startDate ? initialData.startDate.split("T")[0] : ""
+    destination.startDate ? destination.startDate.split("T")[0] : ""
   );
   const [endDate, setEndDate] = useState(
-    initialData.endDate ? initialData.endDate.split("T")[0] : ""
+    destination.endDate ? destination.endDate.split("T")[0] : ""
   );
-  const [places, setPlaces] = useState(initialData.places || []);
+  const [places, setPlaces] = useState(destination.places || []);
   const [duration, setDuration] = useState(
     calculateDuration(startDate, endDate)
   );
@@ -33,61 +33,57 @@ export default function Destination({
   const [editPlaceValue, setEditPlaceValue] = useState({ name: "", price: 0 });
   const [showAccommodationModal, setShowAccommodationModal] = useState(false);
   const [accommodation, setAccommodation] = useState(
-    initialData.accommodation || null
+    destination.accommodation || null
   );
 
   useEffect(() => {
     setDuration(calculateDuration(startDate, endDate));
   }, [startDate, endDate]);
 
+  // Add place to destination
   const handleAddPlace = async (event) => {
     event.preventDefault();
     const placeInput = event.target.elements.placeInput.value.trim();
     const priceInput = event.target.elements.priceInput.value.trim();
 
-    if (!placeInput) {
-      toast.error("Place name is empty", { theme: "colored" });
+    // Validate place input
+    if (typeof placeInput !== "string" || !placeInput.trim()) {
+      toast.error("Place name is incorrect", { theme: "colored" });
       return;
     }
 
-    if (isNaN(parseFloat(priceInput))) {
-      toast.error("Place name is empty", { theme: "colored" });
+    // Validate price input
+    if (isNaN(parseFloat(priceInput)) || !priceInput.trim()) {
+      console.error("Invalid place price:", priceInput);
       return;
     }
 
-    await onAddPlace(placeInput, priceInput);
-    setPlaces((prev) => [
-      ...prev,
-      {
-        name: placeInput,
-        price: parseFloat(priceInput) || 0,
-        coordinates: null,
-      },
-    ]);
+    // Add place values to the component
+    await onAddPlace(destinationIndex, placeInput, priceInput);
     event.target.reset();
   };
 
-  const handleSaveEditPlace = async () => {
-    const updatedPlace = {
-      ...editPlaceValue,
-      price: parseFloat(editPlaceValue.price) || 0,
-    };
-    await onEditPlace(editingIndex, updatedPlace);
-    setPlaces(
-      places.map((place, idx) => (idx === editingIndex ? updatedPlace : place))
-    );
-    setEditingIndex(-1);
-    setEditPlaceValue({ name: "", price: 0 });
+  // Save updated place
+  const handleSaveEditPlace = async (placeIndex) => {
+    try {
+      await onEditPlace(destinationIndex, placeIndex, editPlaceValue);
+
+      setEditingIndex(-1); // Exit edit mode
+      setEditPlaceValue({ name: "", price: 0 }); // Clear the inputs
+    } catch (error) {
+      console.error("Error saving edited place:", error);
+    }
   };
 
-  const handleEditPlace = (index) => {
-    setEditingIndex(index);
-    setEditPlaceValue(places[index]);
+  //
+  const handleEditPlace = (placeIndex) => {
+    setEditingIndex(placeIndex);
+    setEditPlaceValue(places[placeIndex]);
   };
 
-  const handleDeletePlace = async (index) => {
-    await onDeletePlace(index);
-    const updatedPlaces = places.filter((_, idx) => idx !== index);
+  const handleDeletePlace = async (destinationIndex) => {
+    await onDeletePlace(destinationIndex);
+    const updatedPlaces = places.filter((_, idx) => idx !== destinationIndex);
     setPlaces(updatedPlaces);
     saveDestination({
       city,
@@ -145,10 +141,10 @@ export default function Destination({
               })
             }
           />
-          {index > 0 && (
+          {destinationIndex > 0 && (
             <button
               className="delete-destination-button"
-              onClick={() => onDeleteDestination(index)}
+              onClick={() => onDeleteDestination(destinationIndex)}
             >
               <img src={Xicon} alt="delete destination" className="x-icon" />
             </button>
@@ -228,7 +224,7 @@ export default function Destination({
                   className="place-input"
                 />
                 <button
-                  onClick={handleSaveEditPlace}
+                  onClick={() => handleSaveEditPlace(index)}
                   className="add-place-button"
                 >
                   Save
@@ -252,7 +248,7 @@ export default function Destination({
                   </button>
                   <button
                     className="button-icon"
-                    onClick={() => handleDeletePlace(index)}
+                    onClick={() => handleDeletePlace(destinationIndex)}
                   >
                     <img
                       src={deleteIcon}
@@ -312,7 +308,7 @@ export default function Destination({
         {showAccommodationModal && (
           <AccommodationModal
             tripId={tripId}
-            destinationId={initialData._id}
+            destinationId={destination._id}
             accommodation={accommodation}
             onSave={handleSaveAccommodation}
             onClose={handleCloseModal}

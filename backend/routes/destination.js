@@ -100,7 +100,7 @@ router.delete(
   "/:tripId/:destinationId",
   auth,
   checkAccess,
-  async (req, res) => {
+  async (req, res, next) => {
     const { destinationId } = req.params;
 
     try {
