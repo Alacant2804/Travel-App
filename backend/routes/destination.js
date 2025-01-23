@@ -49,10 +49,12 @@ router.post(
       req.trip.destinations.push(newDestination);
       await req.trip.save();
 
+      const createdTrip = req.trip.destinations[req.trip.destinations.length - 1];
+
       res.status(201).json({
         success: true,
         message: "Destination created successfully",
-        data: newDestination,
+        data: createdTrip,
       });
     } catch (error) {
       next(error);
@@ -111,7 +113,7 @@ router.delete(
           .json({ success: false, message: "Destination not found" });
       }
 
-      destination.remove();
+      destination.deleteOne();
       await req.trip.save();
 
       res
@@ -186,10 +188,12 @@ router.post("/:tripId/:destinationId/places", auth, async (req, res, next) => {
     destination.places.push({ name, price, coordinates });
     await trip.save();
 
+    const createdPlace = destination.places[destination.places.length - 1];
+
     res.status(201).json({
       success: true,
       message: "Place added successfully",
-      data: { name, price, coordinates },
+      data: createdPlace,
     });
   } catch (error) {
     next(error);
@@ -256,7 +260,7 @@ router.delete(
           .json({ success: false, message: "Place not found" });
       }
 
-      place.remove();
+      place.deleteOne();
       await trip.save();
 
       res

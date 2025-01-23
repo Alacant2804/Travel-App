@@ -7,15 +7,18 @@ import editIcon from "../../assets/edit-icon.png";
 import Xicon from "../../assets/x-icon.png";
 import "./Destination.css";
 import { toast } from "react-toastify";
+import axios from "axios";
+import { getToken } from "../../util/util";
+import { getCoordinates } from "../../services/tripService";
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 export default function Destination({
   tripId,
   destination = {},
   destinationIndex,
+  country,
   saveDestination,
-  onAddPlace,
-  onEditPlace,
-  onDeletePlace,
   onDeleteDestination,
 }) {
   const [city, setCity] = useState(destination.city || "New Destination");
@@ -40,11 +43,11 @@ export default function Destination({
     setDuration(calculateDuration(startDate, endDate));
   }, [startDate, endDate]);
 
-  // Add place to destination
-  const handleAddPlace = async (event) => {
+   // Add place to the destination component
+   const handleAddPlace = async (event) => {
     event.preventDefault();
     const placeInput = event.target.elements.placeInput.value.trim();
-    const priceInput = event.target.elements.priceInput.value.trim();
+    const priceInput = parseFloat(event.target.elements.priceInput.value);
 
     // Validate place input
     if (typeof placeInput !== "string" || !placeInput.trim()) {
@@ -53,46 +56,164 @@ export default function Destination({
     }
 
     // Validate price input
-    if (isNaN(parseFloat(priceInput)) || !priceInput.trim()) {
+    if (isNaN(priceInput) || priceInput < 0) {
       console.error("Invalid place price:", priceInput);
       return;
     }
 
-    // Add place values to the component
-    await onAddPlace(destinationIndex, placeInput, priceInput);
-    event.target.reset();
-  };
+    // Get coordinates for provided place
+    const address = `${placeInput}, ${destination.city}, ${country}`;
+    const coordinates = await getCoordinates(address);
 
-  // Save updated place
-  const handleSaveEditPlace = async (placeIndex) => {
+    // Validate coordinates
+    if (!coordinates) {
+      toast.error(
+        "We couldn't fetch the coordinates for the address you provided. Please check it and try again.",
+        { theme: "colored" }
+      );
+    }
+
+    // Create object with place data and coordinates
+    const newPlace = {
+      name: placeInput.trim(),
+      price: priceInput,
+      coordinates,
+    };
+
+    // Send places to the server
     try {
-      await onEditPlace(destinationIndex, placeIndex, editPlaceValue);
+      const token = getToken();
+      const response = await axios.post(
+        `${API_URL}/trips/destination/${tripId}/${destination._id}/places`,
+        newPlace,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-      setEditingIndex(-1); // Exit edit mode
-      setEditPlaceValue({ name: "", price: 0 }); // Clear the inputs
+      const createdPlace = response.data.data;
+      const updatedPlaces = [...destination.places, createdPlace];
+
+      setPlaces(updatedPlaces);
+
+      // Notify parent of the updated destination
+      saveDestination({ ...destination, places: updatedPlaces }, destinationIndex);
+      event.target.reset();
+      toast.success("Place added successfully!", { theme: "colored" });
     } catch (error) {
-      console.error("Error saving edited place:", error);
+      console.error("Error adding place:", error);
+      event.target.reset();
+      toast.error("Couldn't add place. Please try again later.", {
+        theme: "colored",
+      });
     }
   };
 
-  //
-  const handleEditPlace = (placeIndex) => {
-    setEditingIndex(placeIndex);
-    setEditPlaceValue(places[placeIndex]);
+  // Save edited place
+  const handleSaveEditPlace = async (placeIndex) => {
+    const updatedPlace = {
+      ...editPlaceValue, // The updated values from the edit form
+    };
+
+    // Get coordinates
+    const coordinates = await getCoordinates(
+      `${updatedPlace.name}, ${destination.city}, ${country}`
+    );
+
+    // Validate coordinates
+    if (
+      !coordinates ||
+      typeof coordinates.lat !== "number" ||
+      typeof coordinates.lon !== "number"
+    ) {
+      console.error("Invalid coordinates:", coordinates);
+      return;
+    }
+
+    // Updated place object with coordinates
+    updatedPlace.coordinates = coordinates;
+
+    // Send updated place to the server
+    try {
+      const token = getToken();
+      const response = await axios.put(
+        `${API_URL}/trips/destination/${tripId}/${destination._id}/places/${places[placeIndex]._id}`,
+        updatedPlace,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const newPlace = response.data.data;
+
+      const updatedPlaces = places.map((place, index) =>
+        index === placeIndex ? { ...place, ...newPlace } : place
+      );
+  
+      setPlaces(updatedPlaces); // Update the places state
+  
+      // Notify parent of the updated destination with the updated places array
+      saveDestination({ ...destination, places: updatedPlaces }, destinationIndex);
+  
+
+      setEditingIndex(-1); // Exit edit mode
+      setEditPlaceValue({ name: "", price: 0 }); // Clear the inputs
+      toast.success("Place updated successfully!", { theme: "colored" });
+    } catch (error) {
+      console.error("Error editing place:", error);
+      toast.error("Couldn't update place. Please try again later.", {
+        theme: "colored",
+      });
+    }
   };
 
-  const handleDeletePlace = async (destinationIndex) => {
-    await onDeletePlace(destinationIndex);
-    const updatedPlaces = places.filter((_, idx) => idx !== destinationIndex);
-    setPlaces(updatedPlaces);
-    saveDestination({
-      city,
-      startDate,
-      endDate,
-      places: updatedPlaces,
-      duration,
-      accommodation,
-    });
+  // Editing mode
+  const handleEditPlace = (placeIndex) => {
+    setEditingIndex(placeIndex); // Sets the specific place as the one being edited
+    setEditPlaceValue(places[placeIndex]); // Pre-fills the edit form with the data of the selected place
+  };  
+
+  // Delete place from destination
+  const handleDeletePlace = async (placeIndex) => {
+    console.log(placeIndex);
+    console.log(destination.places[placeIndex]);
+    const placeId = destination.places[placeIndex]._id;
+
+    // Check if place or destination exists
+    if (!placeId || !destination._id) {
+      console.error("Invalid placeId or destinationId");
+      return;
+    }
+
+    // Send delete request
+    try {
+      const token = getToken();
+      await axios.delete(
+        `${API_URL}/trips/destination/${tripId}/${destination._id}/places/${placeId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      // Update local state
+      const updatedPlaces = places.filter((_, idx) => idx !== placeIndex);
+      setPlaces(updatedPlaces);
+
+      // Notify parent of the updated destination
+      saveDestination({ ...destination, places: updatedPlaces });
+      toast.success("Place deleted successfully!", { theme: "colored" });
+    } catch (error) {
+      console.error("Error deleting place:", error);
+      toast.error("Couldn't delete place. Please try again later.", {
+        theme: "colored",
+      });
+    }
   };
 
   const handleSaveAccommodation = async (accommodationData) => {
@@ -195,7 +316,7 @@ export default function Destination({
         </div>
       </div>
       <ul className="places-to-visit">
-        {places.map((place, index) => (
+        {destination.places.map((place, index) => (
           <li key={index}>
             {editingIndex === index ? (
               <div className="edit-mode">
@@ -248,7 +369,7 @@ export default function Destination({
                   </button>
                   <button
                     className="button-icon"
-                    onClick={() => handleDeletePlace(destinationIndex)}
+                    onClick={() => handleDeletePlace(index)}
                   >
                     <img
                       src={deleteIcon}

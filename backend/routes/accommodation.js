@@ -39,7 +39,9 @@ router.post(
       
       await trip.save();
 
-      res.status(200).json({ success: true, message: "Accommodation created successfully", data: destination.accommodation });
+      const createdAccommodation = destination.accommodation;
+
+      res.status(200).json({ success: true, message: "Accommodation created successfully", data: createdAccommodation });
     } catch (error) {
       next(error)
     }

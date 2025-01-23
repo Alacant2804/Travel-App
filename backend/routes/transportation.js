@@ -23,7 +23,7 @@ router.post("/:tripId/transportation", auth, checkAccess, validateTransportation
     dropoffDate,
     duration,
     price,
-    bookingLink,
+    bookingLink = null,
   } = req.body;
 
   try {
@@ -41,10 +41,12 @@ router.post("/:tripId/transportation", auth, checkAccess, validateTransportation
     req.trip.transportation = newTransportation; 
     await req.trip.save();
 
+    const createdTransportation = req.trip.transportation;
+
     res.status(201).json({
       success: true,
       message: "Transportation details added successfully",
-      data: newTransportation,
+      data: createdTransportation,
     });
   } catch (error) {
     next(error)

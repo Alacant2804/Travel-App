@@ -138,11 +138,6 @@ export const validateAccommodationInput = (req, res, next) => {
       return res.status(400).json({ success: false, message: "Invalid or missing price" });
     }
   
-    // Validate bookingLink
-    if (!bookingLink || typeof bookingLink !== "string") {
-      return res.status(400).json({ success: false, message: "Invalid or missing booking link" });
-    }
-  
     next();
   };
   

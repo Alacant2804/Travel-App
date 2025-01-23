@@ -49,10 +49,12 @@ router.post(
       req.trip.flights.push(newFlight);
       await req.trip.save();
 
+      const createdFlight = req.trip.flights;
+
       res.status(201).json({
         success: true,
         message: "Flight details added successfully",
-        data: newFlight,
+        data: createdFlight,
       });
     } catch (error) {
       next(error);

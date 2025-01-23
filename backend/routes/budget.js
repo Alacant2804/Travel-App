@@ -32,7 +32,9 @@ router.post("/:tripId/budget", auth, checkAccess, async (req, res, next) => {
     req.trip.budget.push(newBudgetItem);
     await req.trip.save();
 
-    res.status(201).json({ success: true, message: 'Budget details created successfully', data: newBudgetItem });
+    const createdBudgetItem = req.trip.budget[req.trip.budget.length - 1];
+
+    res.status(201).json({ success: true, message: 'Budget details created successfully', data: createdBudgetItem });
   } catch (error) {
     next(error);
   }
@@ -77,7 +79,7 @@ router.delete("/:tripId/budget/:budgetId", auth, checkAccess, async (req, res) =
       return res.status(404).json({ success: false, message: "Budget item not found" });
     }
 
-    budgetItem.remove();
+    budgetItem.deleteOne();
     await req.trip.save();
 
     res.status(200).json({ success: true, message: "Budget item deleted successfully" });

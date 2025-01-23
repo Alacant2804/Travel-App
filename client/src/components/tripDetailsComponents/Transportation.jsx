@@ -30,7 +30,7 @@ export default function TransportationModal({ tripId, transportation, onClose })
           },
         });
   
-        setTransportationDetails(response.data);
+        setTransportationDetails(response.data.data);
       } catch (error) {
         console.error('Error fetching transportation data:', error);
       }
@@ -42,8 +42,8 @@ export default function TransportationModal({ tripId, transportation, onClose })
   const handleSaveTransportation = async (transportationData) => {
     try {
       const token = getToken();
-      const url = `${API_URL}/trips/transportation/${tripId}/transportation/${transportationData._id} || ''}`;
-      const method = transportationData._id ? 'put' : 'post'; // PUT for updates, POST for new flights
+      const url = `${API_URL}/trips/transportation/${tripId}/transportation`;
+      const method = transportationData._id ? 'put' : 'post';
 
       const response = await axios({
         method,
@@ -54,7 +54,8 @@ export default function TransportationModal({ tripId, transportation, onClose })
         }
       });
       
-      setTransportationDetails(response.data);
+      setTransportationDetails(response.data.data[0]);
+      console.log(transportationData);
       setIsEditing(false);
       onClose();
     } catch (error) {
