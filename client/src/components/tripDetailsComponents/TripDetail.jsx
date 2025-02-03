@@ -8,10 +8,10 @@ import MapComponent from "./MapComponent";
 import BudgetModal from "./BudgetModal";
 import Loading from "../../styles/loader/Loading";
 import {
-  getCoordinates,
-  fetchPlacesCoordinates,
   fetchTripDetails,
   fetchTripBySlug,
+  fetchTransportationData,
+  fetchFlightData
 } from "../../services/tripService";
 import { calculateDuration, getToken } from "../../util/util";
 import axios from "axios";
@@ -34,10 +34,11 @@ export default function TripDetail() {
   const [mapCenter, setMapCenter] = useState(null);
   const [loading, setLoading] = useState(false);
   const [showFlightModal, setShowFlightModal] = useState(false);
-  const [currentFlight, setCurrentFlight] = useState(null);
   const [showTransportationModal, setShowTransportationModal] = useState(false);
-  const [currentTransportation, setCurrentTransportation] = useState(null);
   const [showBudgetModal, setShowBudgetModal] = useState(false);
+  const [transportationDetails, setTransportationDetails] = useState(null);
+  const [outboundFlight, setOutboundFlight] = useState({});
+  const [inboundFlight, setInboundFlight] = useState({});
 
   // Fetching specified trip via ID or slug
   useEffect(() => {
@@ -79,6 +80,21 @@ export default function TripDetail() {
       setLoading(false);
     }
   }, [tripId, tripSlug]);
+
+  // Fetch details
+  useEffect(() => {
+    fetchTransportationData(tripId)
+      .then(transportationData => setTransportationDetails(transportationData));
+
+    fetchFlightData(tripId)
+      .then((flightData) => {
+        const outbound = flightData.find(f => f.type === 'outbound') || {};
+        const inbound = flightData.find(f => f.type === 'inbound') || {};
+
+        setOutboundFlight(outbound);
+        setInboundFlight(inbound);
+      })
+  }, [tripId]);
 
   // Add new destination in the trip
   const handleAddDestination = async () => {
@@ -222,13 +238,11 @@ export default function TripDetail() {
     }
   };
 
-  const handleOpenFlightModal = (flight = null) => {
-    setCurrentFlight(flight);
+  const handleOpenFlightModal = () => {
     setShowFlightModal(true);
   };
 
-  const handleOpenTransportationModal = (transportationData = null) => {
-    setCurrentTransportation(transportationData);
+  const handleOpenTransportationModal = () => {
     setShowTransportationModal(true);
   };
 
@@ -322,20 +336,24 @@ export default function TripDetail() {
       {showFlightModal && (
         <FlightModal
           tripId={tripId}
-          flight={currentFlight}
+          outboundFlight={outboundFlight}
+          setOutboundFlight={setOutboundFlight}
+          inboundFlight={inboundFlight}
+          setInboundFlight={setInboundFlight}
           onClose={() => setShowFlightModal(false)}
         />
       )}
       {showTransportationModal && (
         <Transportation
           tripId={tripId}
-          transportation={currentTransportation}
+          transportationDetails={transportationDetails}
+          setTransportationDetails={setTransportationDetails}
           onClose={() => setShowTransportationModal(false)}
         />
       )}
       {showBudgetModal && (
         <BudgetModal
-          tripId={trip._id}
+          tripId={tripId}
           onSave={handleSaveBudget}
           onClose={handleCloseBudgetModal}
         />

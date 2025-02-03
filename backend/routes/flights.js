@@ -32,29 +32,39 @@ router.post(
       departureDate,
       bookingLink,
       price,
-      type,
+      type
     } = req.body;
 
     try {
+      if (req.trip.flights.length >= 2) {
+        return res.status(400).json({
+          success: false,
+          message: "You can only have one outbound and one inbound flight.",
+        });
+      }
+
+      // Create new flight
       const newFlight = {
         departureAirport,
         arrivalAirport,
         departureDate,
         bookingLink,
         price: parseFloat(price),
-        type,
+        type
       };
 
-      // Immutably add new flight
-      req.trip.flights.push(newFlight);
-      await req.trip.save();
+      if (type === 'outbound') {
+        req.trip.flights[0] = newFlight; // Set outbound flight
+      } else if (type === 'inbound') {
+        req.trip.flights[1] = newFlight; // Set inbound flight
+      }
 
-      const createdFlight = req.trip.flights;
+      await req.trip.save();
 
       res.status(201).json({
         success: true,
         message: "Flight details added successfully",
-        data: createdFlight,
+        data: req.trip.flights,
       });
     } catch (error) {
       next(error);
@@ -64,42 +74,51 @@ router.post(
 
 // Update flight details
 router.put(
-  "/:tripId/flights/:type",
+  "/:tripId/flights/:flightType",
   auth,
   checkAccess,
   validateFlightInput,
   async (req, res, next) => {
-    const { type } = req.params;
+    const { flightType } = req.params;
     const {
       departureAirport,
       arrivalAirport,
       departureDate,
       bookingLink,
       price,
+      type
     } = req.body;
 
     try {
-      // Find flight based on type
-      const flight = req.trip.flights.find((flight) => flight.type === type);
-      if (!flight) {
-        return res
-          .status(404)
-          .json({ success: false, message: "Flight detail wasn't found" });
+      // Find the index for outbound or inbound flight
+      const flightIndex = flightType === 'outbound' ? 0 : 1;
+      const existingFlight = req.trip.flights[flightIndex];
+      
+      if (!existingFlight) {
+        return res.status(400).json({
+          success: false,
+          message: `${flightType.charAt(0).toUpperCase() + flightType.slice(1)} flight not found.`,
+        });
       }
 
-      // Update flight details
-      flight.departureAirport = departureAirport;
-      flight.arrivalAirport = arrivalAirport;
-      flight.departureDate = departureDate;
-      flight.bookingLink = bookingLink;
-      flight.price = parseFloat(price);
+      // Update the flight details
+      req.trip.flights[flightIndex] = {
+        ...existingFlight,
+        departureAirport,
+        arrivalAirport,
+        departureDate,
+        bookingLink,
+        price: parseFloat(price),
+        type
+      };
 
       await req.trip.save();
+      console.log(req.trip.flights[flightIndex]);
 
       res.status(200).json({
         success: true,
         message: "Flight details updated successfully",
-        data: flight,
+        data: req.trip.flights[flightIndex],
       });
     } catch (error) {
       next(error);

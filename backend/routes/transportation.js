@@ -78,13 +78,13 @@ router.put("/:tripId/transportation", auth, checkAccess, validateTransportationI
       }
 
       // Update transportation details
-      transportation.pickupPlace = pickupPlace;
-      transportation.dropoffPlace = dropoffPlace;
-      transportation.pickupDate = pickupDate;
-      transportation.dropoffDate = dropoffDate;
-      transportation.duration = duration;
-      transportation.price = parseFloat(price);
-      transportation.bookingLink = bookingLink;
+      transportation[0].pickupPlace = pickupPlace;
+      transportation[0].dropoffPlace = dropoffPlace;
+      transportation[0].pickupDate = pickupDate;
+      transportation[0].dropoffDate = dropoffDate;
+      transportation[0].duration = duration;
+      transportation[0].price = parseFloat(price);
+      transportation[0].bookingLink = bookingLink;
 
       await req.trip.save();
 

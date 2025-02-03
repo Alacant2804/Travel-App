@@ -11,7 +11,7 @@ const FlightSchema = new mongoose.Schema({
   departureDate: Date,
   bookingLink: String,
   price: Number,
-  type: { type: String, required: true }
+  type: String
 });
 
 const TransportationSchema = new mongoose.Schema({

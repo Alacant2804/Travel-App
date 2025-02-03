@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import axios from 'axios';
 import { getToken } from '../../util/util';
 import TransportationForm from './TransportationForm';
@@ -6,38 +6,8 @@ import './Transportation.css';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-export default function TransportationModal({ tripId, transportation, onClose }) {
-  const [transportationDetails, setTransportationDetails] = useState({
-    pickupPlace: '',
-    dropoffPlace: '',
-    pickupDate: '',
-    dropoffDate: '',
-    duration: '',
-    price: 0,
-    bookingLink: ''
-  });
+export default function TransportationModal({ tripId, transportationDetails, setTransportationDetails, onClose }) {
   const [isEditing, setIsEditing] = useState(false);
-
-  useEffect(() => {
-    const fetchTransportationData = async () => {
-      try {
-        const token = getToken();
-        let url = `${API_URL}/trips/transportation/${tripId}/transportation`;
-  
-        const response = await axios.get(url, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-  
-        setTransportationDetails(response.data.data);
-      } catch (error) {
-        console.error('Error fetching transportation data:', error);
-      }
-    };
-  
-    fetchTransportationData();
-  }, [tripId]);
 
   const handleSaveTransportation = async (transportationData) => {
     try {
@@ -55,7 +25,6 @@ export default function TransportationModal({ tripId, transportation, onClose })
       });
       
       setTransportationDetails(response.data.data[0]);
-      console.log(transportationData);
       setIsEditing(false);
       onClose();
     } catch (error) {

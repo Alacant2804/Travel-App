@@ -99,10 +99,43 @@ const fetchTripBySlug = async (tripSlug) => {
   }
 };
 
+// Fetch transportation details
+const fetchTransportationData = async (tripId) => {
+  try {
+    const token = getToken();
+    const response = await axios.get(`${API_URL}/trips/transportation/${tripId}/transportation`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    return response.data.data[0];
+  } catch (error) {
+    console.error('Error fetching transportation data:', error);
+  }
+};
+
+const fetchFlightData = async (tripId) => {
+  try {
+    const token = getToken();
+    const response = await axios.get(`${API_URL}/trips/flights/${tripId}/flights`, { 
+      headers: {
+      'Authorization': `Bearer ${token}`
+    } });
+    return response.data.data;
+  } catch (error) {
+    console.error('Error fetching flight data:', error);
+    toast.error("Couldn't fetch the flight data. Please try again later.", {theme: 'colored'}); 
+  }
+};
+
+
 export {
   getCoordinates,
   fetchPlacesCoordinates,
   fetchAccommodationCoordinates,
   fetchTripDetails,
   fetchTripBySlug,
+  fetchTransportationData,
+  fetchFlightData
 };

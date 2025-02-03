@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify'; 
 import './FlightModal.css';
@@ -7,45 +7,27 @@ import { getToken } from '../../util/util';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-export default function FlightModal({ tripId, onClose }) {
-  const [outboundFlight, setOutboundFlight] = useState({});
-  const [inboundFlight, setInboundFlight] = useState({});
-  const [isEditingOutbound, setIsEditingOutbound] = useState(true);
+export default function FlightModal({ tripId, outboundFlight, setOutboundFlight, setInboundFlight, inboundFlight, onClose }) {
   const [isEditing, setIsEditing] = useState(false);
+  const [type, setType] = useState('outbound');
+  const [selectedType, setSelectedType] = useState("outbound");
 
-  useEffect(() => {
-    const fetchData = async () => {
-      if (tripId) { // Only fetch if tripId is available
-        try {
-          const token = getToken();
-          const response = await axios.get(`${API_URL}/trips/flights/${tripId}/flights`, { 
-            headers: {
-            'Authorization': `Bearer ${token}`
-          } });
-          const flights = response.data;
-  
-          const outbound = flights.find(f => f.type === 'outbound') || {};
-          const inbound = flights.find(f => f.type === 'inbound') || {};
-  
-          setOutboundFlight(outbound);
-          setInboundFlight(inbound);
-        } catch (error) {
-          console.error('Error fetching flight data:', error);
-          toast.error("Couldn't fetch the flight data. Please try again later.", {theme: 'colored'}); 
-        }
-      }
-    };
-  
-    fetchData();
-  }, [tripId]); // Fetch only if tripId changes
+  const selectedFlight = selectedType === "outbound" ? outboundFlight : inboundFlight;
 
   // Save flight details
   const handleSaveFlight = async (flightData) => {
     try {
       const token = getToken();
-      const url = `${API_URL}/trips/flights/${tripId}/flights/${flightData._id || ''}`;
-  
-      const method = flightData._id ? 'put' : 'post';  // PUT for updates, POST for new flights
+      let url = `${API_URL}/trips/flights/${tripId}/flights`;
+      
+      console.log("Flight Data: ", flightData);
+      const method = flightData._id ? 'put' : 'post';
+
+      if (method === 'put') {
+        url = `${API_URL}/trips/flights/${tripId}/flights/${flightData.type}`; // Include the type in the URL for update
+      }
+
+      console.log("URL", url);
       const response = await axios({
         method,
         url,
@@ -54,12 +36,13 @@ export default function FlightModal({ tripId, onClose }) {
           'Authorization': `Bearer ${token}`
         }
       });
-  
+      
+      console.log("Response: ", response.data.data);
       // Update specific flight state based on type
       if (flightData.type === 'outbound') {
-        setOutboundFlight(response.data);
+        setOutboundFlight(response.data.data[0]);
       } else {
-        setInboundFlight(response.data);
+        setInboundFlight(response.data.data[1]);
       }
   
       onClose(); // Close the modal after successful save
@@ -73,50 +56,60 @@ export default function FlightModal({ tripId, onClose }) {
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <h2>Flight Details</h2>
-        <div className="modal-tabs">
-          <button
-            className={`tab-btn ${isEditingOutbound ? 'active' : ''}`}
-            onClick={() => setIsEditingOutbound(true)}
-          >
-            Outbound
-          </button>
-          <button
-            className={`tab-btn ${!isEditingOutbound ? 'active' : ''}`}
-            onClick={() => setIsEditingOutbound(false)}
-          >
-            Inbound
-          </button>
-        </div>
         {isEditing ? (
           <FlightForm
-            flight={isEditingOutbound ? outboundFlight : inboundFlight}
+            flight={type === 'outbound' ? outboundFlight : inboundFlight}
+            type={type}
+            setType={setType}
             onSave={handleSaveFlight}
             onClose={() => setIsEditing(false)}
           />
         ) : (
           <div>
-            <h3>{isEditingOutbound ? 'Outbound Flight' : 'Inbound Flight'}</h3>
+            <h3>{selectedType === "outbound" ? "Outbound Flight" : "Inbound Flight"}</h3>
+            <div className="modal-tabs">
+              <button 
+                type="button"
+                className={`tab-btn ${selectedType === "outbound" ? "active" : ""}`} 
+                onClick={() => setSelectedType("outbound")}
+              >
+                Outbound
+              </button>
+              <button 
+                type="button"
+                className={`tab-btn ${selectedType === "inbound" ? "active" : ""}`} 
+                onClick={() => setSelectedType("inbound")}
+              >
+                Inbound
+              </button>  
+            </div>
             <table className="flight-info-table">
               <tbody>
                 <tr>
                   <td><strong>Departure Airport:</strong></td>
-                  <td>{isEditingOutbound ? outboundFlight.departureAirport : inboundFlight.departureAirport}</td>
+                  <td>{selectedFlight?.departureAirport || "N/A"}</td>
                 </tr>
                 <tr>
                   <td><strong>Arrival Airport:</strong></td>
-                  <td>{isEditingOutbound ? outboundFlight.arrivalAirport : inboundFlight.arrivalAirport}</td>
+                  <td>{selectedFlight?.arrivalAirport || "N/A"}</td>
                 </tr>
                 <tr>
                   <td><strong>Departure Date:</strong></td>
-                  <td>{isEditingOutbound ? outboundFlight.departureDate?.split('T')[0] : inboundFlight.departureDate?.split('T')[0]}</td>
+                  <td>{selectedFlight?.departureDate?.split("T")[0] || "N/A"}</td>
                 </tr>
                 <tr>
                   <td><strong>Price:</strong></td>
-                  <td>${(isEditingOutbound ? outboundFlight.price : inboundFlight.price)?.toFixed(2)}</td>
+                  <td>${selectedFlight?.price?.toFixed(2) || "0.00"}</td>
                 </tr>
                 <tr>
                   <td><strong>Booking Link:</strong></td>
-                  <td><a href={isEditingOutbound ? outboundFlight.bookingLink : inboundFlight.bookingLink} target="_blank" rel="noopener noreferrer">{isEditingOutbound ? outboundFlight.bookingLink : inboundFlight.bookingLink}</a></td>
+                  <td>
+                    {selectedFlight?.bookingLink ? (
+                      <a href={selectedFlight.bookingLink} target="_blank" rel="noopener noreferrer">
+                        {selectedFlight.bookingLink}
+                      </a>
+                    ) : "N/A"}
+                  </td>
                 </tr>
               </tbody>
             </table>

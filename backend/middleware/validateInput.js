@@ -67,7 +67,7 @@ export const validateAccommodationInput = (req, res, next) => {
       departureDate,
       bookingLink,
       price,
-      type,
+      type
     } = req.body;
   
     // Validate departureAirport
@@ -86,13 +86,18 @@ export const validateAccommodationInput = (req, res, next) => {
     }
   
     // Validate bookingLink
-    if (!bookingLink || typeof bookingLink !== "string") {
-      return res.status(400).json({ success: false, message: "Invalid or missing booking link" });
+    if (bookingLink && typeof bookingLink !== "string") {
+      return res.status(400).json({ success: false, message: "Invalid booking link" });
     }
   
     // Validate price
     if (price == null || isNaN(price) || price < 0) {
       return res.status(400).json({ success: false, message: "Invalid or missing price" });
+    }
+
+    // Validate type
+    if (!type) {
+      return res.status(400).json({ success: false, message: "Invalid or missing type" });
     }
   
     next();
@@ -136,6 +141,10 @@ export const validateAccommodationInput = (req, res, next) => {
     // Validate price
     if (price == null || isNaN(price) || price < 0) {
       return res.status(400).json({ success: false, message: "Invalid or missing price" });
+    }
+
+    if (bookingLink && typeof bookingLink !== "string") {
+      return res.status(400).json({ success: false, message: "Invalid booking link" });
     }
   
     next();

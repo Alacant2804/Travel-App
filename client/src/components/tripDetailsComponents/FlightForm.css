@@ -1,0 +1,10 @@
+.modal-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-scroll {
+    max-height: 400px;
+    overflow: auto;
+    padding: 100px;
+}   
