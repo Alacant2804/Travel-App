@@ -4,6 +4,7 @@ import { toast } from 'react-toastify';
 import './FlightModal.css';
 import FlightForm from './FlightForm';
 import { getToken } from '../../util/util';
+import { fetchFlightData } from '../../services/tripService';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -19,15 +20,12 @@ export default function FlightModal({ tripId, outboundFlight, setOutboundFlight,
     try {
       const token = getToken();
       let url = `${API_URL}/trips/flights/${tripId}/flights`;
-      
-      console.log("Flight Data: ", flightData);
       const method = flightData._id ? 'put' : 'post';
 
       if (method === 'put') {
         url = `${API_URL}/trips/flights/${tripId}/flights/${flightData.type}`; // Include the type in the URL for update
       }
 
-      console.log("URL", url);
       const response = await axios({
         method,
         url,
@@ -39,11 +37,14 @@ export default function FlightModal({ tripId, outboundFlight, setOutboundFlight,
       
       console.log("Response: ", response.data.data);
       // Update specific flight state based on type
-      if (flightData.type === 'outbound') {
-        setOutboundFlight(response.data.data[0]);
-      } else {
-        setInboundFlight(response.data.data[1]);
-      }
+      fetchFlightData(tripId)
+      .then((updatedFlightData) => {
+        const outbound = updatedFlightData.find(f => f.type === 'outbound') || {};
+        const inbound = updatedFlightData.find(f => f.type === 'inbound') || {};
+
+        setOutboundFlight(outbound);
+        setInboundFlight(inbound);
+      });
   
       onClose(); // Close the modal after successful save
     } catch (error) {

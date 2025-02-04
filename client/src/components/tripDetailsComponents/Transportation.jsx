@@ -1,29 +1,34 @@
-import { useState } from 'react';
-import axios from 'axios';
-import { getToken } from '../../util/util';
-import TransportationForm from './TransportationForm';
-import './Transportation.css';
+import { useState } from "react";
+import axios from "axios";
+import { getToken, calculateDuration } from "../../util/util";
+import TransportationForm from "./TransportationForm";
+import "./Transportation.css";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-export default function TransportationModal({ tripId, transportationDetails, setTransportationDetails, onClose }) {
+export default function TransportationModal({
+  tripId,
+  transportationDetails,
+  setTransportationDetails,
+  onClose,
+}) {
   const [isEditing, setIsEditing] = useState(false);
 
   const handleSaveTransportation = async (transportationData) => {
     try {
       const token = getToken();
       const url = `${API_URL}/trips/transportation/${tripId}/transportation`;
-      const method = transportationData._id ? 'put' : 'post';
+      const method = transportationData._id ? "put" : "post";
 
       const response = await axios({
         method,
         url,
         data: transportationData,
         headers: {
-          'Authorization': `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
-      
+
       setTransportationDetails(response.data.data[0]);
       setIsEditing(false);
       onClose();
@@ -47,38 +52,89 @@ export default function TransportationModal({ tripId, transportationDetails, set
             <table className="transportation-info-table">
               <tbody>
                 <tr>
-                  <td><strong>Pick-Up Place:</strong></td>
-                  <td>{transportationDetails.pickupPlace}</td>
+                  <td>
+                    <strong>Pick-Up Place:</strong>
+                  </td>
+                  <td>{transportationDetails?.pickupPlace || "N/A"}</td>
                 </tr>
                 <tr>
-                  <td><strong>Drop-Off Place:</strong></td>
-                  <td>{transportationDetails.dropoffPlace}</td>
+                  <td>
+                    <strong>Drop-Off Place:</strong>
+                  </td>
+                  <td>{transportationDetails?.dropoffPlace || "N/A"}</td>
                 </tr>
                 <tr>
-                  <td><strong>Pick-Up Date:</strong></td>
-                  <td>{transportationDetails.pickupDate?.split('T')[0]}</td>
+                  <td>
+                    <strong>Pick-Up Date:</strong>
+                  </td>
+                  <td>
+                    {transportationDetails?.pickupDate?.split("T")[0] || "N/A"}
+                  </td>
                 </tr>
                 <tr>
-                  <td><strong>Drop-Off Date:</strong></td>
-                  <td>{transportationDetails.dropoffDate?.split('T')[0]}</td>
+                  <td>
+                    <strong>Drop-Off Date:</strong>
+                  </td>
+                  <td>
+                    {transportationDetails?.dropoffDate?.split("T")[0] || "N/A"}
+                  </td>
+                </tr>
+
+                <tr>
+                  <td>
+                    <strong>Price:</strong>
+                  </td>
+                  <td>${transportationDetails?.price?.toFixed(2) || "N/A"}</td>
                 </tr>
                 <tr>
-                  <td><strong>Duration:</strong></td>
-                  <td>{transportationDetails.duration === 1 ? transportationDetails.duration + " day" : transportationDetails.duration + " days"} </td>
+                  <td>
+                    <strong>Booking Link:</strong>
+                  </td>
+                  <td>
+                    {transportationDetails?.bookingLink ? (
+                      <a
+                        href={transportationDetails.bookingLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {transportationDetails.bookingLink}
+                      </a>
+                    ) : (
+                      "N/A"
+                    )}
+                  </td>
                 </tr>
                 <tr>
-                  <td><strong>Price:</strong></td>
-                  <td>${transportationDetails.price?.toFixed(2)}</td>
-                </tr>
-                <tr>
-                  <td><strong>Booking Link:</strong></td>
-                  <td><a href={transportationDetails.bookingLink} target="_blank" rel="noopener noreferrer">{transportationDetails.bookingLink}</a></td>
+                  <td>
+                    <strong>Duration:</strong>
+                  </td>
+                  <td>
+                    {transportationDetails?.pickupDate &&
+                    transportationDetails?.dropoffDate
+                      ? (() => {
+                          const duration = calculateDuration(
+                            transportationDetails.pickupDate,
+                            transportationDetails.dropoffDate
+                          );
+                          return duration > 0
+                            ? `${duration} ${duration === 1 ? "day" : "days"}`
+                            : "N/A";
+                        })()
+                      : "N/A"}
+                  </td>
                 </tr>
               </tbody>
             </table>
             <div className="modal-actions">
-              <button className="modal-btn edit-btn" onClick={() => setIsEditing(true)}>Edit</button>
-              <button className="modal-btn close-btn" onClick={onClose}>Close</button>
+              <button
+                className="modal-btn edit-btn"
+                onClick={() => setIsEditing(true)}
+              >
+                Edit
+              </button>
+              <button className="modal-btn close-btn" onClick={onClose}>
+                Close
+              </button>
             </div>
           </div>
         )}

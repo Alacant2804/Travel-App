@@ -86,7 +86,7 @@ export default function TripDetail() {
     fetchTransportationData(tripId)
       .then(transportationData => setTransportationDetails(transportationData));
 
-    fetchFlightData(tripId)
+      fetchFlightData(tripId)
       .then((flightData) => {
         const outbound = flightData.find(f => f.type === 'outbound') || {};
         const inbound = flightData.find(f => f.type === 'inbound') || {};

@@ -1,24 +1,24 @@
-import { useState, useEffect } from 'react';
-import './TransportationForm.css';
+import { useState, useEffect } from "react";
+import "./TransportationForm.css";
 
 export default function TransportationForm({ details, onSave, onClose }) {
-  const [pickupPlace, setPickupPlace] = useState('');
-  const [dropoffPlace, setDropoffPlace] = useState('');
-  const [pickupDate, setPickupDate] = useState('');
-  const [dropoffDate, setDropoffDate] = useState('');
-  const [duration, setDuration] = useState('');
+  const [pickupPlace, setPickupPlace] = useState("");
+  const [dropoffPlace, setDropoffPlace] = useState("");
+  const [pickupDate, setPickupDate] = useState("");
+  const [dropoffDate, setDropoffDate] = useState("");
+  const [duration, setDuration] = useState("");
   const [price, setPrice] = useState(0);
-  const [bookingLink, setBookingLink] = useState('');
+  const [bookingLink, setBookingLink] = useState("");
 
   useEffect(() => {
     if (details) {
-      setPickupPlace(details.pickupPlace || '');
-      setDropoffPlace(details.dropoffPlace || '');
-      setPickupDate(details.pickupDate?.split('T')[0] || '');
-      setDropoffDate(details.dropoffDate?.split('T')[0] || '');
-      setDuration(details.duration || '');
+      setPickupPlace(details.pickupPlace || "");
+      setDropoffPlace(details.dropoffPlace || "");
+      setPickupDate(details.pickupDate?.split("T")[0] || "");
+      setDropoffDate(details.dropoffDate?.split("T")[0] || "");
+      setDuration(details.duration || "");
       setPrice(details.price || 0);
-      setBookingLink(details.bookingLink || '');
+      setBookingLink(details.bookingLink || "");
     }
   }, [details]);
 
@@ -32,7 +32,7 @@ export default function TransportationForm({ details, onSave, onClose }) {
       duration,
       price: parseFloat(price),
       bookingLink,
-      _id: details?._id
+      _id: details?._id,
     });
   };
 
@@ -73,15 +73,6 @@ export default function TransportationForm({ details, onSave, onClose }) {
           onChange={(e) => setDropoffDate(e.target.value)}
           className="form-input"
         />
-        <label htmlFor="duration">Duration (days)</label>
-        <input
-          type="number"
-          id="duration"
-          placeholder="Duration"
-          value={duration}
-          onChange={(e) => setDuration(e.target.value)}
-          className="form-input"
-        />
         <label htmlFor="price">Price</label>
         <input
           type="number"
@@ -104,8 +95,16 @@ export default function TransportationForm({ details, onSave, onClose }) {
         />
       </div>
       <div className="modal-actions">
-        <button type="button" className="modal-btn cancel-btn" onClick={onClose}>Cancel</button>
-        <button type="submit" className="modal-btn submit-btn">Save</button>
+        <button
+          type="button"
+          className="modal-btn cancel-btn"
+          onClick={onClose}
+        >
+          Cancel
+        </button>
+        <button type="submit" className="modal-btn submit-btn">
+          Save
+        </button>
       </div>
     </form>
   );
