@@ -11,7 +11,7 @@ import {
   fetchTripDetails,
   fetchTripBySlug,
   fetchTransportationData,
-  fetchFlightData
+  fetchFlightData,
 } from "../../services/tripService";
 import { calculateDuration, getToken } from "../../util/util";
 import axios from "axios";
@@ -83,17 +83,17 @@ export default function TripDetail() {
 
   // Fetch details
   useEffect(() => {
-    fetchTransportationData(tripId)
-      .then(transportationData => setTransportationDetails(transportationData));
+    fetchTransportationData(tripId).then((transportationData) =>
+      setTransportationDetails(transportationData)
+    );
 
-      fetchFlightData(tripId)
-      .then((flightData) => {
-        const outbound = flightData.find(f => f.type === 'outbound') || {};
-        const inbound = flightData.find(f => f.type === 'inbound') || {};
+    fetchFlightData(tripId).then((flightData) => {
+      const outbound = flightData.find((f) => f.type === "outbound") || {};
+      const inbound = flightData.find((f) => f.type === "inbound") || {};
 
-        setOutboundFlight(outbound);
-        setInboundFlight(inbound);
-      })
+      setOutboundFlight(outbound);
+      setInboundFlight(inbound);
+    });
   }, [tripId]);
 
   // Add new destination in the trip
@@ -254,10 +254,6 @@ export default function TripDetail() {
     setShowBudgetModal(false);
   };
 
-  const handleSaveBudget = async () => {
-    fetchTripDetails();
-  };
-
   const places = useMemo(() => {
     return destinations.reduce((acc, destination) => {
       if (destination.places) {
@@ -352,11 +348,7 @@ export default function TripDetail() {
         />
       )}
       {showBudgetModal && (
-        <BudgetModal
-          tripId={tripId}
-          onSave={handleSaveBudget}
-          onClose={handleCloseBudgetModal}
-        />
+        <BudgetModal tripId={tripId} onClose={handleCloseBudgetModal} />
       )}
     </div>
   );

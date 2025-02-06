@@ -74,7 +74,6 @@ const fetchTripDetails = async (tripId) => {
         Authorization: `Bearer ${token}`,
       },
     });
-    console.log("Fetching trip details: ", response.data.data);
     return response.data.data; // return trip data
   } catch (error) {
     console.error("Error fetching trip details:", error);
@@ -143,24 +142,26 @@ const fetchFlightData = async (tripId) => {
 const fetchBudgetData = async (tripId) => {
   try {
     const token = getToken();
-    const response = await axios.get(`${API_URL}/trips/budget/${tripId}`, {
+    const response = await axios.get(`${API_URL}/trips/destination/${tripId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     });
 
+    // Budget array of objects {category, ammount}
     const trip = response.data.data;
-    console.log("Budget get response: ", trip);
 
-    // Calculate totals based on trip data
+    // Calculate flight total
     const flightsTotal = trip.flights.reduce(
       (sum, flight) => sum + flight.price,
       0
     );
+    // Calculate transportation total
     const transportationTotal = trip.transportation.reduce(
       (sum, transport) => sum + transport.price,
       0
     );
+    // Calculate places to visit total
     const placesTotal = trip.destinations.reduce((sum, destination) => {
       return (
         sum +
@@ -170,6 +171,7 @@ const fetchBudgetData = async (tripId) => {
         )
       );
     }, 0);
+    // Calculate accommodation total
     let accommodationTotal = trip.destinations.reduce((sum, destination) => {
       if (destination.accommodation[0]) {
         return sum + destination.accommodation[0]?.price;
@@ -183,25 +185,21 @@ const fetchBudgetData = async (tripId) => {
       {
         category: "Flights",
         amount: flightsTotal,
-        type: "flights",
         _id: "default-flights",
       },
       {
         category: "Transportation",
         amount: transportationTotal,
-        type: "transportation",
         _id: "default-transportation",
       },
       {
         category: "Places to Visit",
         amount: placesTotal,
-        type: "places",
         _id: "default-places",
       },
       {
         category: "Accommodation",
         amount: accommodationTotal,
-        type: "accommodation",
         _id: "default-accommodation",
       },
     ];
@@ -217,7 +215,7 @@ const fetchBudgetData = async (tripId) => {
     return [...defaultItems, ...additionalItems];
   } catch (error) {
     console.error("Error fetching budget data:", error);
-    throw error; // Re-throw the error so it can be handled
+    return [];
   }
 };
 

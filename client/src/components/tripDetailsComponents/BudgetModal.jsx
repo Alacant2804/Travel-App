@@ -8,7 +8,7 @@ import { fetchBudgetData } from "../../services/tripService";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-export default function BudgetModal({ tripId, onSave, onClose }) {
+export default function BudgetModal({ tripId, onClose }) {
   const [budgetItems, setBudgetItems] = useState([]);
   const [editItemId, setEditItemId] = useState(null);
   const [editedItem, setEditedItem] = useState({
@@ -18,24 +18,18 @@ export default function BudgetModal({ tripId, onSave, onClose }) {
   });
   const [newItem, setNewItem] = useState({ category: "", amount: "" });
 
+  // Fetch budget data
   useEffect(() => {
-    fetchBudgetData();
+    if (!tripId) return;
+    fetchBudgetData(tripId)
+      .then((trip) => setBudgetItems(trip))
+      .catch(() =>
+        toast.error("Failed to fetch budget items:", { theme: "colored" })
+      );
   }, [tripId]);
 
+  // Handle editing item
   const handleEdit = (item) => {
-    if (
-      [
-        "default-flights",
-        "default-transportation",
-        "default-places",
-        "default-accommodation",
-      ].includes(item._id)
-    ) {
-      toast.error(
-        "This is a default category. Please edit it in the according place."
-      );
-      return;
-    }
     setEditItemId(item._id);
     setEditedItem({
       category: item.category,
@@ -44,6 +38,7 @@ export default function BudgetModal({ tripId, onSave, onClose }) {
     });
   };
 
+  // Save updated item
   const handleSaveEdit = async () => {
     try {
       const token = getToken();
@@ -52,64 +47,39 @@ export default function BudgetModal({ tripId, onSave, onClose }) {
         amount: parseFloat(editedItem.amount),
       };
 
-      if (
-        updatedItem._id &&
-        ![
-          "default-flights",
-          "default-transportation",
-          "default-places",
-          "default-accommodation",
-        ].includes(updatedItem._id)
-      ) {
-        await axios.put(
-          `${API_URL}/trips/budget/${tripId}/${updatedItem._id}`,
-          updatedItem,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-      }
-
-      // Refetch the budget items to synchronize state
-      const responseBudget = await axios.get(
-        `${API_URL}/trips/budget/${tripId}`,
+      await axios.put(
+        `${API_URL}/trips/budget/${tripId}/${updatedItem._id}`,
+        updatedItem,
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
       );
-      const additionalItems = responseBudget.data.map((item) => ({
-        ...item,
-        amount: parseFloat(item.amount),
-      }));
-      setBudgetItems((prevItems) => [
-        ...prevItems.filter((item) =>
-          [
-            "default-flights",
-            "default-transportation",
-            "default-places",
-            "default-accommodation",
-          ].includes(item._id)
-        ),
-        ...additionalItems,
-      ]);
 
+      // Update local state
+      setBudgetItems((prevItems) =>
+        prevItems.map((item) =>
+          item._id === updatedItem._id ? updatedItem : item
+        )
+      );
+
+      // Reset the form
       setEditItemId(null);
       setEditedItem({ category: "", amount: "", _id: null });
-      onSave();
     } catch (error) {
       console.error("Error saving budget item:", error);
+      toast.error("Couldn't update budget item", { theme: "colored" });
     }
   };
 
+  // Save new item
   const handleSaveNew = async () => {
     try {
       const token = getToken();
       const newBudgetItem = { ...newItem, amount: parseFloat(newItem.amount) };
 
+      // Check if category and amount are provided
       if (newBudgetItem.category && newBudgetItem.amount) {
         await axios.post(`${API_URL}/trips/budget/${tripId}`, newBudgetItem, {
           headers: {
@@ -117,54 +87,20 @@ export default function BudgetModal({ tripId, onSave, onClose }) {
           },
         });
 
-        // Refetch the budget items to synchronize state
-        const responseBudget = await axios.get(
-          `${API_URL}/trips/budget/${tripId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        const additionalItems = responseBudget.data.map((item) => ({
-          ...item,
-          amount: parseFloat(item.amount),
-        }));
+        // Update local state with new budget item
+        setBudgetItems((prevItems) => [...prevItems, newBudgetItem]);
 
-        setBudgetItems((prevItems) => [
-          ...prevItems.filter((item) =>
-            [
-              "default-flights",
-              "default-transportation",
-              "default-places",
-              "default-accommodation",
-            ].includes(item._id)
-          ),
-          ...additionalItems,
-        ]);
-
+        // Reset the form
         setNewItem({ category: "", amount: "" });
-        onSave();
       }
     } catch (error) {
       console.error("Error saving budget item:", error);
+      toast.error("Couldn't save new budget item", { theme: "colored" });
     }
   };
 
+  // Delete budget item
   const handleDelete = async (id) => {
-    if (
-      !id ||
-      [
-        "default-flights",
-        "default-transportation",
-        "default-places",
-        "default-accommodation",
-      ].includes(id)
-    ) {
-      toast.error("Cannot delete this item.");
-      return;
-    }
-
     try {
       await axios.delete(`${API_URL}/trips/budget/${tripId}/${id}`, {
         headers: {
@@ -172,32 +108,12 @@ export default function BudgetModal({ tripId, onSave, onClose }) {
         },
       });
 
-      // Refetch the budget items to synchronize state
-      const responseBudget = await axios.get(
-        `${API_URL}/trips/budget/${tripId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
+      setBudgetItems((prevItems) =>
+        prevItems.filter((item) => item._id !== id)
       );
-      const additionalItems = responseBudget.data.map((item) => ({
-        ...item,
-        amount: parseFloat(item.amount),
-      }));
-      setBudgetItems((prevItems) => [
-        ...prevItems.filter((item) =>
-          [
-            "default-flights",
-            "default-transportation",
-            "default-places",
-            "default-accommodation",
-          ].includes(item._id)
-        ),
-        ...additionalItems,
-      ]);
     } catch (error) {
       console.error("Error deleting budget item:", error);
+      toast.error("Couldn't delete budget item", { theme: "colored" });
     }
   };
 
