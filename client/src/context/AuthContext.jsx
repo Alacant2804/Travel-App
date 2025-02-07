@@ -17,13 +17,10 @@ export const AuthProvider = ({ children }) => {
 
   // Login function
   const login = async (email, password) => {
-    console.log("Login function called");
     setLoading(true);
     setError(null);
     try {
-      console.log("Try block started");
       const response = await authService.login({ email, password });
-      console.log("Token:", response.token);
       localStorage.setItem("token", response.token);
       setUser(response.user);
       toast.success("Login successful!", {

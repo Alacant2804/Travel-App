@@ -35,10 +35,11 @@ router.post("/:tripId", auth, checkAccess, async (req, res, next) => {
   try {
     const newBudgetItem = { category, amount: parseFloat(amount) };
 
-    // Immutably add new budget item
+    // Add new budget item
     req.trip.budget.push(newBudgetItem);
     await req.trip.save();
 
+    // Get new budget item from database with _id
     const createdBudgetItem = req.trip.budget[req.trip.budget.length - 1];
 
     res.status(201).json({

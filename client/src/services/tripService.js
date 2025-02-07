@@ -206,7 +206,7 @@ const fetchBudgetData = async (tripId) => {
 
     // Map additional items to float amounts
     const additionalItems =
-      trip.additionalItems?.map((item) => ({
+      trip.budget?.map((item) => ({
         ...item,
         amount: parseFloat(item.amount),
       })) || [];

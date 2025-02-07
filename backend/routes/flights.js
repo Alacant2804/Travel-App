@@ -7,13 +7,11 @@ const router = express.Router();
 
 router.get("/:tripId/flights", auth, checkAccess, async (req, res, next) => {
   try {
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "Flight details retrieved successfully",
-        data: req.trip.flights,
-      });
+    res.status(200).json({
+      success: true,
+      message: "Flight details retrieved successfully",
+      data: req.trip.flights,
+    });
   } catch (error) {
     next(error);
   }
@@ -32,7 +30,7 @@ router.post(
       departureDate,
       bookingLink,
       price,
-      type
+      type,
     } = req.body;
 
     try {
@@ -50,12 +48,12 @@ router.post(
         departureDate,
         bookingLink,
         price: parseFloat(price),
-        type
+        type,
       };
 
-      if (type === 'outbound') {
+      if (type === "outbound") {
         req.trip.flights[0] = newFlight; // Set outbound flight
-      } else if (type === 'inbound') {
+      } else if (type === "inbound") {
         req.trip.flights[1] = newFlight; // Set inbound flight
       }
 
@@ -86,18 +84,19 @@ router.put(
       departureDate,
       bookingLink,
       price,
-      type
+      type,
     } = req.body;
 
     try {
       // Find the index for outbound or inbound flight
-      const flightIndex = flightType === 'outbound' ? 0 : 1;
-      const existingFlight = req.trip.flights[flightIndex];
-      
-      if (!existingFlight) {
+      const flightIndex = flightType === "outbound" ? 0 : 1;
+
+      if (!req.trip.flights[flightIndex]) {
         return res.status(400).json({
           success: false,
-          message: `${flightType.charAt(0).toUpperCase() + flightType.slice(1)} flight not found.`,
+          message: `${
+            flightType.charAt(0).toUpperCase() + flightType.slice(1)
+          } flight not found.`,
         });
       }
 
@@ -109,11 +108,10 @@ router.put(
         departureDate,
         bookingLink,
         price: parseFloat(price),
-        type
+        type,
       };
 
       await req.trip.save();
-      console.log(req.trip.flights[flightIndex]);
 
       res.status(200).json({
         success: true,

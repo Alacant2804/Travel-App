@@ -46,10 +46,13 @@ router.post(
         accommodation,
       };
 
+      // Add new destination to database
       req.trip.destinations.push(newDestination);
       await req.trip.save();
 
-      const createdTrip = req.trip.destinations[req.trip.destinations.length - 1];
+      // Get new destination from database with _id
+      const createdTrip =
+        req.trip.destinations[req.trip.destinations.length - 1];
 
       res.status(201).json({
         success: true,

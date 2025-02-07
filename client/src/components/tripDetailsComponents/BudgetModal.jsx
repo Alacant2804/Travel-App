@@ -67,6 +67,7 @@ export default function BudgetModal({ tripId, onClose }) {
       // Reset the form
       setEditItemId(null);
       setEditedItem({ category: "", amount: "", _id: null });
+      toast.success("Budget updated", { theme: "colored" });
     } catch (error) {
       console.error("Error saving budget item:", error);
       toast.error("Couldn't update budget item", { theme: "colored" });
@@ -81,17 +82,22 @@ export default function BudgetModal({ tripId, onClose }) {
 
       // Check if category and amount are provided
       if (newBudgetItem.category && newBudgetItem.amount) {
-        await axios.post(`${API_URL}/trips/budget/${tripId}`, newBudgetItem, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const response = await axios.post(
+          `${API_URL}/trips/budget/${tripId}`,
+          newBudgetItem,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
         // Update local state with new budget item
-        setBudgetItems((prevItems) => [...prevItems, newBudgetItem]);
+        setBudgetItems((prevItems) => [...prevItems, response.data.data]);
 
         // Reset the form
         setNewItem({ category: "", amount: "" });
+        toast.success("Budget updated", { theme: "colored" });
       }
     } catch (error) {
       console.error("Error saving budget item:", error);
@@ -102,6 +108,7 @@ export default function BudgetModal({ tripId, onClose }) {
   // Delete budget item
   const handleDelete = async (id) => {
     try {
+      const token = getToken();
       await axios.delete(`${API_URL}/trips/budget/${tripId}/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -111,6 +118,7 @@ export default function BudgetModal({ tripId, onClose }) {
       setBudgetItems((prevItems) =>
         prevItems.filter((item) => item._id !== id)
       );
+      toast.success("Budget item deleted", { theme: "colored" });
     } catch (error) {
       console.error("Error deleting budget item:", error);
       toast.error("Couldn't delete budget item", { theme: "colored" });
