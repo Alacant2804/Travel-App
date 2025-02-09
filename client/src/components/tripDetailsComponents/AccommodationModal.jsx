@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
 import { calculateDuration, getToken } from "../../util/util";
-import Loading from "../../styles/loader/Loading";
 import axios from "axios";
 import "./AccommodationModal.css";
-
+import {
+  getCoordinates,
+  fetchAccommodationData,
+} from "../../services/tripService";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -13,8 +15,8 @@ export default function AccommodationModal({
   accommodation,
   onSave,
   onClose,
+  setLoading,
 }) {
-  const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [address, setAddress] = useState("");
   const [startDate, setStartDate] = useState("");
@@ -24,40 +26,30 @@ export default function AccommodationModal({
   const [price, setPrice] = useState(0);
 
   useEffect(() => {
-    const fetchAccommodation = async () => {
-      try {
-        const token = getToken();
-        const response = await axios.get(
-          `${API_URL}/trips/accommodation/${tripId}/destinations/${destinationId}/accommodation`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-
-        const fetchedAccommodation = response.data;
-
-        console.log("Fetch accommodation data: ", fetchAccommodation);
-
+    setLoading(true);
+    fetchAccommodationData(tripId, destinationId)
+      .then((fetchedAccommodation) => {
         if (fetchedAccommodation) {
           setAddress(fetchedAccommodation[0]?.address || "");
-          setStartDate(fetchedAccommodation[0]?.startDate ? fetchedAccommodation[0].startDate.split("T")[0] : "");
-          setEndDate(fetchedAccommodation[0]?.endDate ? fetchedAccommodation[0].endDate.split("T")[0] : "");
+          setStartDate(
+            fetchedAccommodation[0]?.startDate
+              ? fetchedAccommodation[0].startDate.split("T")[0]
+              : ""
+          );
+          setEndDate(
+            fetchedAccommodation[0]?.endDate
+              ? fetchedAccommodation[0].endDate.split("T")[0]
+              : ""
+          );
           setBookingLink(fetchedAccommodation[0]?.bookingLink || "");
           setPrice(parseFloat(fetchedAccommodation[0]?.price) || 0);
         } else {
           console.log("No accommodation data received.");
         }
-      } catch (error) {
-        console.error("Error fetching accommodation:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchAccommodation();
-  }, [destinationId, accommodation]);
+      })
+      .catch((error) => console.error("Error fetching accommodation", error))
+      .finally(() => setLoading(false));
+  }, [tripId, destinationId]);
 
   useEffect(() => {
     if (startDate && endDate) {
@@ -65,39 +57,13 @@ export default function AccommodationModal({
     }
   }, [startDate, endDate]);
 
-  const fetchCoordinates = async (address) => {
-    try {
-      const response = await axios.get(
-        "https://nominatim.openstreetmap.org/search",
-        {
-          params: {
-            q: address,
-            format: "json",
-            limit: 1,
-          },
-        }
-      );
-
-      if (response.data.length > 0) {
-        const { lat, lon } = response.data[0];
-        return { lat: parseFloat(lat), lon: parseFloat(lon) };
-      } else {
-        console.error("No coordinates found for the provided address.");
-        return null;
-      }
-    } catch (error) {
-      console.error("Error fetching coordinates:", error);
-      return null;
-    }
-  };
-
   const handleSave = async () => {
     if (!tripId || !destinationId) {
       console.error("Missing tripId or destinationId.");
       return;
     }
-    
-    const coordinates = await fetchCoordinates(address);
+
+    const coordinates = await getCoordinates(address);
     const accommodationData = {
       address,
       startDate,
@@ -110,40 +76,29 @@ export default function AccommodationModal({
 
     try {
       const token = getToken();
-      let response;
-      if (accommodation?._id) {
-        // Use PUT for updating existing accommodation
-        response = await axios.put(
-          `${API_URL}/trips/accommodation/${tripId}/destinations/${destinationId}/accommodation/${accommodation._id}`,
-          accommodationData,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-      } else {
-        // Use POST for creating new accommodation
-        response = await axios.post(
-          `${API_URL}/trips/accommodation/${tripId}/destinations/${destinationId}/accommodation`,
-          accommodationData,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+      let url = `${API_URL}/trips/accommodation/${tripId}/destinations/${destinationId}`;
+      const method = accommodation._id ? "put" : "post";
+
+      if (method === "put") {
+        url = `${API_URL}/trips/accommodation/${tripId}/destinations/${destinationId}/${accommodation._id}`;
       }
-      onSave(response.data);
+
+      const response = await axios({
+        method,
+        url,
+        data: accommodationData,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      console.log("Accommodation Response: ", response.data.data);
+      onSave(response.data.data);
       setIsEditing(false);
     } catch (error) {
       console.error("Error saving accommodation:", error);
     }
   };
-
-  if (loading) {
-    return <Loading />;
-  }
 
   return (
     <div className="modal-overlay" onClick={onClose}>

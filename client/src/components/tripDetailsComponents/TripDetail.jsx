@@ -299,11 +299,11 @@ export default function TripDetail() {
           <strong>Country:</strong> {trip.country}
         </p>
         <p>
-          <strong>Start Date:</strong>
+          <strong>Start Date: </strong>
           {trip.destinations[0].startDate.split("T")[0]}
         </p>
         <p>
-          <strong>End Date:</strong>
+          <strong>End Date: </strong>
           {trip.destinations[0].endDate.split("T")[0]}
         </p>
         <p>

@@ -219,6 +219,25 @@ const fetchBudgetData = async (tripId) => {
   }
 };
 
+const fetchAccommodationData = async (tripId, destinationId) => {
+  try {
+    const token = getToken();
+    const response = await axios.get(
+      `${API_URL}/trips/accommodation/${tripId}/destinations/${destinationId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    console.log("Trip Service response: ", response.data.data);
+
+    return response.data.data;
+  } catch (error) {
+    console.error("Error fetching accommodation:", error);
+  }
+};
+
 export {
   getCoordinates,
   fetchPlacesCoordinates,
@@ -228,4 +247,5 @@ export {
   fetchTransportationData,
   fetchFlightData,
   fetchBudgetData,
+  fetchAccommodationData,
 };

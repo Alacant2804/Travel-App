@@ -10,6 +10,7 @@ import { toast } from "react-toastify";
 import axios from "axios";
 import { getToken } from "../../util/util";
 import { getCoordinates } from "../../services/tripService";
+import Loading from "../../styles/loader/Loading";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -38,13 +39,14 @@ export default function Destination({
   const [accommodation, setAccommodation] = useState(
     destination.accommodation || null
   );
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     setDuration(calculateDuration(startDate, endDate));
   }, [startDate, endDate]);
 
-   // Add place to the destination component
-   const handleAddPlace = async (event) => {
+  // Add place to the destination component
+  const handleAddPlace = async (event) => {
     event.preventDefault();
     const placeInput = event.target.elements.placeInput.value.trim();
     const priceInput = parseFloat(event.target.elements.priceInput.value);
@@ -99,7 +101,10 @@ export default function Destination({
       setPlaces(updatedPlaces);
 
       // Notify parent of the updated destination
-      saveDestination({ ...destination, places: updatedPlaces }, destinationIndex);
+      saveDestination(
+        { ...destination, places: updatedPlaces },
+        destinationIndex
+      );
       event.target.reset();
       toast.success("Place added successfully!", { theme: "colored" });
     } catch (error) {
@@ -153,12 +158,14 @@ export default function Destination({
       const updatedPlaces = places.map((place, index) =>
         index === placeIndex ? { ...place, ...newPlace } : place
       );
-  
+
       setPlaces(updatedPlaces); // Update the places state
-  
+
       // Notify parent of the updated destination with the updated places array
-      saveDestination({ ...destination, places: updatedPlaces }, destinationIndex);
-  
+      saveDestination(
+        { ...destination, places: updatedPlaces },
+        destinationIndex
+      );
 
       setEditingIndex(-1); // Exit edit mode
       setEditPlaceValue({ name: "", price: 0 }); // Clear the inputs
@@ -175,7 +182,7 @@ export default function Destination({
   const handleEditPlace = (placeIndex) => {
     setEditingIndex(placeIndex); // Sets the specific place as the one being edited
     setEditPlaceValue(places[placeIndex]); // Pre-fills the edit form with the data of the selected place
-  };  
+  };
 
   // Delete place from destination
   const handleDeletePlace = async (placeIndex) => {
@@ -371,11 +378,15 @@ export default function Destination({
                     className="button-icon"
                     onClick={() => handleDeletePlace(index)}
                   >
-                    <img
-                      src={deleteIcon}
-                      alt="delete"
-                      className="delete-icon"
-                    />
+                    {loading ? (
+                      <Loading />
+                    ) : (
+                      <img
+                        src={deleteIcon}
+                        alt="delete"
+                        className="delete-icon"
+                      />
+                    )}
                   </button>
                 </div>
               </div>
@@ -433,6 +444,7 @@ export default function Destination({
             accommodation={accommodation}
             onSave={handleSaveAccommodation}
             onClose={handleCloseModal}
+            setLoading={setLoading}
           />
         )}
       </div>

@@ -1,6 +1,7 @@
 .trip-detail-page {
   padding: 20px;
   font-family: Arial, sans-serif;
+  min-height: calc(100vh - 20vh);
 }
 
 .button-section {

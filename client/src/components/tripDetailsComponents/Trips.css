@@ -1,7 +1,7 @@
 .trips-page {
-    padding: 20px;
-    background-color: #f5f5f5;
-    min-height: 80vh;
+  padding: 20px;
+  background-color: #f5f5f5;
+  min-height: 80vh;
 }
 
 .trips-main {
@@ -102,7 +102,7 @@
   border: none;
   border-radius: 4px;
   color: #fff;
-  background-color: #4CAF50;
+  background-color: #4caf50;
   cursor: pointer;
   text-decoration: none;
   transition: background-color 0.3s ease;
@@ -117,5 +117,5 @@
 }
 
 .trip-card .trip-btn:hover {
-  background-color: #388E3C;
+  background-color: #388e3c;
 }

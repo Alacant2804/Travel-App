@@ -1,333 +1,336 @@
 .trip-detail-container {
-    padding: 20px;
-    background-color: #ffffff;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    max-width: 800px;
-    margin: 0 auto;
-    margin-bottom: 30px;
+  padding: 20px;
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  max-width: 800px;
+  margin: 0 auto;
+  margin-bottom: 30px;
 }
 
 .trip-info {
-    text-align: center;
-    margin-bottom: 20px;
+  text-align: center;
+  margin-bottom: 20px;
 }
 
 .trip-info h2 {
-    margin-bottom: 10px;
+  margin-bottom: 10px;
 }
 
 .breaker {
-    width: 50px;
-    height: 3px;
-    background-color: #007bff;
-    margin: 10px auto;
+  width: 50px;
+  height: 3px;
+  background-color: #007bff;
+  margin: 10px auto;
 }
 
 .date-info {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
 }
 
 .date-info p {
-    flex: 1;
-    margin: 0 5px;
-    padding: 10px;
-    background-color: #f9f9f9;
-    border-radius: 8px;
+  flex: 1;
+  margin: 0 5px;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
 }
 
 .places-to-visit {
-    list-style-type: none;
-    padding: 0;
-    margin-top: 20px;
+  list-style-type: none;
+  padding: 0;
+  margin-top: 20px;
 }
 
 .places-to-visit li {
-    margin: 5px 0;
-    padding: 10px;
-    background-color: #f9f9f9;
-    border-radius: 8px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  margin: 5px 0;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .places-list {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
 }
 
 .action-buttons {
-    display: flex;
-    gap: 5px;
+  display: flex;
+  gap: 5px;
 }
 
 .button-icon {
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
 }
 
 .button-icon img {
-    width: 32px;
-    height: 32px;
+  width: 32px;
+  height: 32px;
 }
 
 .edit-mode {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
 }
 
-.edit-mode input, .edit-mode button {
-    margin: 0 10px;
+.edit-mode input,
+.edit-mode button {
+  margin: 0 10px;
 }
 
 .place-add-form {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 30px;
 }
 
 .place-input-fields {
-    display: flex;
-    justify-content: space-between;
-    width: 80%;
-    gap: 1rem;
+  display: flex;
+  justify-content: space-between;
+  width: 80%;
+  gap: 1rem;
 }
 
 .place-input {
-    flex: 1;
-    margin: 10px 0;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    max-width: 300px;
-    box-sizing: border-box;
+  flex: 1;
+  margin: 10px 0;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  max-width: 300px;
+  box-sizing: border-box;
 }
 
 .add-place-button {
-    padding: 10px 20px;
-    font-size: 1em;
-    background-color: #28a745;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    margin-top: 10px;
+  padding: 10px 20px;
+  font-size: 1em;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 10px;
 }
 
 .add-place-button:hover {
-    background-color: #218838;
+  background-color: #218838;
 }
 
 .place-add-form {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 30px;
 }
 
 .place-input-fields {
-    display: flex;
-    justify-content: space-between;
-    width: 80%;
-    gap: 1rem;
+  display: flex;
+  justify-content: space-between;
+  width: 80%;
+  gap: 1rem;
 }
 
 .place-input {
-    flex: 1;
-    margin: 10px 0;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    max-width: 300px;
-    box-sizing: border-box;
+  flex: 1;
+  margin: 10px 0;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  max-width: 300px;
+  box-sizing: border-box;
 }
 
 .destination-input {
-    font-size: 1.5em;
-    font-weight: bold;
-    border: none;
-    text-align: center;
-    background-color: transparent;
-    width: 100%;
-    max-width: 100%;
+  font-size: 1.5em;
+  font-weight: bold;
+  border: none;
+  text-align: center;
+  background-color: transparent;
+  width: 100%;
+  max-width: 100%;
 }
 
 .accommodation-info {
-    margin-top: 16px;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    background: #f8f9fa;
-  }
-  
+  margin-top: 16px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #f8f9fa;
+}
+
 .accommodation-info p {
   margin: 4px 0;
 }
 
 .total-places {
-    margin-bottom: 5px;
+  margin-bottom: 5px;
 }
 
 .destination-details {
-    display: flex;
-    justify-content: space-between;
+  display: flex;
+  justify-content: space-between;
 }
 
 .accommodation-button {
-    position: relative;
-    cursor: pointer;
-    background: none; 
-    border: none;
-    padding: 0;
+  position: relative;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
 }
-  
+
 .accommodation-button::before {
-    content: attr(data-title);
-    position: absolute;
-    top: -30px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(0, 0, 0, 0.8);
-    color: #fff;
-    padding: 5px 10px;
-    border-radius: 5px;
-    white-space: nowrap;
-    font-size: 12px;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.2s ease-in-out;
-    z-index: 10;
+  content: attr(data-title);
+  position: absolute;
+  top: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  padding: 5px 10px;
+  border-radius: 5px;
+  white-space: nowrap;
+  font-size: 12px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease-in-out;
+  z-index: 10;
 }
-  
+
 .accommodation-button:hover::before {
-    opacity: 1;
+  opacity: 1;
 }
-  
+
 .accommodation-icon {
-    width: 32px;
-    height: 32px;
-    transition: transform 0.2s ease-in-out;
+  width: 32px;
+  height: 32px;
+  transition: transform 0.2s ease-in-out;
 }
-  
+
 .accommodation-button:hover .accommodation-icon {
-    transform: translateY(-3px);
+  transform: translateY(-3px);
 }
 
 .places-list {
-    display: flex;
-    justify-content: space-around;
+  display: flex;
+  justify-content: space-around;
 }
 
 .action-buttons {
-    display: flex;
-    gap: 10px;
+  display: flex;
+  gap: 10px;
 }
 
-.edit-icon, .delete-icon {
-    width: 32px;
-    height: 32px;
-    vertical-align: middle;
-    border: 0;
-    background-color: transparent;
-    transition: transform 0.2s ease-in-out;
+.edit-icon,
+.delete-icon {
+  width: 32px;
+  height: 32px;
+  vertical-align: middle;
+  border: 0;
+  background-color: transparent;
+  transition: transform 0.2s ease-in-out;
 }
 
 .button-icon {
-    border: none;
-    background-color: transparent;
-    padding: 0;
-    cursor: pointer;
+  border: none;
+  background-color: transparent;
+  padding: 0;
+  cursor: pointer;
 }
 
-.x-icon, .delete-destination-button {
-    width: 18px;
-    height: 18px;
-    background-color: transparent;
-    border: none;
-    padding: 0;
-    cursor: pointer;
+.x-icon,
+.delete-destination-button {
+  width: 18px;
+  height: 18px;
+  background-color: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
 }
 
 @media (max-width: 768px) {
-    .date-info {
-        flex-direction: column;
-        align-items: center;
-    }
+  .date-info {
+    flex-direction: column;
+    align-items: center;
+  }
 
-    .date-info p {
-        width: 90%;
-        text-align: center;
-        margin: 5px 0;
-    }
+  .date-info p {
+    width: 90%;
+    text-align: center;
+    margin: 5px 0;
+  }
 
-    .places-list {
-        flex-direction: column;
-    }
+  .places-list {
+    flex-direction: column;
+  }
 
-    .trip-info {
-        text-align: left;
-    }
+  .trip-info {
+    text-align: left;
+  }
 
-    .destination-details {
-        flex-direction: column;
-        align-items: center;
-    }
+  .destination-details {
+    flex-direction: column;
+    align-items: center;
+  }
 
-    .destination-details .totals {
-        margin-bottom: 10px;
-    }
+  .destination-details .totals {
+    margin-bottom: 10px;
+  }
 
-    .place-input-fields {
-        flex-direction: column;
-        width: 100%;
-    }
+  .place-input-fields {
+    flex-direction: column;
+    width: 100%;
+  }
 }
 
 @media (max-width: 480px) {
-    .destination-input {
-        font-size: 1.2em;
-    }
+  .destination-input {
+    font-size: 1.2em;
+  }
 
-    .accommodation-button::before {
-        font-size: 10px;
-    }
+  .accommodation-button::before {
+    font-size: 10px;
+  }
 
-    .accommodation-icon,
-    .edit-icon,
-    .delete-icon {
-        width: 24px;
-        height: 24px;
-    }
+  .accommodation-icon,
+  .edit-icon,
+  .delete-icon {
+    width: 24px;
+    height: 24px;
+  }
 
-    .add-place-button {
-        font-size: 0.9em;
-    }
+  .add-place-button {
+    font-size: 0.9em;
+  }
 
-    .place-input {
-        padding: 8px;
-        font-size: 0.9em;
-    }
+  .place-input {
+    padding: 8px;
+    font-size: 0.9em;
+  }
 
-    .place-input-fields {
-        gap: 0.5rem;
-    }
+  .place-input-fields {
+    gap: 0.5rem;
+  }
 
-    .trip-info h2 {
-        font-size: 1.5em;
-    }
+  .trip-info h2 {
+    font-size: 1.5em;
+  }
 
-    .trip-detail-container {
-        padding: 10px;
-    }
+  .trip-detail-container {
+    padding: 10px;
+  }
 }
