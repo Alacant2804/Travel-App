@@ -133,7 +133,7 @@ export default function Destination({
       typeof coordinates.lat !== "number" ||
       typeof coordinates.lon !== "number"
     ) {
-      console.error("Invalid coordinates:", coordinates);
+      console.error("Invalid coordinates");
       return;
     }
 

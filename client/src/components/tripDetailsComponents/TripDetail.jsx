@@ -73,7 +73,7 @@ export default function TripDetail() {
             tripData.destinations[0].city
           );
           if (coordinates) {
-            setMapCenter({ lat: coordinates.lat, lng: coordinates.lon });
+            setMapCenter({ lat: coordinates.lat, lon: coordinates.lon });
           }
         }
       } catch (error) {
