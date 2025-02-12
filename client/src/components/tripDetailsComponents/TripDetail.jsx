@@ -12,6 +12,7 @@ import {
   fetchTripBySlug,
   fetchTransportationData,
   fetchFlightData,
+  getCoordinates,
 } from "../../services/tripService";
 import { calculateDuration, getToken } from "../../util/util";
 import axios from "axios";
@@ -43,42 +44,50 @@ export default function TripDetail() {
   // Fetching specified trip via ID or slug
   useEffect(() => {
     setLoading(true);
-    if (!tripId) {
-      fetchTripBySlug(tripSlug)
-        .then((slugTrip) => {
-          if (slugTrip) {
-            setTripId(slugTrip._id);
-            setTripName(slugTrip.tripName);
-            setTrip(slugTrip);
-            setDestinations(slugTrip.destinations);
-            setLoading(false);
+
+    const fetchTrip = async () => {
+      try {
+        let tripData;
+        if (tripId) {
+          tripData = await fetchTripDetails(tripId);
+        } else if (tripSlug) {
+          tripData = await fetchTripBySlug(tripSlug);
+          if (tripData) {
+            setTripId(tripData._id);
           } else {
             toast.error("Trip not found.", { theme: "colored" });
             setLoading(false);
+            return;
           }
-        })
-        .catch(() => {
-          toast.error(
-            "An error occurred while fetching trip details. Please try again later.",
-            { theme: "colored" }
-          );
+        } else {
           setLoading(false);
-        });
-    } else {
-      fetchTripDetails(tripId)
-        .then((tripData) => {
-          setTrip(tripData);
-          setDestinations(tripData.destinations || []);
-          setLoading(false);
-        })
-        .catch(() => {
-          toast.error(
-            "An error occurred while fetching trip details. Please try again later.",
-            { theme: "colored" }
+          return;
+        }
+
+        setTrip(tripData);
+        setDestinations(tripData.destinations || []);
+
+        // Calculate map center
+        if (tripData.destinations && tripData.destinations.length > 0) {
+          const coordinates = await getCoordinates(
+            tripData.destinations[0].city
           );
-        });
-      setLoading(false);
-    }
+          if (coordinates) {
+            setMapCenter({ lat: coordinates.lat, lng: coordinates.lon });
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching trip:", error);
+        toast.error(
+          "An error occurred while fetching trip details. Please try again later.",
+          { theme: "colored" }
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTrip();
   }, [tripId, tripSlug]);
 
   // Fetch details
@@ -328,7 +337,9 @@ export default function TripDetail() {
       <button className="add-destination-button" onClick={handleAddDestination}>
         Add New Destination
       </button>
-      {mapCenter && <MapComponent places={places} center={mapCenter} />}
+      {mapCenter && (
+        <MapComponent destinations={destinations} center={mapCenter} />
+      )}
       {showFlightModal && (
         <FlightModal
           tripId={tripId}

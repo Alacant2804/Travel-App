@@ -230,7 +230,6 @@ const fetchAccommodationData = async (tripId, destinationId) => {
         },
       }
     );
-    console.log("Trip Service response: ", response.data.data);
 
     return response.data.data;
   } catch (error) {
