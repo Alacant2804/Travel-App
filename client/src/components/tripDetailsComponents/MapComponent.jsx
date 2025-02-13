@@ -4,7 +4,7 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { useEffect } from "react";
 
-import homeIconUrl from "../../assets/home.png";
+import homeIconUrl from "../../assets/accommodation.png";
 import "./MapComponent.css";
 
 // Fix default icon issue
@@ -71,20 +71,22 @@ export default function MapComponent({ destinations, center }) {
               )}
 
               {/* Rendering markers for accommodation */}
-              {destination.accommodation?.coordinates && (
-                <Marker>
-                  key={`accommodation-${destination._id}`}
-                  position=
-                  {[
-                    destination.accommodation.coordinates.lat,
-                    destination.accommodation.coordinates.lon,
-                  ]}
-                  icon={homeIcon}
-                  <Popup>
-                    Accommodation: {destination.accommodation.address}
-                  </Popup>
-                </Marker>
-              )}
+              {Array.isArray(destination.accommodation) &&
+                destination.accommodation.length > 0 &&
+                destination.accommodation[0]?.coordinates && (
+                  <Marker
+                    key={`accommodation-${destination._id}`}
+                    position={[
+                      destination.accommodation[0].coordinates.lat,
+                      destination.accommodation[0].coordinates.lon,
+                    ]}
+                    icon={homeIcon}
+                  >
+                    <Popup>
+                      Accommodation: {destination.accommodation[0].address}
+                    </Popup>
+                  </Marker>
+                )}
             </>
           ))}
       </MarkerClusterGroup>

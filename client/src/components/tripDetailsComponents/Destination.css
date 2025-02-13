@@ -67,18 +67,6 @@
   gap: 5px;
 }
 
-.button-icon {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 5px;
-}
-
-.button-icon img {
-  width: 32px;
-  height: 32px;
-}
-
 .edit-mode {
   display: flex;
   justify-content: center;

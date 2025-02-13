@@ -29,17 +29,13 @@
 
 .icon,
 .budget-icon {
-  width: 32px;
-  height: 32px;
+  width: 48px;
+  height: 48px;
+  margin-left: 2vh;
   vertical-align: middle;
   border: 0;
   background-color: transparent;
   transition: transform 0.2s ease-in-out;
-}
-
-.budget-icon {
-  width: 40px;
-  height: 40px;
 }
 
 .button-icon:hover,

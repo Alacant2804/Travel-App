@@ -77,7 +77,7 @@ export default function AccommodationModal({
     try {
       const token = getToken();
       let url = `${API_URL}/trips/accommodation/${tripId}/destinations/${destinationId}`;
-      const method = accommodation._id ? "put" : "post";
+      const method = accommodation && accommodation._id ? "put" : "post";
 
       if (method === "put") {
         url = `${API_URL}/trips/accommodation/${tripId}/destinations/${destinationId}/${accommodation._id}`;
@@ -92,7 +92,6 @@ export default function AccommodationModal({
         },
       });
 
-      console.log("Accommodation Response: ", response.data.data);
       onSave(response.data.data);
       setIsEditing(false);
     } catch (error) {
