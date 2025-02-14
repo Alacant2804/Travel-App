@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 import auth from "../middleware/auth.js";
+import { loginLimiter } from "../middleware/rateLimit.js";
 
 const router = express.Router();
 
@@ -10,9 +11,13 @@ const router = express.Router();
 router.get("/user", auth, async (req, res, next) => {
   try {
     const user = await User.findById(req.user.id).select("-password");
-    res.status(200).json({ success: true, message: "User is authenticated successfully", data: user });
+    res.status(200).json({
+      success: true,
+      message: "User is authenticated successfully",
+      data: user,
+    });
   } catch (error) {
-    next(error)
+    next(error);
   }
 });
 
@@ -57,7 +62,7 @@ router.post("/sign-up", async (req, res, next) => {
 });
 
 // Login a user
-router.post("/login", async (req, res, next) => {
+router.post("/login", loginLimiter, async (req, res, next) => {
   const { email, password } = req.body;
   try {
     let user = await User.findOne({ email });
@@ -89,12 +94,12 @@ router.post("/login", async (req, res, next) => {
       }
     );
   } catch (error) {
-    next(error)
+    next(error);
   }
 });
 
 router.post("/logout", (req, res) => {
-  res.clearCookie("token");
+  res.clearCookie("token", { httpOnly: true, secure: true });
   res.json({ message: "Logged out successfully" });
 });
 

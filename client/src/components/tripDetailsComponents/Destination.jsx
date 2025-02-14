@@ -70,9 +70,10 @@ export default function Destination({
     // Validate coordinates
     if (!coordinates) {
       toast.error(
-        "We couldn't fetch the coordinates for the address you provided. Please check it and try again.",
+        "Failed to fetch coordinates for the address you provided. Please check it and try again.",
         { theme: "colored" }
       );
+      return false;
     }
 
     // Create object with place data and coordinates
@@ -379,7 +380,7 @@ export default function Destination({
                     onClick={() => handleDeletePlace(index)}
                   >
                     {loading ? (
-                      <Loading />
+                      <div>Loading accommodation...</div>
                     ) : (
                       <img
                         src={deleteIcon}

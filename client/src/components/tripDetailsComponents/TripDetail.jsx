@@ -263,15 +263,6 @@ export default function TripDetail() {
     setShowBudgetModal(false);
   };
 
-  const places = useMemo(() => {
-    return destinations.reduce((acc, destination) => {
-      if (destination.places) {
-        acc.push(...destination.places);
-      }
-      return acc;
-    }, []);
-  }, [destinations]);
-
   if (loading) {
     return <Loading />;
   }

@@ -32,40 +32,6 @@ const getCoordinates = async (query) => {
   }
 };
 
-const fetchPlacesCoordinates = async (places, city, tripCountry) => {
-  // Check if places exist
-  if (!Array.isArray(places) || places.length === 0) {
-    console.error("Invalid or empty places array.");
-    return [];
-  }
-
-  // Fetch places coordinates
-  const placeResults = await Promise.all(
-    places.map(async (place) => {
-      const coordinates = await getCoordinates(
-        `${place.name}, ${city}, ${tripCountry}`
-      );
-      return { ...place, coordinates };
-    })
-  );
-
-  return placeResults;
-};
-
-const fetchAccommodationCoordinates = async (destination, tripCountry) => {
-  // Check if accommodation exists
-  if (!destination.accommodation) {
-    return null;
-  }
-
-  // Fetch coordinates for accommodation
-  const coordinates = await getCoordinates(
-    `${destination.accommodation.address}, ${destination.city}, ${tripCountry}`
-  );
-
-  return coordinates; // Return coordinates or null if the fetch fails
-};
-
 const fetchTripDetails = async (tripId) => {
   try {
     const token = getToken();
@@ -239,8 +205,6 @@ const fetchAccommodationData = async (tripId, destinationId) => {
 
 export {
   getCoordinates,
-  fetchPlacesCoordinates,
-  fetchAccommodationCoordinates,
   fetchTripDetails,
   fetchTripBySlug,
   fetchTransportationData,

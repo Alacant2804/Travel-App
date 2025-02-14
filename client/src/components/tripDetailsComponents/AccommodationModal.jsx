@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
-import { calculateDuration, getToken } from "../../util/util";
 import axios from "axios";
-import "./AccommodationModal.css";
+import { toast } from "react-toastify";
+import { calculateDuration, getToken } from "../../util/util";
 import {
   getCoordinates,
   fetchAccommodationData,
 } from "../../services/tripService";
+import "./AccommodationModal.css";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -25,6 +26,7 @@ export default function AccommodationModal({
   const [bookingLink, setBookingLink] = useState("");
   const [price, setPrice] = useState(0);
 
+  // Fetch accommodation data & set state
   useEffect(() => {
     setLoading(true);
     fetchAccommodationData(tripId, destinationId)
@@ -51,12 +53,14 @@ export default function AccommodationModal({
       .finally(() => setLoading(false));
   }, [tripId, destinationId]);
 
+  // Calculate duration
   useEffect(() => {
     if (startDate && endDate) {
       setDuration(calculateDuration(startDate, endDate));
     }
   }, [startDate, endDate]);
 
+  // Save accommodation data
   const handleSave = async () => {
     if (!tripId || !destinationId) {
       console.error("Missing tripId or destinationId.");
@@ -64,6 +68,7 @@ export default function AccommodationModal({
     }
 
     const coordinates = await getCoordinates(address);
+
     const accommodationData = {
       address,
       startDate,
@@ -96,6 +101,16 @@ export default function AccommodationModal({
       setIsEditing(false);
     } catch (error) {
       console.error("Error saving accommodation:", error);
+      console.log(error.response.data);
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
+        toast.error(error.response.data.message, { theme: "colored" });
+      } else {
+        toast.error("An unexpected error occurred. Please try again.");
+      }
     }
   };
 

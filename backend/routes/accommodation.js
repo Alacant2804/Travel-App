@@ -44,6 +44,8 @@ router.post(
         req.params.destinationId
       );
 
+      console.log(req.body.address);
+
       destination.accommodation = req.body;
       await trip.save();
 
