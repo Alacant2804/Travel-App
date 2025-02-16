@@ -51,10 +51,10 @@ router.post(
         type,
       };
 
-      if (type === "outbound") {
-        req.trip.flights[0] = newFlight; // Set outbound flight
-      } else if (type === "inbound") {
-        req.trip.flights[1] = newFlight; // Set inbound flight
+      if (type === "inbound") {
+        req.trip.flights[0] = newFlight; // Set inbound flight
+      } else if (type === "outbound") {
+        req.trip.flights[1] = newFlight; // Set outbound flight
       }
 
       await req.trip.save();
@@ -77,7 +77,6 @@ router.put(
   checkAccess,
   validateFlightInput,
   async (req, res, next) => {
-    const { flightType } = req.params;
     const {
       departureAirport,
       arrivalAirport,
@@ -89,20 +88,20 @@ router.put(
 
     try {
       // Find the index for outbound or inbound flight
-      const flightIndex = flightType === "outbound" ? 0 : 1;
+      const flightIndex = type === "outbound" ? 0 : 1;
 
       if (!req.trip.flights[flightIndex]) {
         return res.status(400).json({
           success: false,
           message: `${
-            flightType.charAt(0).toUpperCase() + flightType.slice(1)
+            type.charAt(0).toUpperCase() + type.slice(1)
           } flight not found.`,
         });
       }
 
       // Update the flight details
       req.trip.flights[flightIndex] = {
-        ...existingFlight,
+        ...req.trip.flights[flightIndex],
         departureAirport,
         arrivalAirport,
         departureDate,

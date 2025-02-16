@@ -67,6 +67,34 @@ export default function AccommodationModal({
       return;
     }
 
+    // Front end form validation
+    if (!address || typeof address !== "string") {
+      toast.error(
+        "Invalid address. Address must be a string containing letters only.",
+        { theme: "colored" }
+      );
+      return;
+    }
+
+    if (!startDate || !endDate) {
+      toast.error("Please provide start and end dates.", { theme: "colored" });
+      return;
+    }
+
+    if (new Date(startDate) > new Date(endDate)) {
+      return res.status(400).json({
+        success: false,
+        message: "End date cannot be earlier than the start date.",
+      });
+    }
+
+    if (!price || price < 0 || isNaN(price)) {
+      toast.error("Invalid price. Price must be a valid positive number.", {
+        theme: "colored",
+      });
+      return;
+    }
+
     const coordinates = await getCoordinates(address);
 
     const accommodationData = {
@@ -102,11 +130,7 @@ export default function AccommodationModal({
     } catch (error) {
       console.error("Error saving accommodation:", error);
       console.log(error.response.data);
-      if (
-        error.response &&
-        error.response.data &&
-        error.response.data.message
-      ) {
+      if (error.response?.data?.message) {
         toast.error(error.response.data.message, { theme: "colored" });
       } else {
         toast.error("An unexpected error occurred. Please try again.");

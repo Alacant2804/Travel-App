@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { toast } from "react-toastify";
 import "./TransportationForm.css";
 
 export default function TransportationForm({ details, onSave, onClose }) {
@@ -24,6 +25,46 @@ export default function TransportationForm({ details, onSave, onClose }) {
 
   const handleSave = (e) => {
     e.preventDefault();
+
+    // Front end form validation
+    if (!pickupPlace || typeof pickupPlace !== "string") {
+      toast.error(
+        "Please provide a pick up place. Pick up place cannot be a number.",
+        { theme: "colored" }
+      );
+      return;
+    }
+
+    if (!dropoffPlace || typeof dropoffPlace !== "string") {
+      toast.error(
+        "Please provide a drop off place. Drop off place cannot be a number.",
+        { theme: "colored" }
+      );
+      return;
+    }
+
+    if (!pickupDate || !dropoffDate) {
+      toast.error("Please provide pick up and drop off dates.", {
+        theme: "colored",
+      });
+      return;
+    }
+
+    if (new Date(pickupDate) > new Date(dropoffDate)) {
+      return res.status(400).json({
+        success: false,
+        message: "Dropoff date must be after pick up date.",
+      });
+    }
+
+    if (!price || price < 0 || isNaN(price)) {
+      toast.error("Invalid price. Price must be a valid positive number.", {
+        theme: "colored",
+      });
+      return;
+    }
+
+    // Save transportation data
     onSave({
       pickupPlace,
       dropoffPlace,

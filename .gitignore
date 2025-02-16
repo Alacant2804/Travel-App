@@ -7,14 +7,12 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-# Node modules
-travel-app/node_modules/
-travel-app/backend/node_modules/
-travel-app/client/node_modules/
+# Node modules (ignore in all subdirectories)
+**/node_modules/
 
-# Build directories
-travel-app/client/dist/
-travel-app/client/dist-ssr/
+# Build directories (ignore in all subdirectories)
+**/dist/
+**/dist-ssr/
 *.local
 
 # Editor directories and files
@@ -28,14 +26,14 @@ travel-app/client/dist-ssr/
 *.sln
 *.sw?
 
-# Environment variables
-travel-app/backend/.env
+# Ignore all .env files in any directory
+**/.env
 
-# Debug
+# Debug files
 debug.log
 debug/
 
-# Coverage directory used by tools like istanbul
+# Coverage directory used by testing tools like Istanbul
 coverage/
 *.lcov
 
@@ -45,4 +43,6 @@ temp/
 *.tmp
 *.temp
 .cache/
+
+# Vercel deployment files
 .vercel

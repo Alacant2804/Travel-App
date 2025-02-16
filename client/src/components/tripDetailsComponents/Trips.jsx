@@ -168,7 +168,9 @@ export default function Trips() {
           </p>
           <p>
             <strong>Duration: </strong>{" "}
-            {trip.destinations[0]?.duration === 1
+            {trip.destinations[0]?.duration === 0
+              ? "1 day"
+              : trip.destinations[0]?.duration === 1
               ? trip.destinations[0]?.duration + " day"
               : trip.destinations[0]?.duration + " days"}
           </p>

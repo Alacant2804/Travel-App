@@ -1,55 +1,46 @@
+import validator from "validator";
+
 export const validateAccommodationInput = (req, res, next) => {
   const { address, startDate, endDate, price, bookingLink } = req.body;
 
   // Validate address
-  if (!address) {
+  if (!address || validator.isEmpty(address)) {
     return res
       .status(400)
       .json({ success: false, message: "Address is missing" });
   }
 
-  if (typeof address !== "string" || !isNaN(address.trim())) {
+  if (typeof address !== "string") {
     return res.status(400).json({
       success: false,
       message:
-        "Invalid address. Please enter a street name along with a number.",
+        "Invalid address. Address must be a string containing letters only.",
     });
   }
 
-  // Validate startDate
-  const parsedStartDate = Date.parse(startDate);
-  const parsedEndDate = Date.parse(endDate);
-  if (!startDate) {
+  if (!/[a-zA-Z]/.test(address)) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid address. It must contain at least one letter.",
+    });
+  }
+
+  /// Validate startDate
+  if (!startDate || !validator.isISO8601(startDate)) {
     return res
       .status(400)
-      .json({ success: false, message: "Start date is missing" });
-  }
-
-  if (isNaN(parsedStartDate)) {
-    return res.status(400).json({
-      success: false,
-      message:
-        "Invalid start date. Please select a valid date from the calendar.",
-    });
+      .json({ success: false, message: "Please provide a valid start date." });
   }
 
   // Validate endDate
-  if (!endDate) {
+  if (!endDate || !validator.isISO8601(endDate)) {
     return res
       .status(400)
-      .json({ success: false, message: "End date is missing" });
-  }
-
-  if (isNaN(parsedEndDate)) {
-    return res.status(400).json({
-      success: false,
-      message:
-        "Invalid end date. Please select a valid date from the calendar.",
-    });
+      .json({ success: false, message: "Please provide a valid end date." });
   }
 
   // Validate duration
-  if (parsedEndDate < parsedStartDate) {
+  if (new Date(startDate) > new Date(endDate)) {
     return res.status(400).json({
       success: false,
       message: "End date cannot be earlier than the start date.",
@@ -57,38 +48,24 @@ export const validateAccommodationInput = (req, res, next) => {
   }
 
   // Validate price
-  if (price == null || isNaN(price) || typeof price !== "number") {
+  if (
+    price == null ||
+    isNaN(price) ||
+    price < 0 ||
+    !/^\d+(\.\d{1,2})?$/.test(price)
+  ) {
     return res.status(400).json({
       success: false,
-      message: "Invalid price. Please enter a valid number.",
-    });
-  }
-
-  if (price < 0) {
-    return res.status(400).json({
-      success: false,
-      message: "Invalid price. Please enter a positive number.",
+      message: "Invalid price. Price must be a valid positive number.",
     });
   }
 
   // Validate bookingLink
-  if (bookingLink) {
-    if (typeof bookingLink !== "string") {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid booking link. It must be a string.",
-      });
-    }
-
-    // Regular expression for basic URL validation
-    const urlPattern = /^(https?:\/\/)?([\w-]+\.)+[\w-]+(\/[\w-./?%&=]*)?$/;
-
-    if (!urlPattern.test(bookingLink)) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid booking link. Please enter a valid URL.",
-      });
-    }
+  if (bookingLink && !validator.isURL(bookingLink)) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid booking link. Please enter a valid URL.",
+    });
   }
 
   next();
@@ -98,34 +75,42 @@ export const validateDestinationInput = (req, res, next) => {
   const { city, startDate, endDate, places = [] } = req.body;
 
   // Validate city
-  if (!city || typeof city !== "string") {
+  if (!city || validator.isEmpty(city)) {
     return res.status(400).json({
       success: false,
-      message: "Invalid or missing city. City must be a string.",
+      message: "City is missing",
+    });
+  }
+
+  if (typeof city !== "string" || /\d/.test(city)) {
+    return res.status(400).json({
+      success: false,
+      message: "City cannot be a number.",
     });
   }
 
   // Validate startDate
-  if (!startDate || isNaN(Date.parse(startDate))) {
+  if (!startDate || !validator.isISO8601(startDate)) {
     return res.status(400).json({
       success: false,
-      message: "Invalid or missing startDate. Provide a valid date.",
+      message: "Please provide a valid start date.",
     });
   }
 
   // Validate endDate
-  if (!endDate || isNaN(Date.parse(endDate))) {
+  if (!endDate || !validator.isISO8601(endDate)) {
     return res.status(400).json({
       success: false,
-      message: "Invalid or missing endDate. Provide a valid date.",
+      message: "Please provide a valid end date.",
     });
   }
 
-  // Check that endDate is after startDate
+  // Validate duration
   if (new Date(startDate) > new Date(endDate)) {
-    return res
-      .status(400)
-      .json({ success: false, message: "endDate must be after startDate." });
+    return res.status(400).json({
+      success: false,
+      message: "End date cannot be earlier than the start date.",
+    });
   }
 
   // Validate places
@@ -133,6 +118,17 @@ export const validateDestinationInput = (req, res, next) => {
     return res.status(400).json({
       success: false,
       message: "Invalid places. Places must be an array.",
+    });
+  }
+
+  if (
+    places.some(
+      (place) => typeof place !== "string" || validator.isEmpty(place)
+    )
+  ) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid places. Each place must be a non-empty string.",
     });
   }
 
@@ -149,47 +145,78 @@ export const validateFlightInput = (req, res, next) => {
     type,
   } = req.body;
 
-  // Validate departureAirport
-  if (!departureAirport || typeof departureAirport !== "string") {
+  // Validate type
+  if (!type || (type !== "outbound" && type !== "inbound")) {
     return res.status(400).json({
       success: false,
-      message: "Invalid or missing departure airport",
+      message: "Type is required. Please select a valid type.",
+    });
+  }
+
+  // Validate departureAirport
+  if (!departureAirport || validator.isEmpty(departureAirport.trim())) {
+    return res.status(400).json({
+      success: false,
+      message: "Departure airport is required.",
+    });
+  }
+
+  if (typeof departureAirport !== "string" || /\d/.test(departureAirport)) {
+    return res.status(400).json({
+      success: false,
+      message: "Departure airport cannot be a number.",
     });
   }
 
   // Validate arrivalAirport
-  if (!arrivalAirport || typeof arrivalAirport !== "string") {
-    return res
-      .status(400)
-      .json({ success: false, message: "Invalid or missing arrival airport" });
+  if (!arrivalAirport || validator.isEmpty(arrivalAirport.trim())) {
+    return res.status(400).json({
+      success: false,
+      message: "Arrival airport is required.",
+    });
+  }
+
+  if (typeof arrivalAirport !== "string" || /\d/.test(arrivalAirport)) {
+    return res.status(400).json({
+      success: false,
+      message: "Arrival airport cannot be a number.",
+    });
+  }
+
+  if (departureAirport === arrivalAirport) {
+    return res.status(400).json({
+      success: false,
+      message: "Departure and arrival airports cannot be the same.",
+    });
   }
 
   // Validate departureDate
-  if (!departureDate || isNaN(Date.parse(departureDate))) {
-    return res
-      .status(400)
-      .json({ success: false, message: "Invalid or missing departure date" });
-  }
-
-  // Validate bookingLink
-  if (bookingLink && typeof bookingLink !== "string") {
-    return res
-      .status(400)
-      .json({ success: false, message: "Invalid booking link" });
+  if (!departureDate || !validator.isISO8601(departureDate)) {
+    return res.status(400).json({
+      success: false,
+      message: "Please provide a valid departure date.",
+    });
   }
 
   // Validate price
-  if (price == null || isNaN(price) || price < 0) {
-    return res
-      .status(400)
-      .json({ success: false, message: "Invalid or missing price" });
+  if (
+    price == null ||
+    isNaN(price) ||
+    price < 0 ||
+    !/^\d+(\.\d{1,2})?$/.test(price)
+  ) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid price. Price must be a valid positive number.",
+    });
   }
 
-  // Validate type
-  if (!type) {
-    return res
-      .status(400)
-      .json({ success: false, message: "Invalid or missing type" });
+  // Validate bookingLink
+  if (bookingLink && !validator.isURL(bookingLink)) {
+    return res.status(400).json({
+      success: false,
+      message: "Booking link must be a valid URL.",
+    });
   }
 
   next();
@@ -205,53 +232,79 @@ export const validateTransportationInput = (req, res, next) => {
     bookingLink,
   } = req.body;
 
-  // Validate pickupPlace
-  if (!pickupPlace || typeof pickupPlace !== "string") {
-    return res
-      .status(400)
-      .json({ success: false, message: "Invalid or missing pickup place" });
+  // Validate pick up place
+  if (!pickupPlace || validator.isEmpty(pickupPlace.trim())) {
+    return res.status(400).json({
+      success: false,
+      message: "Pick up place is required.",
+    });
   }
 
-  // Validate dropoffPlace
-  if (!dropoffPlace || typeof dropoffPlace !== "string") {
-    return res
-      .status(400)
-      .json({ success: false, message: "Invalid or missing dropoff place" });
+  if (typeof pickupPlace !== "string" || /\d/.test(pickupPlace)) {
+    return res.status(400).json({
+      success: false,
+      message: "Pick up place cannot be a number.",
+    });
   }
 
-  // Validate pickupDate
-  if (!pickupDate || isNaN(Date.parse(pickupDate))) {
-    return res
-      .status(400)
-      .json({ success: false, message: "Invalid or missing pickup date" });
+  // Validate drop off place
+  if (!dropoffPlace || validator.isEmpty(dropoffPlace.trim())) {
+    return res.status(400).json({
+      success: false,
+      message: "Drop off place is required.",
+    });
   }
 
-  // Validate dropoffDate
-  if (!dropoffDate || isNaN(Date.parse(dropoffDate))) {
-    return res
-      .status(400)
-      .json({ success: false, message: "Invalid or missing dropoff date" });
+  if (typeof dropoffPlace !== "string" || /\d/.test(dropoffPlace)) {
+    return res.status(400).json({
+      success: false,
+      message: "Drop off place cannot be a number.",
+    });
   }
 
-  // Check that dropoffDate is after pickupDate
+  // Validate pick up date
+  if (!pickupDate || !validator.isISO8601(pickupDate)) {
+    return res.status(400).json({
+      success: false,
+      message: "Please provide a valid pick up date.",
+    });
+  }
+
+  // Validate drop off date
+  if (!dropoffDate || !validator.isISO8601(dropoffDate)) {
+    return res.status(400).json({
+      success: false,
+      message: "Please provide a valid drop off date.",
+    });
+  }
+
+  // Check that drop off date is after pick up date
   if (new Date(pickupDate) > new Date(dropoffDate)) {
     return res.status(400).json({
       success: false,
-      message: "Dropoff date must be after pickup date",
+      message: "Dropoff date must be after pick up date.",
     });
   }
 
   // Validate price
-  if (price == null || isNaN(price) || price < 0) {
-    return res
-      .status(400)
-      .json({ success: false, message: "Invalid or missing price" });
+  if (
+    price == null ||
+    isNaN(price) ||
+    price < 0 ||
+    !/^\d+(\.\d{1,2})?$/.test(price)
+  ) {
+    return res.status(400).json({
+      success: false,
+      message: "Price must be a valid positive number.",
+    });
   }
 
-  if (bookingLink && typeof bookingLink !== "string") {
-    return res
-      .status(400)
-      .json({ success: false, message: "Invalid booking link" });
+  // Validate bookingLink
+  if (bookingLink && validator.isURL(bookingLink)) {
+    return res.status(400).json({
+      success: false,
+      message: "Booking link must be a valid URL.",
+    });
   }
 
   next();

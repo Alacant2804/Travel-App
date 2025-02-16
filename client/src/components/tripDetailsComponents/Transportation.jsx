@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+import { toast } from "react-toastify";
 import { getToken, calculateDuration } from "../../util/util";
 import TransportationForm from "./TransportationForm";
 import "./Transportation.css";
@@ -34,6 +35,11 @@ export default function TransportationModal({
       onClose();
     } catch (error) {
       console.error("Error saving transportation:", error);
+      if (error.response?.data?.message) {
+        toast.error(error.response.data.message, { theme: "colored" });
+      } else {
+        toast.error("An unexpected error occurred. Please try again.");
+      }
     }
   };
 
@@ -55,20 +61,20 @@ export default function TransportationModal({
                   <td>
                     <strong>Pick-Up Place:</strong>
                   </td>
-                  <td>{transportationDetails?.pickupPlace || "N/A"}</td>
+                  <td>{transportationDetails?.pickupPlace || ""}</td>
                 </tr>
                 <tr>
                   <td>
                     <strong>Drop-Off Place:</strong>
                   </td>
-                  <td>{transportationDetails?.dropoffPlace || "N/A"}</td>
+                  <td>{transportationDetails?.dropoffPlace || ""}</td>
                 </tr>
                 <tr>
                   <td>
                     <strong>Pick-Up Date:</strong>
                   </td>
                   <td>
-                    {transportationDetails?.pickupDate?.split("T")[0] || "N/A"}
+                    {transportationDetails?.pickupDate?.split("T")[0] || ""}
                   </td>
                 </tr>
                 <tr>
@@ -76,7 +82,7 @@ export default function TransportationModal({
                     <strong>Drop-Off Date:</strong>
                   </td>
                   <td>
-                    {transportationDetails?.dropoffDate?.split("T")[0] || "N/A"}
+                    {transportationDetails?.dropoffDate?.split("T")[0] || ""}
                   </td>
                 </tr>
 
@@ -84,7 +90,7 @@ export default function TransportationModal({
                   <td>
                     <strong>Price:</strong>
                   </td>
-                  <td>${transportationDetails?.price?.toFixed(2) || "N/A"}</td>
+                  <td>${transportationDetails?.price?.toFixed(2) || 0}</td>
                 </tr>
                 <tr>
                   <td>
@@ -100,7 +106,7 @@ export default function TransportationModal({
                         {transportationDetails.bookingLink}
                       </a>
                     ) : (
-                      "N/A"
+                      ""
                     )}
                   </td>
                 </tr>
@@ -116,11 +122,14 @@ export default function TransportationModal({
                             transportationDetails.pickupDate,
                             transportationDetails.dropoffDate
                           );
-                          return duration > 0
+                          if (duration === 0) {
+                            return "1 day";
+                          }
+                          return duration >= 0
                             ? `${duration} ${duration === 1 ? "day" : "days"}`
-                            : "N/A";
+                            : "";
                         })()
-                      : "N/A"}
+                      : ""}
                   </td>
                 </tr>
               </tbody>

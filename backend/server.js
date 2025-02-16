@@ -36,13 +36,13 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(mongoSanitize()); // Prevent NoSQL injection
+// Security headers
 app.use(
   helmet({
     contentSecurityPolicy: false, // Disable CSP if causing issues
     crossOriginResourcePolicy: { policy: "cross-origin" }, // Allow cross-origin resource loading
   })
 );
-// Security headers
 app.use(globalLimiter); // Rate limits for API
 
 app.use(express.static(path.join(__dirname, "../client/dist")));

@@ -95,12 +95,6 @@ router.put(
           .json({ success: false, message: "Transportation not found" });
       }
 
-      if (req.body.price < 0 && isNaN(req.body.price)) {
-        return res
-          .status(400)
-          .json({ success: false, message: "Price is not valid" });
-      }
-
       // Update transportation details
       transportation[0].pickupPlace = pickupPlace;
       transportation[0].dropoffPlace = dropoffPlace;
