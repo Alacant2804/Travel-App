@@ -59,7 +59,9 @@ export default function Destination({
 
     // Validate price input
     if (isNaN(priceInput) || priceInput < 0) {
-      console.error("Invalid place price:", priceInput);
+      toast.error("Invalid price. Price must be a valid positive number.", {
+        theme: "colored",
+      });
       return;
     }
 

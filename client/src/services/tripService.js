@@ -98,9 +98,6 @@ const fetchFlightData = async (tripId) => {
     return response.data.data;
   } catch (error) {
     console.error("Error fetching flight data:", error);
-    toast.error("Couldn't fetch the flight data. Please try again later.", {
-      theme: "colored",
-    });
   }
 };
 

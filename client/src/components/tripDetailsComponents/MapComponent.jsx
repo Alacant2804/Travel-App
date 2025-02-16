@@ -1,3 +1,4 @@
+import React from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import MarkerClusterGroup from "react-leaflet-cluster";
 import L from "leaflet";
@@ -54,8 +55,8 @@ export default function MapComponent({ destinations, center }) {
 
       <MarkerClusterGroup>
         {Array.isArray(destinations) &&
-          destinations.map((destination) => (
-            <>
+          destinations.map((destination, destIndex) => (
+            <React.Fragment key={`destination-${destination._id || destIndex}`}>
               {/* Rendering markers for places */}
               {destination.places?.map((place, index) =>
                 place.coordinates ? (
@@ -87,7 +88,7 @@ export default function MapComponent({ destinations, center }) {
                     </Popup>
                   </Marker>
                 )}
-            </>
+            </React.Fragment>
           ))}
       </MarkerClusterGroup>
     </MapContainer>
