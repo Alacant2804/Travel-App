@@ -34,10 +34,10 @@ router.post(
     } = req.body;
 
     try {
-      if (req.trip.flights.length >= 2) {
+      if (req.trip.flights.some((flight) => flight.type === type)) {
         return res.status(400).json({
           success: false,
-          message: "You can only have one outbound and one inbound flight.",
+          message: `You can only have one ${type} flight.`,
         });
       }
 
@@ -51,11 +51,11 @@ router.post(
         type,
       };
 
-      if (type === "inbound") {
-        req.trip.flights[0] = newFlight; // Set inbound flight
-      } else if (type === "outbound") {
-        req.trip.flights[1] = newFlight; // Set outbound flight
-      }
+      // Remove old flight and add new one
+      req.trip.flights = [
+        ...req.trip.flights.filter((flight) => flight.type !== type),
+        newFlight,
+      ];
 
       await req.trip.save();
 
@@ -87,10 +87,12 @@ router.put(
     } = req.body;
 
     try {
-      // Find the index for outbound or inbound flight
-      const flightIndex = type === "outbound" ? 0 : 1;
+      // Find the flight index
+      let flightIndex = req.trip.flights.findIndex(
+        (flight) => flight.type === type
+      );
 
-      if (!req.trip.flights[flightIndex]) {
+      if (flightIndex === -1) {
         return res.status(400).json({
           success: false,
           message: `${

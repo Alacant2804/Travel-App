@@ -15,7 +15,6 @@ export default function FlightForm({ flight, type, setType, onSave, onClose }) {
   );
   const [bookingLink, setBookingLink] = useState(flight?.bookingLink || "");
   const [price, setPrice] = useState(flight?.price || 0);
-  const [isEditingOutbound, setIsEditingOutbound] = useState(false);
 
   useEffect(() => {
     if (flight) {
@@ -28,11 +27,6 @@ export default function FlightForm({ flight, type, setType, onSave, onClose }) {
       );
       setBookingLink(flight.bookingLink || "");
       setPrice(flight?.price || 0);
-      if (isEditingOutbound) {
-        setType("outbound");
-      } else {
-        setType("inbound");
-      }
     }
   }, [flight]);
 
@@ -111,23 +105,17 @@ export default function FlightForm({ flight, type, setType, onSave, onClose }) {
       <div className="modal-tabs">
         <button
           type="button"
-          className={`tab-btn ${!isEditingOutbound ? "active" : ""}`}
-          onClick={() => {
-            setIsEditingOutbound(false);
-            setType("inbound");
-          }}
+          className={`tab-btn ${type === "outbound" ? "active" : ""}`}
+          onClick={() => setType("outbound")}
         >
-          Inbound
+          Outbound
         </button>
         <button
           type="button"
-          className={`tab-btn ${isEditingOutbound ? "active" : ""}`}
-          onClick={() => {
-            setIsEditingOutbound(true);
-            setType("outbound");
-          }}
+          className={`tab-btn ${type === "inbound" ? "active" : ""}`}
+          onClick={() => setType("inbound")}
         >
-          Outbound
+          Inbound
         </button>
       </div>
       <div className="form-scroll">

@@ -34,7 +34,7 @@ export default function TransportationModal({
       setIsEditing(false);
       onClose();
     } catch (error) {
-      console.error("Error saving transportation:", error);
+      console.error("Error saving transportation: ", error);
       if (error.response?.data?.message) {
         toast.error(error.response.data.message, { theme: "colored" });
       } else {

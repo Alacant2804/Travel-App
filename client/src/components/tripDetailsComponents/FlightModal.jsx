@@ -17,28 +17,15 @@ export default function FlightModal({
   onClose,
 }) {
   const [isEditing, setIsEditing] = useState(false);
-  const [type, setType] = useState("inbound");
+  const [type, setType] = useState(() => {
+    if (!outboundFlight && inboundFlight) return "inbound"; // If inbound exists but outbound doesn't
+    return "outbound"; // Default to outbound
+  });
 
   const selectedFlight = type === "outbound" ? outboundFlight : inboundFlight;
 
-  useEffect(() => {
-    console.log("Flight type in form: ", type);
-  });
   // Save flight details
   const handleSaveFlight = async (flightData) => {
-    // Validate dates before saving
-    if (inboundFlight && outboundFlight) {
-      const inboundDate = new Date(inboundFlight.departureDate);
-      const outboundDate = new Date(outboundFlight.departureDate);
-
-      if (inboundDate > outboundDate) {
-        toast.error("Inbound flight cannot be after outbound flight.", {
-          theme: "colored",
-        });
-        return;
-      }
-    }
-
     try {
       const token = getToken();
       let url = `${API_URL}/trips/flights/${tripId}/flights`;
@@ -48,7 +35,7 @@ export default function FlightModal({
         url = `${API_URL}/trips/flights/${tripId}/flights/${type}`;
       }
 
-      const response = await axios({
+      await axios({
         method,
         url,
         data: flightData,
@@ -57,7 +44,6 @@ export default function FlightModal({
         },
       });
 
-      console.log(response.data.data);
       // Update specific flight state based on type
       fetchFlightData(tripId).then((updatedFlightData) => {
         const outbound =
@@ -71,10 +57,12 @@ export default function FlightModal({
 
       onClose(); // Close the modal after successful save
     } catch (error) {
-      console.error("Error saving flight:", error);
-      toast.error("Couldn't save the flight. Please try again later.", {
-        theme: "colored",
-      });
+      console.error("Error saving flight: ", error);
+      if (error.response?.data?.message) {
+        toast.error(error.response.data.message, { theme: "colored" });
+      } else {
+        toast.error("An unexpected error occurred. Please try again.");
+      }
     }
   };
 
@@ -98,17 +86,17 @@ export default function FlightModal({
             <div className="modal-tabs">
               <button
                 type="button"
-                className={`tab-btn ${type === "inbound" ? "active" : ""}`}
-                onClick={() => setType("inbound")}
-              >
-                Inbound
-              </button>
-              <button
-                type="button"
                 className={`tab-btn ${type === "outbound" ? "active" : ""}`}
                 onClick={() => setType("outbound")}
               >
                 Outbound
+              </button>
+              <button
+                type="button"
+                className={`tab-btn ${type === "inbound" ? "active" : ""}`}
+                onClick={() => setType("inbound")}
+              >
+                Inbound
               </button>
             </div>
             <table className="flight-info-table">
@@ -160,7 +148,10 @@ export default function FlightModal({
             <div className="modal-actions">
               <button
                 className="modal-btn edit-btn"
-                onClick={() => setIsEditing(true)}
+                onClick={() => {
+                  setType(selectedFlight?.type || "outbound");
+                  setIsEditing(true);
+                }}
               >
                 Edit
               </button>

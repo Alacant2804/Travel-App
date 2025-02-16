@@ -128,8 +128,7 @@ export default function AccommodationModal({
       onSave(response.data.data);
       setIsEditing(false);
     } catch (error) {
-      console.error("Error saving accommodation:", error);
-      console.log(error.response.data);
+      console.error("Error saving accommodation: ", error);
       if (error.response?.data?.message) {
         toast.error(error.response.data.message, { theme: "colored" });
       } else {
