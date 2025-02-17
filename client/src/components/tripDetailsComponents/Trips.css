@@ -69,6 +69,30 @@
   cursor: pointer;
   min-width: 250px;
   margin-top: 30px;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.trip-card.completed {
+  opacity: 0.7;
+  border: 2px solid #ccc;
+  background-color: #f0f0f0;
+  color: #888;
+  position: relative;
+}
+
+.trip-card.completed::before {
+  content: "\2713";
+  position: absolute;
+  top: 0%;
+  left: 100%;
+  transform: translate(-50%, -50%);
+  font-size: 70px;
+  color: green;
+  z-index: 1;
+}
+
+.trip-card.completed .trip-link {
+  text-decoration: line-through;
 }
 
 .trip-card a {

@@ -144,53 +144,75 @@ export default function Trips() {
       return [];
     }
 
-    return trips.map((trip) => (
-      <li key={trip._id} className="trip-card">
-        <div className="trip-link" onClick={() => handleTripClick(trip)}>
-          <h3>{trip.tripName}</h3>
+    return trips.map((trip) => {
+      const endDate = new Date(trip.destinations[0].endDate);
+      const today = new Date();
+
+      endDate.setHours(0, 0, 0, 0);
+      today.setHours(0, 0, 0, 0);
+
+      const isTripCompleted =
+        trip.destinations && trip.destinations.length > 0 && endDate < today;
+
+      return (
+        <li
+          key={trip._id}
+          className={`trip-card ${isTripCompleted ? "completed" : ""}`}
+        >
+          <div className="trip-link" onClick={() => handleTripClick(trip)}>
+            <h3>{trip.tripName}</h3>
+
+            <p>
+              <strong>Country: </strong> {trip.country}
+            </p>
+            <p>
+              <strong>City: </strong> {trip.destinations[0].city}
+            </p>
+            <p>
+              <strong>Start Date: </strong>{" "}
+              {trip.destinations[0].startDate.split("T")[0]}
+            </p>
+            <p>
+              <strong>End Date: </strong>{" "}
+              {trip.destinations[0].endDate.split("T")[0]}
+            </p>
+            <p>
+              <strong>Duration: </strong>{" "}
+              {trip.destinations[0]?.duration === 0
+                ? "1 day"
+                : trip.destinations[0]?.duration === 1
+                ? trip.destinations[0]?.duration + " day"
+                : trip.destinations[0]?.duration + " days"}
+            </p>
+          </div>
           <p>
-            <strong>Country: </strong> {trip.country}
+            <strong>Status: </strong>{" "}
+            <span className="completed-status">
+              {isTripCompleted ? "Completed" : "Upcoming"}
+            </span>
           </p>
-          <p>
-            <strong>City: </strong> {trip.destinations[0].city}
-          </p>
-          <p>
-            <strong>Start Date: </strong>{" "}
-            {trip.destinations[0].startDate.split("T")[0]}
-          </p>
-          <p>
-            <strong>End Date: </strong>{" "}
-            {trip.destinations[0].endDate.split("T")[0]}
-          </p>
-          <p>
-            <strong>Duration: </strong>{" "}
-            {trip.destinations[0]?.duration === 0
-              ? "1 day"
-              : trip.destinations[0]?.duration === 1
-              ? trip.destinations[0]?.duration + " day"
-              : trip.destinations[0]?.duration + " days"}
-          </p>
-        </div>
-        <div className="trip-actions">
-          <button
-            className="trip-btn edit"
-            onClick={(event) => {
-              event.stopPropagation();
-              setIsModalOpen(true);
-              setEditingTrip(trip);
-            }}
-          >
-            Edit
-          </button>
-          <button
-            className="trip-btn delete"
-            onClick={(event) => handleDeleteTrip(trip._id, event)}
-          >
-            Delete
-          </button>
-        </div>
-      </li>
-    ));
+          <div className="trip-actions">
+            <button
+              className="trip-btn edit"
+              onClick={(event) => {
+                event.stopPropagation();
+                setIsModalOpen(true);
+                setEditingTrip(trip);
+              }}
+              // disabled={isTripCompleted}
+            >
+              Edit
+            </button>
+            <button
+              className="trip-btn delete"
+              onClick={(event) => handleDeleteTrip(trip._id, event)}
+            >
+              Delete
+            </button>
+          </div>
+        </li>
+      );
+    });
   }, [trips, handleDeleteTrip, handleTripClick]);
 
   if (loading) {
