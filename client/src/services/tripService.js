@@ -1,6 +1,6 @@
 import axios from "axios";
-import { getToken } from "../util/util";
-import { slugify } from "../util/slugify";
+import { getToken } from "../utils/util";
+import { slugify } from "../utils/slugify";
 
 const API_URL = import.meta.env.VITE_API_URL;
 

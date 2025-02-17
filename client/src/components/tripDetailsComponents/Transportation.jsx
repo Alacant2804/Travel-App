@@ -1,7 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
-import { toast } from "react-toastify";
-import { getToken, calculateDuration } from "../../util/util";
+import { getToken, calculateDuration } from "../../utils/util";
+import errorHandler from "../../utils/errorHandler";
 import TransportationForm from "./TransportationForm";
 import "./Transportation.css";
 
@@ -34,12 +34,7 @@ export default function TransportationModal({
       setIsEditing(false);
       onClose();
     } catch (error) {
-      console.error("Error saving transportation: ", error);
-      if (error.response?.data?.message) {
-        toast.error(error.response.data.message, { theme: "colored" });
-      } else {
-        toast.error("An unexpected error occurred. Please try again.");
-      }
+      errorHandler(error);
     }
   };
 

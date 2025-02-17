@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { calculateDuration, getToken } from "../../util/util";
+import { calculateDuration, getToken } from "../../utils/util";
+import errorHandler from "../../utils/errorHandler";
 import {
   getCoordinates,
   fetchAccommodationData,
@@ -76,19 +77,29 @@ export default function AccommodationModal({
       return;
     }
 
-    if (!startDate || !endDate) {
-      toast.error("Please provide start and end dates.", { theme: "colored" });
+    if (!startDate) {
+      toast.error("Please provide start date.", { theme: "colored" });
+      return;
+    }
+
+    if (!endDate) {
+      toast.error("Please provide end date.", { theme: "colored" });
       return;
     }
 
     if (new Date(startDate) > new Date(endDate)) {
-      return res.status(400).json({
-        success: false,
-        message: "End date cannot be earlier than the start date.",
+      toast.error("End date cannot be earlier than the start date.", {
+        theme: "colored",
       });
+      return;
     }
 
-    if (!price || price < 0 || isNaN(price)) {
+    if (
+      price == null ||
+      price < 0 ||
+      isNaN(price) ||
+      typeof price !== "number"
+    ) {
       toast.error("Invalid price. Price must be a valid positive number.", {
         theme: "colored",
       });
@@ -128,12 +139,7 @@ export default function AccommodationModal({
       onSave(response.data.data);
       setIsEditing(false);
     } catch (error) {
-      console.error("Error saving accommodation: ", error);
-      if (error.response?.data?.message) {
-        toast.error(error.response.data.message, { theme: "colored" });
-      } else {
-        toast.error("An unexpected error occurred. Please try again.");
-      }
+      errorHandler(error);
     }
   };
 
@@ -153,7 +159,7 @@ export default function AccommodationModal({
             <input
               type="text"
               id="address"
-              placeholder="Address (without country name)"
+              placeholder="Address (only street name and number)"
               value={address}
               onChange={(e) => setAddress(e.target.value)}
               className="form-input"

@@ -82,10 +82,13 @@ export default function FlightForm({ flight, type, setType, onSave, onClose }) {
       return;
     }
 
-    if (!price || isNaN(parseFloat(price)) || price < 0) {
-      toast.error("Invalid price. Price must be a valid positive number.", {
-        theme: "colored",
-      });
+    if (price !== "" && (isNaN(parseFloat(price)) || parseFloat(price) < 0)) {
+      toast.error(
+        "Invalid price. Price must be a valid positive number or can be empty",
+        {
+          theme: "colored",
+        }
+      );
       return;
     }
 

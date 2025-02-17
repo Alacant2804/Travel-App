@@ -14,7 +14,7 @@ import {
   fetchFlightData,
   getCoordinates,
 } from "../../services/tripService";
-import { calculateDuration, getToken } from "../../util/util";
+import { calculateDuration, getToken } from "../../utils/util";
 import axios from "axios";
 import Title from "../common/Title";
 import "./TripDetail.css";
@@ -22,6 +22,7 @@ import budgetIcon from "../../assets/budget.png";
 import carIcon from "../../assets/car.png";
 import planeIcon from "../../assets/plane.png";
 import { toast } from "react-toastify";
+import errorHandler from "../../utils/errorHandler";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -77,10 +78,9 @@ export default function TripDetail() {
           }
         }
       } catch (error) {
-        console.error("Error fetching trip:", error);
-        toast.error(
-          "An error occurred while fetching trip details. Please try again later.",
-          { theme: "colored" }
+        errorHandler(
+          error,
+          "An error occurred while fetching trip details. Please try again later."
         );
       } finally {
         setLoading(false);
@@ -135,10 +135,10 @@ export default function TripDetail() {
         response.data.data,
       ]);
     } catch (error) {
-      console.error("Error adding destination:", error);
-      toast.error("Couldn't create new destination, please try again later", {
-        theme: "colored",
-      });
+      errorHandler(
+        error,
+        "Couldn't create new destination, please try again later"
+      );
     }
   };
 
@@ -200,10 +200,10 @@ export default function TripDetail() {
           ]);
         }
       } catch (error) {
-        console.error("Error saving destination:", error);
-        toast.error("Couldn't save new destination, please try again later", {
-          theme: "colored",
-        });
+        errorHandler(
+          error,
+          "Couldn't save new destination, please try again later"
+        );
       }
     },
     [destinations, tripId]
@@ -240,10 +240,10 @@ export default function TripDetail() {
       );
       toast.success("Destination deleted successfully!", { theme: "colored" });
     } catch (error) {
-      console.error("Error deleting destination:", error);
-      toast.error("Couldn't delete destination. Please try again later.", {
-        theme: "colored",
-      });
+      errorHandler(
+        error,
+        "Couldn't delete destination. Please try again later."
+      );
     }
   };
 

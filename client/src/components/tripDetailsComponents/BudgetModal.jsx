@@ -3,8 +3,9 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "./BudgetModal.css";
-import { getToken } from "../../util/util";
+import { getToken } from "../../utils/util";
 import { fetchBudgetData } from "../../services/tripService";
+import errorHandler from "../../utils/errorHandler";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -40,6 +41,35 @@ export default function BudgetModal({ tripId, onClose }) {
 
   // Save updated item
   const handleSaveEdit = async () => {
+    if (
+      editedItem.amount == null ||
+      isNaN(editedItem.amount) ||
+      editedItem.amount < 0 ||
+      !/^\d+(\.\d{1,2})?$/.test(editedItem.amount)
+    ) {
+      toast.error("Amount must be a valid positive number.", {
+        theme: "colored",
+      });
+      return;
+    }
+
+    if (!editedItem.category.trim()) {
+      toast.error("Category is required.", {
+        theme: "colored",
+      });
+      return;
+    }
+
+    if (
+      typeof editedItem.category !== "string" ||
+      /\d/.test(editedItem.category)
+    ) {
+      toast.error("Category cannot be a number.", {
+        theme: "colored",
+      });
+      return;
+    }
+
     try {
       const token = getToken();
       const updatedItem = {
@@ -67,18 +97,46 @@ export default function BudgetModal({ tripId, onClose }) {
       // Reset the form
       setEditItemId(null);
       setEditedItem({ category: "", amount: "", _id: null });
-      toast.success("Budget updated", { theme: "colored" });
+      toast.success("Budget item updated successfully", { theme: "colored" });
     } catch (error) {
-      console.error("Error saving budget item:", error);
-      toast.error("Couldn't update budget item", { theme: "colored" });
+      errorHandler(error);
     }
   };
 
   // Save new item
   const handleSaveNew = async () => {
+    if (
+      newItem.amount == null ||
+      isNaN(newItem.amount) ||
+      newItem.amount < 0 ||
+      !/^\d+(\.\d{1,2})?$/.test(newItem.amount)
+    ) {
+      toast.error("Amount must be a valid positive number.", {
+        theme: "colored",
+      });
+      return;
+    }
+
+    if (!newItem.category.trim()) {
+      toast.error("Category is required.", {
+        theme: "colored",
+      });
+      return;
+    }
+
+    if (typeof newItem.category !== "string" || /\d/.test(newItem.category)) {
+      toast.error("Category cannot be a number.", {
+        theme: "colored",
+      });
+      return;
+    }
+
     try {
       const token = getToken();
-      const newBudgetItem = { ...newItem, amount: parseFloat(newItem.amount) };
+      const newBudgetItem = {
+        ...newItem,
+        amount: parseFloat(newItem.amount),
+      };
 
       // Check if category and amount are provided
       if (newBudgetItem.category && newBudgetItem.amount) {
@@ -97,11 +155,10 @@ export default function BudgetModal({ tripId, onClose }) {
 
         // Reset the form
         setNewItem({ category: "", amount: "" });
-        toast.success("Budget updated", { theme: "colored" });
+        toast.success("New budget item added", { theme: "colored" });
       }
     } catch (error) {
-      console.error("Error saving budget item:", error);
-      toast.error("Couldn't save new budget item", { theme: "colored" });
+      errorHandler(error);
     }
   };
 
@@ -118,10 +175,11 @@ export default function BudgetModal({ tripId, onClose }) {
       setBudgetItems((prevItems) =>
         prevItems.filter((item) => item._id !== id)
       );
-      toast.success("Budget item deleted", { theme: "colored" });
+      toast.success("Budget item removed successfully", { theme: "colored" });
     } catch (error) {
-      console.error("Error deleting budget item:", error);
-      toast.error("Couldn't delete budget item", { theme: "colored" });
+      errorHandler(
+        "Failed to delete budget item. Please refresh and try again."
+      );
     }
   };
 

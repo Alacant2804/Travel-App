@@ -1,13 +1,88 @@
 import validator from "validator";
 
+export const validateTripInput = (req, res, next) => {
+  const { tripName, country, destinations } = req.body;
+
+  // Validate trip name
+  if (!tripName || validator.isEmpty(tripName.trim())) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Trip name is required" });
+  }
+
+  // Validate country
+  if (!country || validator.isEmpty(country.trim())) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Country is required" });
+  }
+
+  if (typeof country !== "string" || !/[a-zA-Z]/.test(country)) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid country. Country must contain at least one letter.",
+    });
+  }
+
+  // Ensure destinations exist and are an array
+  if (!Array.isArray(destinations) || destinations.length === 0) {
+    return res.status(400).json({
+      success: false,
+      message: "At least one destination is required.",
+    });
+  }
+
+  // Validate each destination inside the array
+  for (const destination of destinations) {
+    const { city, startDate, endDate } = destination;
+
+    if (!city || validator.isEmpty(city.trim())) {
+      return res.status(400).json({
+        success: false,
+        message: "Each destination must have a city.",
+      });
+    }
+
+    if (typeof city !== "string" || !/[a-zA-Z]/.test(city)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid city. City must contain at least one letter.",
+      });
+    }
+
+    if (!startDate || !validator.isISO8601(startDate)) {
+      return res.status(400).json({
+        success: false,
+        message: "Each destination must have a valid start date.",
+      });
+    }
+
+    if (!endDate || !validator.isISO8601(endDate)) {
+      return res.status(400).json({
+        success: false,
+        message: "Each destination must have a valid end date.",
+      });
+    }
+
+    if (new Date(startDate) > new Date(endDate)) {
+      return res.status(400).json({
+        success: false,
+        message: "End date cannot be earlier than the start date.",
+      });
+    }
+  }
+
+  next();
+};
+
 export const validateAccommodationInput = (req, res, next) => {
   const { address, startDate, endDate, price, bookingLink } = req.body;
 
   // Validate address
-  if (!address || validator.isEmpty(address)) {
+  if (!address || validator.isEmpty(address.trim())) {
     return res
       .status(400)
-      .json({ success: false, message: "Address is missing" });
+      .json({ success: false, message: "Address is required" });
   }
 
   if (typeof address !== "string") {
@@ -21,7 +96,7 @@ export const validateAccommodationInput = (req, res, next) => {
   if (!/[a-zA-Z]/.test(address)) {
     return res.status(400).json({
       success: false,
-      message: "Invalid address. It must contain at least one letter.",
+      message: "Invalid address. Address must contain at least one letter.",
     });
   }
 
@@ -52,7 +127,8 @@ export const validateAccommodationInput = (req, res, next) => {
     price == null ||
     isNaN(price) ||
     price < 0 ||
-    !/^\d+(\.\d{1,2})?$/.test(price)
+    !/^\d+(\.\d{1,2})?$/.test(price) ||
+    typeof price !== "number"
   ) {
     return res.status(400).json({
       success: false,
@@ -305,6 +381,73 @@ export const validateTransportationInput = (req, res, next) => {
       success: false,
       message: "Booking link must be a valid URL.",
     });
+  }
+
+  next();
+};
+
+export const validateBudgetInput = (req, res, next) => {
+  const { amount, category } = req.body;
+
+  // Validate price
+  if (
+    amount == null ||
+    isNaN(amount) ||
+    amount < 0 ||
+    !/^\d+(\.\d{1,2})?$/.test(amount)
+  ) {
+    return res.status(400).json({
+      success: false,
+      message: "Amount must be a valid positive number.",
+    });
+  }
+
+  // Validate category
+  if (!category || validator.isEmpty(category.trim())) {
+    return res.status(400).json({
+      success: false,
+      message: "Category is required",
+    });
+  }
+
+  if (typeof category !== "string" || /\d/.test(category)) {
+    return res.status(400).json({
+      success: false,
+      message: "Category cannot be a number.",
+    });
+  }
+
+  const defaultCategories = [
+    "Flights",
+    "Transportation",
+    "Places to Visit",
+    "Accommodation",
+  ];
+
+  if (req.trip) {
+    const categoryLower = category.toLowerCase();
+
+    const categoryExists = req.trip.budget.some(
+      (item) => item.category.toLowerCase() === categoryLower
+    );
+
+    if (categoryExists) {
+      return res.status(400).json({
+        success: false,
+        message: "Category already exists in the budget.",
+      });
+    }
+
+    const isDefaultCategory = defaultCategories.some(
+      (defaultCategory) => defaultCategory.toLowerCase() === categoryLower
+    );
+
+    if (isDefaultCategory) {
+      return res.status(400).json({
+        success: false,
+        message: "You cannot use a default category.",
+      });
+    }
   }
 
   next();

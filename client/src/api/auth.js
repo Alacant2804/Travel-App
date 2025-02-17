@@ -1,4 +1,4 @@
-import axios from "../util/axiosConfig.js";
+import axios from "../utils/axiosConfig.js";
 
 // Register a new user
 const register = async (userData) => {

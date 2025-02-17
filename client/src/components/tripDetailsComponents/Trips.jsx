@@ -3,11 +3,12 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import Title from "../common/Title";
-import { slugify } from "../../util/slugify";
+import { slugify } from "../../utils/slugify";
+import errorHandler from "../../utils/errorHandler";
 import TripFormModal from "./TripFormModal";
 import { TripsContext } from "../../context/TripsContext";
 import { AuthContext } from "../../context/AuthContext";
-import { getToken } from "../../util/util";
+import { getToken } from "../../utils/util";
 import Loading from "../../styles/loader/Loading";
 import "./Trips.css";
 
@@ -75,10 +76,7 @@ export default function Trips() {
           });
         }
       } catch (error) {
-        toast.error("Error saving trip. Please try again.", {
-          theme: "colored",
-        });
-        console.error("Error saving trip:", error);
+        errorHandler(error);
       } finally {
         setLoading(false);
       }
@@ -107,15 +105,13 @@ export default function Trips() {
             theme: "colored",
           });
         } else {
-          toast.error("Error deleting trip. Please try again.", {
+          toast.error("Coudln't delete trip. Please try again.", {
             theme: "colored",
           });
+          return;
         }
       } catch (error) {
-        toast.error("Error deleting trip. Please try again.", {
-          theme: "colored",
-        });
-        console.error("Error deleting trip:", error);
+        errorHandler(error, "Error deleting trip. Please try again.");
       } finally {
         setLoading(false);
       }

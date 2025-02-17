@@ -3,6 +3,7 @@ import auth from "../middleware/auth.js";
 import Trip from "../models/Trip.js";
 import { calculateDurationInDays } from "../utils/calculateDuration.js";
 import { checkAccess } from "../middleware/checkAccess.js";
+import { validateTripInput } from "../middleware/validateInput.js";
 
 const router = express.Router();
 
@@ -31,7 +32,7 @@ router.get("/", auth, async (req, res, next) => {
 });
 
 // Add a new trip
-router.post("/", auth, async (req, res, next) => {
+router.post("/", auth, validateTripInput, async (req, res, next) => {
   // Destructure variables from request
   const { tripName, country, destinations } = req.body;
   calculateDurationInDays(destinations);
@@ -57,28 +58,34 @@ router.post("/", auth, async (req, res, next) => {
 });
 
 // Update an existing trip
-router.put("/:tripId", auth, checkAccess, async (req, res, next) => {
-  const { tripName, country, destinations } = req.body;
+router.put(
+  "/:tripId",
+  auth,
+  checkAccess,
+  validateTripInput,
+  async (req, res, next) => {
+    const { tripName, country, destinations } = req.body;
 
-  calculateDurationInDays(destinations);
+    calculateDurationInDays(destinations);
 
-  try {
-    // Update trip information
-    const trip = req.trip; // Access the trip from checkTripAccess middleware
-    trip.tripName = tripName;
-    trip.country = country;
-    trip.destinations = destinations;
+    try {
+      // Update trip information
+      const trip = req.trip; // Access the trip from checkTripAccess middleware
+      trip.tripName = tripName;
+      trip.country = country;
+      trip.destinations = destinations;
 
-    await trip.save();
-    res.status(200).json({
-      success: true,
-      message: "Trip updated successfully",
-      data: trip,
-    });
-  } catch (error) {
-    next(error);
+      await trip.save();
+      res.status(200).json({
+        success: true,
+        message: "Trip updated successfully",
+        data: trip,
+      });
+    } catch (error) {
+      next(error);
+    }
   }
-});
+);
 
 // Delete a trip
 router.delete("/:tripId", auth, checkAccess, async (req, res, next) => {

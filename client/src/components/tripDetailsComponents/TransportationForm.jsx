@@ -27,37 +27,48 @@ export default function TransportationForm({ details, onSave, onClose }) {
     e.preventDefault();
 
     // Front end form validation
-    if (!pickupPlace || typeof pickupPlace !== "string") {
-      toast.error(
-        "Please provide a pick up place. Pick up place cannot be a number.",
-        { theme: "colored" }
-      );
+    if (!pickupPlace.trim()) {
+      toast.error("Please provide a pick up place.", { theme: "colored" });
       return;
     }
 
-    if (!dropoffPlace || typeof dropoffPlace !== "string") {
-      toast.error(
-        "Please provide a drop off place. Drop off place cannot be a number.",
-        { theme: "colored" }
-      );
+    if (typeof pickupPlace !== "string" || !/[a-zA-Z]/.test(pickupPlace)) {
+      toast.error("Pick up place cannot be a number.", { theme: "colored" });
+      return;
+    }
+
+    if (!dropoffPlace.trim()) {
+      toast.error("Please provide a drop off place.", { theme: "colored" });
+      return;
+    }
+
+    if (typeof dropoffPlace !== "string" || !/[a-zA-Z]/.test(dropoffPlace)) {
+      toast.error("Drop off place cannot be a number.", { theme: "colored" });
+      return;
+    }
+
+    if (!pickupDate) {
+      toast.error("Please provide pick up date.", {
+        theme: "colored",
+      });
       return;
     }
 
     if (!pickupDate || !dropoffDate) {
-      toast.error("Please provide pick up and drop off dates.", {
+      toast.error("Please provide drop off date.", {
         theme: "colored",
       });
       return;
     }
 
     if (new Date(pickupDate) > new Date(dropoffDate)) {
-      return res.status(400).json({
-        success: false,
-        message: "Dropoff date must be after pick up date.",
+      toast.error("End date cannot be earlier than the start date.", {
+        theme: "colored",
       });
+      return;
     }
 
-    if (!price || price < 0 || isNaN(price)) {
+    if (price == null || price < 0 || isNaN(price)) {
       toast.error("Invalid price. Price must be a valid positive number.", {
         theme: "colored",
       });

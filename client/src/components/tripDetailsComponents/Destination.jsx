@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { calculateDuration } from "../../util/util";
 import AccommodationModal from "./AccommodationModal";
 import accommodationIcon from "../../assets/accommodation-icon.png";
 import deleteIcon from "../../assets/delete-icon.png";
@@ -8,9 +7,9 @@ import Xicon from "../../assets/x-icon.png";
 import "./Destination.css";
 import { toast } from "react-toastify";
 import axios from "axios";
-import { getToken } from "../../util/util";
+import { getToken, calculateDuration } from "../../utils/util";
 import { getCoordinates } from "../../services/tripService";
-import Loading from "../../styles/loader/Loading";
+import errorHandler from "../../utils/errorHandler";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -111,11 +110,8 @@ export default function Destination({
       event.target.reset();
       toast.success("Place added successfully!", { theme: "colored" });
     } catch (error) {
-      console.error("Error adding place:", error);
+      errorHandler(error, "Couldn't add place. Please try again later.");
       event.target.reset();
-      toast.error("Couldn't add place. Please try again later.", {
-        theme: "colored",
-      });
     }
   };
 
@@ -124,6 +120,16 @@ export default function Destination({
     const updatedPlace = {
       ...editPlaceValue, // The updated values from the edit form
     };
+
+    if (!updatedPlace.name) {
+      toast.error("Place name is required", { theme: "colored" });
+      return;
+    }
+
+    if (!updatedPlace.price) {
+      toast.error("Place price is required", { theme: "colored" });
+      return;
+    }
 
     // Get coordinates
     const coordinates = await getCoordinates(
@@ -174,10 +180,7 @@ export default function Destination({
       setEditPlaceValue({ name: "", price: 0 }); // Clear the inputs
       toast.success("Place updated successfully!", { theme: "colored" });
     } catch (error) {
-      console.error("Error editing place:", error);
-      toast.error("Couldn't update place. Please try again later.", {
-        theme: "colored",
-      });
+      errorHandler(error, "Couldn't update place. Please try again later.");
     }
   };
 
@@ -189,8 +192,6 @@ export default function Destination({
 
   // Delete place from destination
   const handleDeletePlace = async (placeIndex) => {
-    console.log(placeIndex);
-    console.log(destination.places[placeIndex]);
     const placeId = destination.places[placeIndex]._id;
 
     // Check if place or destination exists
@@ -219,10 +220,7 @@ export default function Destination({
       saveDestination({ ...destination, places: updatedPlaces });
       toast.success("Place deleted successfully!", { theme: "colored" });
     } catch (error) {
-      console.error("Error deleting place:", error);
-      toast.error("Couldn't delete place. Please try again later.", {
-        theme: "colored",
-      });
+      errorHandler(error, "Couldn't delete place. Please try again later.");
     }
   };
 

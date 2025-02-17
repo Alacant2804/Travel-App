@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
-import { toast } from "react-toastify";
 import "./FlightModal.css";
 import FlightForm from "./FlightForm";
-import { getToken } from "../../util/util";
+import { getToken } from "../../utils/util";
 import { fetchFlightData } from "../../services/tripService";
+import errorHandler from "../../utils/errorHandler";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -16,13 +16,16 @@ export default function FlightModal({
   inboundFlight,
   onClose,
 }) {
+  const [type, setType] = useState("outbound");
   const [isEditing, setIsEditing] = useState(false);
-  const [type, setType] = useState(() => {
-    if (!outboundFlight && inboundFlight) return "inbound"; // If inbound exists but outbound doesn't
-    return "outbound"; // Default to outbound
-  });
+  const [editingType, setEditingType] = useState(null); // Store the type being edited
+  const [flightToEdit, setFlightToEdit] = useState(null); // Store the actual flight data to edit
 
-  const selectedFlight = type === "outbound" ? outboundFlight : inboundFlight;
+  const handleEdit = (type) => {
+    setEditingType(type);
+    setFlightToEdit(type === "outbound" ? outboundFlight : inboundFlight);
+    setIsEditing(true);
+  };
 
   // Save flight details
   const handleSaveFlight = async (flightData) => {
@@ -32,7 +35,7 @@ export default function FlightModal({
       const method = flightData._id ? "put" : "post";
 
       if (method === "put") {
-        url = `${API_URL}/trips/flights/${tripId}/flights/${type}`;
+        url = `${API_URL}/trips/flights/${tripId}/flights/${flightData.type}`;
       }
 
       await axios({
@@ -57,12 +60,7 @@ export default function FlightModal({
 
       onClose(); // Close the modal after successful save
     } catch (error) {
-      console.error("Error saving flight: ", error);
-      if (error.response?.data?.message) {
-        toast.error(error.response.data.message, { theme: "colored" });
-      } else {
-        toast.error("An unexpected error occurred. Please try again.");
-      }
+      errorHandler(error);
     }
   };
 
@@ -72,11 +70,15 @@ export default function FlightModal({
         <h2>Flight Details</h2>
         {isEditing ? (
           <FlightForm
-            flight={type === "outbound" ? outboundFlight : inboundFlight}
-            type={type}
-            setType={setType}
+            flight={flightToEdit}
+            type={editingType}
+            setType={setEditingType}
             onSave={handleSaveFlight}
-            onClose={() => setIsEditing(false)}
+            onClose={() => {
+              setIsEditing(false);
+              setEditingType(null);
+              setFlightToEdit(null);
+            }}
           />
         ) : (
           <div>
@@ -105,38 +107,67 @@ export default function FlightModal({
                   <td>
                     <strong>Departure Airport:</strong>
                   </td>
-                  <td>{selectedFlight?.departureAirport || ""}</td>
+                  <td>
+                    {type === "outbound"
+                      ? outboundFlight?.departureAirport
+                      : inboundFlight?.departureAirport || ""}
+                  </td>
                 </tr>
                 <tr>
                   <td>
                     <strong>Arrival Airport:</strong>
                   </td>
-                  <td>{selectedFlight?.arrivalAirport || ""}</td>
+                  <td>
+                    {type === "outbound"
+                      ? outboundFlight?.arrivalAirport
+                      : inboundFlight?.arrivalAirport || ""}
+                  </td>
                 </tr>
                 <tr>
                   <td>
                     <strong>Departure Date:</strong>
                   </td>
-                  <td>{selectedFlight?.departureDate?.split("T")[0] || ""}</td>
+                  <td>
+                    {type === "outbound"
+                      ? outboundFlight?.departureDate?.split("T")[0]
+                      : inboundFlight?.departureDate?.split("T")[0] || ""}
+                  </td>
                 </tr>
                 <tr>
                   <td>
                     <strong>Price:</strong>
                   </td>
-                  <td>${selectedFlight?.price?.toFixed(2) || 0}</td>
+                  <td>
+                    $
+                    {type === "outbound"
+                      ? outboundFlight?.price?.toFixed(2)
+                      : inboundFlight?.price?.toFixed(2) || 0}
+                  </td>
                 </tr>
                 <tr>
                   <td>
                     <strong>Booking Link:</strong>
                   </td>
                   <td>
-                    {selectedFlight?.bookingLink ? (
+                    {type === "outbound" ? (
+                      outboundFlight?.bookingLink ? (
+                        <a
+                          href={outboundFlight.bookingLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {outboundFlight.bookingLink}
+                        </a>
+                      ) : (
+                        ""
+                      )
+                    ) : inboundFlight?.bookingLink ? (
                       <a
-                        href={selectedFlight.bookingLink}
+                        href={inboundFlight.bookingLink}
                         target="_blank"
                         rel="noopener noreferrer"
                       >
-                        {selectedFlight.bookingLink}
+                        {inboundFlight.bookingLink}
                       </a>
                     ) : (
                       ""
@@ -148,10 +179,7 @@ export default function FlightModal({
             <div className="modal-actions">
               <button
                 className="modal-btn edit-btn"
-                onClick={() => {
-                  setType(selectedFlight?.type || "outbound");
-                  setIsEditing(true);
-                }}
+                onClick={() => handleEdit(type)}
               >
                 Edit
               </button>

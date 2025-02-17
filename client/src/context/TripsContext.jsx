@@ -7,7 +7,7 @@ import {
 } from "react";
 import axios from "axios";
 import { AuthContext } from "./AuthContext";
-import { getToken } from "../util/util";
+import { getToken } from "../utils/util";
 
 export const TripsContext = createContext();
 

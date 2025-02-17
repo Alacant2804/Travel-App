@@ -11,20 +11,64 @@ export default function TripFormModal({ onRequestClose, onSubmit, trip }) {
 
   useEffect(() => {
     if (trip) {
-      const { tripName, country, destinations } = trip;
-      const { city, startDate, endDate } = destinations[0] || {};
-      setTripName(tripName);
-      setCountry(country);
-      setCity(city || "");
-      setStartDate(startDate ? startDate.split("T")[0] : "");
-      setEndDate(endDate ? endDate.split("T")[0] : "");
+      setTripName((prev) => (prev !== trip.tripName ? trip.tripName : prev));
+      setCountry((prev) => (prev !== trip.country ? trip.country : prev));
+
+      const { city, startDate, endDate } = trip.destinations[0] || {};
+      setCity((prev) => (prev !== city ? city : prev));
+      setStartDate((prev) =>
+        prev !== startDate ? startDate?.split("T")[0] : prev
+      );
+      setEndDate((prev) => (prev !== endDate ? endDate?.split("T")[0] : prev));
     }
   }, [trip]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    if (!tripName || !country || !city || !startDate || !endDate) {
-      toast.error("Please fill out all fields.", {
+    if (!tripName.trim()) {
+      toast.error("Trip name is required", {
+        theme: "colored",
+      });
+      return;
+    }
+
+    if (!country.trim()) {
+      toast.error("Please provide a valid country name.", {
+        theme: "colored",
+      });
+      return;
+    }
+
+    if (typeof country !== "string" || !/[a-zA-Z]/.test(country)) {
+      toast.error("Country name cannot be a number.", {
+        theme: "colored",
+      });
+      return;
+    }
+
+    if (!city.trim()) {
+      toast.error("Please provide a valid city name.", {
+        theme: "colored",
+      });
+      return;
+    }
+
+    if (typeof city !== "string" || !/[a-zA-Z]/.test(city)) {
+      toast.error("City cannot be a number.", {
+        theme: "colored",
+      });
+      return;
+    }
+
+    if (!startDate) {
+      toast.error("Please provide a valid start date.", {
+        theme: "colored",
+      });
+      return;
+    }
+
+    if (!endDate) {
+      toast.error("Please provide a valid end date.", {
         theme: "colored",
       });
       return;
@@ -67,7 +111,6 @@ export default function TripFormModal({ onRequestClose, onSubmit, trip }) {
             value={tripName}
             onChange={(e) => setTripName(e.target.value)}
             className="form-input"
-            required
           />
           <input
             type="text"
@@ -75,7 +118,6 @@ export default function TripFormModal({ onRequestClose, onSubmit, trip }) {
             value={country}
             onChange={(e) => setCountry(e.target.value)}
             className="form-input"
-            required
           />
           <input
             type="text"
@@ -83,21 +125,18 @@ export default function TripFormModal({ onRequestClose, onSubmit, trip }) {
             value={city}
             onChange={(e) => setCity(e.target.value)}
             className="form-input"
-            required
           />
           <input
             type="date"
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
             className="form-input"
-            required
           />
           <input
             type="date"
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
             className="form-input"
-            required
           />
           <div className="modal-actions">
             <button
