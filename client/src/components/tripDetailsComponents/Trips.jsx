@@ -1,5 +1,6 @@
 import { useState, useCallback, useMemo, useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { parseISO, addDays } from "date-fns"; // Import parse and format
 import axios from "axios";
 import { toast } from "react-toastify";
 import Title from "../common/Title";
@@ -145,14 +146,22 @@ export default function Trips() {
     }
 
     return trips.map((trip) => {
-      const endDate = new Date(trip.destinations[0].endDate);
+      const startDateString = trip.destinations[0].startDate;
+      const endDateString = trip.destinations[0].endDate;
+
+      const startDateUTC = parseISO(startDateString);
+      const endDateUTC = parseISO(endDateString);
+
+      const startDate = addDays(startDateUTC, 1);
+      const endDate = addDays(endDateUTC, 1);
       const today = new Date();
 
-      endDate.setHours(0, 0, 0, 0);
-      today.setHours(0, 0, 0, 0);
+      startDate.setHours(23, 59, 59, 999);
+      endDate.setHours(23, 59, 59, 999);
 
-      const isTripCompleted =
-        trip.destinations && trip.destinations.length > 0 && endDate < today;
+      const isTripCompleted = endDate < today;
+      const isTripInProgress =
+        startDate <= today && today <= endDate && !isTripCompleted;
 
       return (
         <li
@@ -184,13 +193,17 @@ export default function Trips() {
                 ? trip.destinations[0]?.duration + " day"
                 : trip.destinations[0]?.duration + " days"}
             </p>
+            <p>
+              <strong>Status: </strong>
+              {isTripCompleted ? (
+                <span className="completed-status">Completed</span>
+              ) : isTripInProgress ? (
+                <span className="in-progress-status">In Progress</span>
+              ) : (
+                <span>Upcoming</span>
+              )}
+            </p>
           </div>
-          <p>
-            <strong>Status: </strong>{" "}
-            <span className="completed-status">
-              {isTripCompleted ? "Completed" : "Upcoming"}
-            </span>
-          </p>
           <div className="trip-actions">
             <button
               className="trip-btn edit"
@@ -199,7 +212,6 @@ export default function Trips() {
                 setIsModalOpen(true);
                 setEditingTrip(trip);
               }}
-              // disabled={isTripCompleted}
             >
               Edit
             </button>

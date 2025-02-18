@@ -9,8 +9,12 @@ import errorHandler from "../../utils/errorHandler";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-export default function BudgetModal({ tripId, onClose }) {
-  const [budgetItems, setBudgetItems] = useState([]);
+export default function BudgetModal({
+  tripId,
+  budgetItems,
+  setBudgetItems,
+  onClose,
+}) {
   const [editItemId, setEditItemId] = useState(null);
   const [editedItem, setEditedItem] = useState({
     category: "",
@@ -18,16 +22,6 @@ export default function BudgetModal({ tripId, onClose }) {
     _id: null,
   });
   const [newItem, setNewItem] = useState({ category: "", amount: "" });
-
-  // Fetch budget data
-  useEffect(() => {
-    if (!tripId) return;
-    fetchBudgetData(tripId)
-      .then((trip) => setBudgetItems(trip))
-      .catch(() =>
-        toast.error("Failed to fetch budget items:", { theme: "colored" })
-      );
-  }, [tripId]);
 
   // Handle editing item
   const handleEdit = (item) => {

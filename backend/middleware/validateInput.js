@@ -427,9 +427,13 @@ export const validateBudgetInput = (req, res, next) => {
   if (req.trip) {
     const categoryLower = category.toLowerCase();
 
-    const categoryExists = req.trip.budget.some(
-      (item) => item.category.toLowerCase() === categoryLower
-    );
+    const categoryExists = req.trip.budget.some((item) => {
+      // Exclude the item being edited from the check
+      if (req.params.budgetId && item._id.toString() === req.params.budgetId) {
+        return false; // Don't count the current item when editing
+      }
+      return item.category.toLowerCase() === categoryLower;
+    });
 
     if (categoryExists) {
       return res.status(400).json({

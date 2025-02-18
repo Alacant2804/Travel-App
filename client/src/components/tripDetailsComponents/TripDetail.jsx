@@ -1,5 +1,5 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
-import { useParams, useLocation } from "react-router-dom";
+import { useState, useEffect, useCallback } from "react";
+import { useParams, useLocation, useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import Destination from "./Destination";
 import FlightModal from "./FlightModal";
@@ -12,6 +12,7 @@ import {
   fetchTripBySlug,
   fetchTransportationData,
   fetchFlightData,
+  fetchBudgetData,
   getCoordinates,
 } from "../../services/tripService";
 import { calculateDuration, getToken } from "../../utils/util";
@@ -27,6 +28,7 @@ import errorHandler from "../../utils/errorHandler";
 const API_URL = import.meta.env.VITE_API_URL;
 
 export default function TripDetail() {
+  const navigate = useNavigate();
   const { tripSlug } = useParams();
   const location = useLocation();
   const [tripId, setTripId] = useState(location.state?.tripId || "");
@@ -38,6 +40,7 @@ export default function TripDetail() {
   const [showFlightModal, setShowFlightModal] = useState(false);
   const [showTransportationModal, setShowTransportationModal] = useState(false);
   const [showBudgetModal, setShowBudgetModal] = useState(false);
+  const [budgetItems, setBudgetItems] = useState([]);
   const [transportationDetails, setTransportationDetails] = useState(null);
   const [outboundFlight, setOutboundFlight] = useState({});
   const [inboundFlight, setInboundFlight] = useState({});
@@ -58,10 +61,12 @@ export default function TripDetail() {
           } else {
             toast.error("Trip not found.", { theme: "colored" });
             setLoading(false);
+            navigate("/404", { replace: true });
             return;
           }
         } else {
           setLoading(false);
+          navigate("/404", { replace: true });
           return;
         }
 
@@ -88,22 +93,7 @@ export default function TripDetail() {
     };
 
     fetchTrip();
-  }, [tripId, tripSlug]);
-
-  // Fetch details
-  useEffect(() => {
-    fetchTransportationData(tripId).then((transportationData) =>
-      setTransportationDetails(transportationData)
-    );
-
-    fetchFlightData(tripId).then((flightData) => {
-      const outbound = flightData.find((f) => f.type === "outbound") || {};
-      const inbound = flightData.find((f) => f.type === "inbound") || {};
-
-      setOutboundFlight(outbound);
-      setInboundFlight(inbound);
-    });
-  }, [tripId]);
+  }, [tripId, tripSlug, navigate]);
 
   // Add new destination in the trip
   const handleAddDestination = async () => {
@@ -248,19 +238,55 @@ export default function TripDetail() {
   };
 
   const handleOpenFlightModal = () => {
-    setShowFlightModal(true);
+    setLoading(true);
+    try {
+      fetchFlightData(tripId).then((flightData) => {
+        const outbound = flightData.find((f) => f.type === "outbound") || {};
+        const inbound = flightData.find((f) => f.type === "inbound") || {};
+
+        setOutboundFlight(outbound);
+        setInboundFlight(inbound);
+        setShowFlightModal(true);
+      });
+    } catch (error) {
+      errorHandler(
+        error,
+        "Couldn't fetch flight details. Please try again later"
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleOpenTransportationModal = () => {
-    setShowTransportationModal(true);
+  const handleOpenTransportationModal = async () => {
+    setLoading(true);
+    try {
+      const transportationData = await fetchTransportationData(tripId);
+      setTransportationDetails(transportationData);
+      setShowTransportationModal(true);
+    } catch (error) {
+      errorHandler(
+        error,
+        "Couldn't fetch transportation details. Please try again later"
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleOpenBudgetModal = () => {
-    setShowBudgetModal(true);
-  };
-
-  const handleCloseBudgetModal = () => {
-    setShowBudgetModal(false);
+    setLoading(true);
+    try {
+      fetchBudgetData(tripId).then((trip) => setBudgetItems(trip));
+      setShowBudgetModal(true);
+    } catch (error) {
+      errorHandler(
+        error,
+        "Couldn't fetch budget details. Please try again later"
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (loading) {
@@ -350,7 +376,12 @@ export default function TripDetail() {
         />
       )}
       {showBudgetModal && (
-        <BudgetModal tripId={tripId} onClose={handleCloseBudgetModal} />
+        <BudgetModal
+          tripId={tripId}
+          budgetItems={budgetItems}
+          setBudgetItems={setBudgetItems}
+          onClose={() => setShowBudgetModal(false)}
+        />
       )}
     </div>
   );
