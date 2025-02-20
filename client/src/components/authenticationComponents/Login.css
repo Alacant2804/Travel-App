@@ -8,7 +8,7 @@
   margin: 0;
   padding: 0;
   height: 80vh;
-  background-image: url("./background-login.jpg");
+  background-image: url("../../assets/background-signup.jpg");
   background-size: cover;
   background-position: center;
 }

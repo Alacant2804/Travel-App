@@ -197,17 +197,6 @@ export const validateDestinationInput = (req, res, next) => {
     });
   }
 
-  if (
-    places.some(
-      (place) => typeof place !== "string" || validator.isEmpty(place)
-    )
-  ) {
-    return res.status(400).json({
-      success: false,
-      message: "Invalid places. Each place must be a non-empty string.",
-    });
-  }
-
   next();
 };
 

@@ -1,5 +1,10 @@
 import { useState, useEffect, useCallback } from "react";
-import { useParams, useLocation, useNavigate } from "react-router-dom";
+import {
+  useParams,
+  useLocation,
+  useNavigate,
+  Navigate,
+} from "react-router-dom";
 import { Link } from "react-router-dom";
 import Destination from "./Destination";
 import FlightModal from "./FlightModal";
@@ -28,15 +33,15 @@ import errorHandler from "../../utils/errorHandler";
 const API_URL = import.meta.env.VITE_API_URL;
 
 export default function TripDetail() {
+  const [trip, setTrip] = useState(null);
   const navigate = useNavigate();
   const { tripSlug } = useParams();
   const location = useLocation();
   const [tripId, setTripId] = useState(location.state?.tripId || "");
   const [tripName, setTripName] = useState(location.state?.tripName || "");
-  const [trip, setTrip] = useState(null);
   const [destinations, setDestinations] = useState([]);
   const [mapCenter, setMapCenter] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [showFlightModal, setShowFlightModal] = useState(false);
   const [showTransportationModal, setShowTransportationModal] = useState(false);
   const [showBudgetModal, setShowBudgetModal] = useState(false);
@@ -61,12 +66,11 @@ export default function TripDetail() {
           } else {
             toast.error("Trip not found.", { theme: "colored" });
             setLoading(false);
-            navigate("/404", { replace: true });
             return;
           }
         } else {
+          toast.error("Trip not found.", { theme: "colored" });
           setLoading(false);
-          navigate("/404", { replace: true });
           return;
         }
 
@@ -293,8 +297,8 @@ export default function TripDetail() {
     return <Loading />;
   }
 
-  if (!trip) {
-    return <p>Trip not found!</p>;
+  if (!trip && !loading) {
+    return <Navigate to="/404" replace={true} />;
   }
 
   return (
@@ -319,21 +323,21 @@ export default function TripDetail() {
           </button>
         </div>
       </div>
-      <h1 className="trip-title">{trip.tripName}</h1>
+      <h1 className="trip-title">{trip?.tripName}</h1>
       <div className="trip-info-row">
         <p>
-          <strong>Country:</strong> {trip.country}
+          <strong>Country:</strong> {trip?.country}
         </p>
         <p>
           <strong>Start Date: </strong>
-          {trip.destinations[0].startDate.split("T")[0]}
+          {trip?.destinations[0]?.startDate.split("T")[0]}
         </p>
         <p>
           <strong>End Date: </strong>
-          {trip.destinations[0].endDate.split("T")[0]}
+          {trip?.destinations[0]?.endDate.split("T")[0]}
         </p>
         <p>
-          <strong>Duration:</strong> {trip.destinations[0].duration} days
+          <strong>Duration:</strong> {trip?.destinations[0]?.duration} days
         </p>
       </div>
       <div className="destinations">

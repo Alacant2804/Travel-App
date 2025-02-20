@@ -29,6 +29,8 @@ export default function Destination({
     destination.endDate ? destination.endDate.split("T")[0] : ""
   );
   const [places, setPlaces] = useState(destination.places || []);
+  const [displayedPlaces, setDisplayedPlaces] = useState([]);
+  const [showMore, setShowMore] = useState(false);
   const [duration, setDuration] = useState(
     calculateDuration(startDate, endDate)
   );
@@ -44,6 +46,21 @@ export default function Destination({
     setDuration(calculateDuration(startDate, endDate));
   }, [startDate, endDate]);
 
+  useEffect(() => {
+    if (destination && destination.places) {
+      const initialDisplayCount = displayedPlaces.length || 5;
+      const nextDisplayedPlaces = places.slice(
+        0,
+        Math.min(initialDisplayCount, destination.places.length)
+      );
+      setDisplayedPlaces(nextDisplayedPlaces);
+      setShowMore(destination.places.length > nextDisplayedPlaces.length);
+    } else {
+      setDisplayedPlaces([]);
+      setShowMore(false);
+    }
+  }, [destination]);
+
   // Add place to the destination component
   const handleAddPlace = async (event) => {
     event.preventDefault();
@@ -52,7 +69,7 @@ export default function Destination({
 
     // Validate place input
     if (typeof placeInput !== "string" || !placeInput.trim()) {
-      toast.error("Place name is incorrect", { theme: "colored" });
+      toast.error("Place name should be a valid string", { theme: "colored" });
       return;
     }
 
@@ -244,6 +261,20 @@ export default function Destination({
     setShowAccommodationModal(false);
   };
 
+  // Show more places
+  const handleShowMore = () => {
+    const increment = 5;
+    let nextStartIndex = displayedPlaces.length;
+    const nextEndIndex = nextStartIndex + increment;
+
+    const nextItems = places.slice(nextStartIndex, nextEndIndex);
+    setDisplayedPlaces((prevDisplayedPlaces) => [
+      ...prevDisplayedPlaces,
+      ...nextItems,
+    ]);
+    setShowMore(places.length > nextEndIndex);
+  };
+
   const totalPlaces = places.length;
   const totalPrice = places.reduce(
     (sum, place) => sum + (parseFloat(place.price) || 0),
@@ -324,7 +355,7 @@ export default function Destination({
         </div>
       </div>
       <ul className="places-to-visit">
-        {destination.places.map((place, index) => (
+        {displayedPlaces.map((place, index) => (
           <li key={index}>
             {editingIndex === index ? (
               <div className="edit-mode">
@@ -394,6 +425,11 @@ export default function Destination({
             )}
           </li>
         ))}
+        {showMore && (
+          <button className="show-more-button" onClick={handleShowMore}>
+            Show More
+          </button>
+        )}
       </ul>
       <form onSubmit={handleAddPlace} className="place-add-form">
         <div className="place-input-fields">
