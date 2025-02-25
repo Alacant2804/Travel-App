@@ -17,6 +17,7 @@ import destinationRoutes from "./routes/destination.js";
 import flightRoutes from "./routes/flights.js";
 import transportationRoutes from "./routes/transportation.js";
 import tripRoutes from "./routes/trips.js";
+import weatherRoutes from "./routes/weather.js";
 
 dotenv.config();
 
@@ -54,6 +55,7 @@ app.use("/api/trips/budget", budgetRoutes);
 app.use("/api/trips/transportation", transportationRoutes);
 app.use("/api/trips/flights", flightRoutes);
 app.use("/api/trips/accommodation", accommodationRoutes);
+app.use("/api/trips/weather", weatherRoutes);
 
 app.use(errorHandler);
 

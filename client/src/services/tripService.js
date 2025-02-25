@@ -1,4 +1,5 @@
 import axios from "axios";
+import { format } from "date-fns";
 import { getToken } from "../utils/util";
 import { slugify } from "../utils/slugify";
 
@@ -200,6 +201,29 @@ const fetchAccommodationData = async (tripId, destinationId) => {
   }
 };
 
+const fetchWeatherData = async (destinations, startDate, endDate) => {
+  const start = format(new Date(startDate), "yyyy-MM-dd");
+  const end = format(new Date(endDate), "yyyy-MM-dd");
+  // const weatherResults = {};
+  try {
+    const response = await axios.get(
+      `${API_URL}/trips/weather/Wroclaw/${start}/${end}`
+    );
+    // for (const destination of destinations) {
+    //   const response = await axios.get(
+    //     `/api/weather/${destination.name}/${start}/${end}`
+    //   );
+    // console.log("Response: ", response.data);
+    // weatherResults[destination.name] = response.data;
+    // }
+    console.log(response.data);
+    return response.data;
+    // return weatherResults;
+  } catch (error) {
+    console.error("Error fetching weather data:", error);
+  }
+};
+
 export {
   getCoordinates,
   fetchTripDetails,
@@ -208,4 +232,5 @@ export {
   fetchFlightData,
   fetchBudgetData,
   fetchAccommodationData,
+  fetchWeatherData,
 };
