@@ -4,51 +4,100 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000; /* Ensure it's on top */
+  z-index: 1000;
 }
 
 .weather-modal {
-  background-color: white;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-  width: 80%; /* Adjust as needed */
-  max-width: 600px; /* Maximum width */
+  background: #ffffff;
+  width: 380px;
+  max-width: 90%;
+  border-radius: 12px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  animation: fadeIn 0.3s ease-in-out;
 }
 
 .weather-modal-header {
+  background: linear-gradient(135deg, #007bff, #0056b3);
+  padding: 18px 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 15px;
+  font-size: 20px;
+  font-weight: bold;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  border-bottom: 3px solid #004494;
 }
 
 .weather-modal-header h2 {
   margin: 0;
+  font-size: 20px;
+  color: white;
 }
 
-.weather-modal-header button {
+.close-button {
   background: none;
   border: none;
-  font-size: 1.2em;
+  color: white;
+  font-size: 26px;
   cursor: pointer;
+  transition: transform 0.2s ease, color 0.3s ease;
+}
+
+.close-button:hover {
+  transform: scale(1.3);
+  color: #ffdddd;
 }
 
 .weather-modal-body {
-  /* Add styles for the body content (e.g., scroll if needed) */
-  overflow-y: auto; /* Add scroll if content overflows */
-  max-height: 400px; /* Set a max height for the scrollable area */
+  padding: 20px;
+  text-align: center;
 }
-.weather-day {
-  border: 1px solid #ddd;
-  margin-bottom: 10px;
-  padding: 10px;
-  border-radius: 5px;
+
+.weather-details {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
 }
+
+.weather-icon img {
+  width: 90px;
+  height: 90px;
+}
+
+.weather-info p {
+  font-size: 17px;
+  margin: 6px 0;
+  color: #333;
+}
+
+.weather-info strong {
+  color: #007bff;
+}
+
+.weather-value {
+  font-weight: bold;
+  color: #222;
+}
+
 .error-message {
-  color: red;
+  color: #d9534f;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }

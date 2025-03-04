@@ -178,7 +178,13 @@
   justify-content: space-between;
 }
 
-.accommodation-button {
+.buttons {
+  display: flex;
+  gap: 1vw;
+}
+
+.accommodation-button,
+.weather-button {
   position: relative;
   cursor: pointer;
   background: none;
@@ -186,7 +192,8 @@
   padding: 0;
 }
 
-.accommodation-button::before {
+.accommodation-button::before,
+.weather-button::before {
   content: attr(data-title);
   position: absolute;
   top: -30px;
@@ -204,17 +211,20 @@
   z-index: 10;
 }
 
-.accommodation-button:hover::before {
+.accommodation-button:hover::before,
+.weather-button:hover::before {
   opacity: 1;
 }
 
-.accommodation-icon {
+.accommodation-icon,
+.weather-icon {
   width: 32px;
   height: 32px;
   transition: transform 0.2s ease-in-out;
 }
 
-.accommodation-button:hover .accommodation-icon {
+.accommodation-button:hover .accommodation-icon,
+.weather-button:hover .weather-icon {
   transform: translateY(-3px);
 }
 

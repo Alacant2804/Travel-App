@@ -1,15 +1,17 @@
 import { useState, useEffect } from "react";
+import { toast } from "react-toastify";
+import axios from "axios";
 import AccommodationModal from "./AccommodationModal";
+import { getToken, calculateDuration } from "../../utils/util";
+import { getCoordinates, fetchWeatherData } from "../../services/tripService";
+import errorHandler from "../../utils/errorHandler";
 import accommodationIcon from "../../assets/accommodation-icon.png";
 import deleteIcon from "../../assets/delete-icon.png";
 import editIcon from "../../assets/edit-icon.png";
 import Xicon from "../../assets/x-icon.png";
+import weatherIcon from "../../assets/weather-icon.png";
 import "./Destination.css";
-import { toast } from "react-toastify";
-import axios from "axios";
-import { getToken, calculateDuration } from "../../utils/util";
-import { getCoordinates } from "../../services/tripService";
-import errorHandler from "../../utils/errorHandler";
+import WeatherModal from "./WeatherModal";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -41,6 +43,9 @@ export default function Destination({
     destination.accommodation || null
   );
   const [loading, setLoading] = useState(false);
+  const [weatherData, setWeatherData] = useState({});
+  const [showWeatherModal, setShowWeatherModal] = useState(false);
+  const [weatherError, setWeatherError] = useState("");
 
   useEffect(() => {
     setDuration(calculateDuration(startDate, endDate));
@@ -59,6 +64,26 @@ export default function Destination({
       setDisplayedPlaces([]);
       setShowMore(false);
     }
+  }, [destination]);
+
+  useEffect(() => {
+    if (!destination?.city) return;
+    let isMounted = true; // Track if component is still mounted
+
+    const fetchData = async () => {
+      try {
+        const data = await fetchWeatherData(destination.city);
+        if (isMounted) setWeatherData(data); // Update state if component is mounted
+      } catch (error) {
+        if (isMounted) console.error("Weather fetch failed:", error);
+      }
+    };
+
+    fetchData();
+
+    return () => {
+      isMounted = false; // Prevent updates after unmount
+    };
   }, [destination]);
 
   // Add place to the destination component
@@ -281,6 +306,35 @@ export default function Destination({
     0
   );
 
+  const handleOpenWeatherModal = async () => {
+    // If data already exists and matches the destination, don't fetch
+    if (weatherData && weatherData.name === destination.city) {
+      setShowWeatherModal(true);
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const data = await fetchWeatherData(destination.city);
+      setWeatherData(data);
+      setShowWeatherModal(true);
+      setWeatherError(null);
+    } catch (error) {
+      setWeatherError(
+        error.response?.data?.message || "Couldn't fetch weather data."
+      );
+      setShowWeatherModal(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCloseWeatherModal = () => {
+    setShowWeatherModal(false);
+    setWeatherError(null);
+  };
+
   return (
     <div className="trip-detail-container">
       <div className="trip-info">
@@ -463,17 +517,26 @@ export default function Destination({
             <strong>Total Price:</strong> ${totalPrice.toFixed(2)}
           </p>
         </div>
-        <button
-          className="accommodation-button"
-          data-title="Add Accommodation"
-          onClick={handleOpenModal}
-        >
-          <img
-            src={accommodationIcon}
-            alt="accommodation"
-            className="accommodation-icon"
-          />
-        </button>
+        <div className="buttons">
+          <button
+            className="accommodation-button"
+            data-title="Add Accommodation"
+            onClick={handleOpenModal}
+          >
+            <img
+              src={accommodationIcon}
+              alt="accommodation"
+              className="accommodation-icon"
+            />
+          </button>
+          <button
+            className="weather-button"
+            data-title="Check Weather"
+            onClick={handleOpenWeatherModal}
+          >
+            <img src={weatherIcon} alt="weather" className="weather-icon" />
+          </button>
+        </div>
         {showAccommodationModal && (
           <AccommodationModal
             tripId={tripId}
@@ -482,6 +545,14 @@ export default function Destination({
             onSave={handleSaveAccommodation}
             onClose={handleCloseModal}
             setLoading={setLoading}
+          />
+        )}
+        {showWeatherModal && (
+          <WeatherModal
+            weatherData={weatherData}
+            onClose={handleCloseWeatherModal}
+            weatherError={weatherError}
+            loading={loading}
           />
         )}
       </div>

@@ -19,14 +19,12 @@ import {
   fetchTransportationData,
   fetchFlightData,
   fetchBudgetData,
-  fetchWeatherData,
   getCoordinates,
 } from "../../services/tripService";
 import { calculateDuration, getToken } from "../../utils/util";
 import axios from "axios";
 import Title from "../common/Title";
 import "./TripDetail.css";
-import weatherIcon from "../../assets/weather-icon.png";
 import budgetIcon from "../../assets/budget.png";
 import carIcon from "../../assets/car.png";
 import planeIcon from "../../assets/plane.png";
@@ -48,8 +46,6 @@ export default function TripDetail() {
   const [showFlightModal, setShowFlightModal] = useState(false);
   const [showTransportationModal, setShowTransportationModal] = useState(false);
   const [showBudgetModal, setShowBudgetModal] = useState(false);
-  const [showWeatherModal, setShowWeatherModal] = useState(false);
-  const [weatherData, setWeatherData] = useState({});
   const [budgetItems, setBudgetItems] = useState([]);
   const [transportationDetails, setTransportationDetails] = useState(null);
   const [outboundFlight, setOutboundFlight] = useState({});
@@ -298,25 +294,6 @@ export default function TripDetail() {
     }
   };
 
-  const handleOpenWeatherModal = () => {
-    setLoading(true);
-    try {
-      fetchWeatherData(
-        destinations,
-        destinations[0].startDate,
-        destinations[0].endDate
-      ).then((weatherData) => setWeatherData(weatherData));
-      setShowWeatherModal(true);
-    } catch (error) {
-      errorHandler(
-        error,
-        "Couldn't fetch weather data. Please try again later"
-      );
-    } finally {
-      setLoading(false);
-    }
-  };
-
   if (loading) {
     return <Loading />;
   }
@@ -333,9 +310,6 @@ export default function TripDetail() {
           <button className="back-button">Go Back</button>
         </Link>
         <div className="trip-icons">
-          <button className="button-icon" onClick={handleOpenWeatherModal}>
-            <img src={weatherIcon} alt="Weather" className="icon" />
-          </button>
           <button className="button-icon" onClick={handleOpenBudgetModal}>
             <img src={budgetIcon} alt="Budget" className="budget-icon" />
           </button>
@@ -387,12 +361,6 @@ export default function TripDetail() {
       </button>
       {mapCenter && (
         <MapComponent destinations={destinations} center={mapCenter} />
-      )}
-      {showWeatherModal && (
-        <WeatherModal
-          weatherData={weatherData}
-          onClose={() => setShowWeatherModal(false)}
-        />
       )}
       {showFlightModal && (
         <FlightModal
