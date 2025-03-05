@@ -11,8 +11,7 @@ export default function MainPhoto() {
         <h2>Make the Best of Your Trip!</h2>
         <p>
           Discover new adventures, explore stunning destinations, and create
-          memories that will last a lifetime. Let us help you plan the journey
-          of your dreams.
+          memories that will last a lifetime.
         </p>
         <Link to="/trips">
           <button className="trip-button">Create Your Trip</button>

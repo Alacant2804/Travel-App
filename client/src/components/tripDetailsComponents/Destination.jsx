@@ -9,6 +9,11 @@ import accommodationIcon from "../../assets/accommodation-icon.png";
 import deleteIcon from "../../assets/delete-icon.png";
 import editIcon from "../../assets/edit-icon.png";
 import Xicon from "../../assets/x-icon.png";
+import sunnyIcon from "../../assets/sunny-icon.png";
+import cloudyIcon from "../../assets/cloudy-icon.png";
+import rainyIcon from "../../assets/rainy-icon.png";
+import snowyIcon from "../../assets/snowy-icon.png";
+import thunderstormIcon from "../../assets/thunderstorm-icon.png";
 import weatherIcon from "../../assets/weather-icon.png";
 import "./Destination.css";
 import WeatherModal from "./WeatherModal";
@@ -46,6 +51,7 @@ export default function Destination({
   const [weatherData, setWeatherData] = useState({});
   const [showWeatherModal, setShowWeatherModal] = useState(false);
   const [weatherError, setWeatherError] = useState("");
+  const [weatherIconSource, setWeatherIconSource] = useState("");
 
   useEffect(() => {
     setDuration(calculateDuration(startDate, endDate));
@@ -81,10 +87,35 @@ export default function Destination({
 
     fetchData();
 
+    if (
+      weatherData &&
+      weatherData.weather &&
+      weatherData.weather[0] &&
+      weatherData.weather[0].main
+    ) {
+      const icons = {
+        Clear: sunnyIcon,
+        Clouds: cloudyIcon,
+        Drizzle: rainyIcon,
+        Rain: rainyIcon,
+        Snow: snowyIcon,
+        Thunderstorm: thunderstormIcon,
+        Default: weatherIcon,
+      };
+
+      const weatherCondition = weatherData.weather[0].main;
+
+      if (icons.hasOwnProperty(weatherCondition)) {
+        setWeatherIconSource(icons[weatherCondition]);
+      } else {
+        setWeatherIconSource(icons.Default);
+      }
+    }
+
     return () => {
       isMounted = false; // Prevent updates after unmount
     };
-  }, [destination]);
+  }, [destination, weatherData]);
 
   // Add place to the destination component
   const handleAddPlace = async (event) => {
@@ -534,7 +565,11 @@ export default function Destination({
             data-title="Check Weather"
             onClick={handleOpenWeatherModal}
           >
-            <img src={weatherIcon} alt="weather" className="weather-icon" />
+            <img
+              src={weatherIconSource}
+              alt="weather"
+              className="weather-icon"
+            />
           </button>
         </div>
         {showAccommodationModal && (
