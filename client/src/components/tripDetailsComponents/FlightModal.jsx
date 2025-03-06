@@ -70,7 +70,7 @@ export default function FlightModal({
         <h2>Flight Details</h2>
         {isEditing ? (
           <FlightForm
-            flight={flightToEdit}
+            flight={editingType === "outbound" ? outboundFlight : inboundFlight}
             type={editingType}
             setType={setEditingType}
             onSave={handleSaveFlight}

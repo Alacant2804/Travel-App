@@ -1,5 +1,5 @@
 .about-app {
-  padding: 60px 20px;
+  padding: 30px 20px;
   background-color: #f8f9fa;
   text-align: center;
 }
@@ -37,9 +37,7 @@
   padding: 20px;
   width: 280px;
   text-align: center;
-  transition:
-    transform 0.3s ease,
-    box-shadow 0.3s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .feature-card:hover {
@@ -89,5 +87,11 @@
   .feature-card {
     width: 80%;
     margin-bottom: 10px;
+  }
+}
+
+@media (max-width: 425px) {
+  .about-header {
+    font-size: 0.8rem;
   }
 }

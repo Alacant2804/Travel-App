@@ -10,7 +10,7 @@ export default function MainPhoto() {
       <div className="main-photo-text">
         <h2>Make the Best of Your Trip!</h2>
         <p>
-          Discover new adventures, explore stunning destinations, and create
+          Discover new adventures, explore stunning destinations and create
           memories that will last a lifetime.
         </p>
         <Link to="/trips">

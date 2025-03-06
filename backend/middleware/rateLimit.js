@@ -1,16 +1,5 @@
 import rateLimit from "express-rate-limit";
 
-// Global rate limiter (100 requests per 15 minutes)
-export const globalLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Max requests per IP
-  message: {
-    success: false,
-    message: "Too many requests. Please try again later.",
-  },
-  headers: true, // Sends back rate limit headers
-});
-
 // Login rate limiter (5 attempts per 5 minutes)
 export const loginLimiter = rateLimit({
   windowMs: 5 * 60 * 1000, // 5 minutes

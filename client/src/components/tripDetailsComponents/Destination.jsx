@@ -59,18 +59,15 @@ export default function Destination({
 
   useEffect(() => {
     if (destination && destination.places) {
-      const initialDisplayCount = displayedPlaces.length || 5;
-      const nextDisplayedPlaces = places.slice(
-        0,
-        Math.min(initialDisplayCount, destination.places.length)
-      );
+      const initialDisplayCount = Math.min(5, destination.places.length);
+      const nextDisplayedPlaces = places.slice(0, initialDisplayCount);
       setDisplayedPlaces(nextDisplayedPlaces);
-      setShowMore(destination.places.length > nextDisplayedPlaces.length);
+      setShowMore(destination.places.length > initialDisplayCount);
     } else {
       setDisplayedPlaces([]);
       setShowMore(false);
     }
-  }, [destination]);
+  }, [destination.places]);
 
   useEffect(() => {
     if (!destination?.city) return;

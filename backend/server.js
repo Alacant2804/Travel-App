@@ -7,7 +7,6 @@ import mongoSanitize from "express-mongo-sanitize";
 import helmet from "helmet";
 import { fileURLToPath } from "url";
 import { errorHandler } from "./middleware/errorHandler.js";
-import { globalLimiter } from "./middleware/rateLimit.js";
 
 // Routes import
 import authRoutes from "./routes/auth.js";
@@ -44,8 +43,6 @@ app.use(
     crossOriginResourcePolicy: { policy: "cross-origin" }, // Allow cross-origin resource loading
   })
 );
-app.use(globalLimiter); // Rate limits for API
-
 app.use(express.static(path.join(__dirname, "../client/dist")));
 
 app.use("/api/auth", authRoutes);
