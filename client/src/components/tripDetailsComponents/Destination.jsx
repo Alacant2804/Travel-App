@@ -20,14 +20,14 @@ import WeatherModal from "./WeatherModal";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-export default function Destination({
+const Destination = ({
   tripId,
   destination = {},
   destinationIndex,
   country,
   saveDestination,
   onDeleteDestination,
-}) {
+}) => {
   const [city, setCity] = useState(destination.city || "New Destination");
   const [startDate, setStartDate] = useState(
     destination.startDate ? destination.startDate.split("T")[0] : ""
@@ -590,4 +590,8 @@ export default function Destination({
       </div>
     </div>
   );
-}
+};
+
+const MemoizedDestination = React.memo(Destination);
+
+export default MemoizedDestination;

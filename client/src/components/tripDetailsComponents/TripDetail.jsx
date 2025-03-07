@@ -11,7 +11,6 @@ import FlightModal from "./FlightModal";
 import Transportation from "./Transportation";
 import MapComponent from "./MapComponent";
 import BudgetModal from "./BudgetModal";
-import WeatherModal from "./WeatherModal";
 import Loading from "../../styles/loader/Loading";
 import {
   fetchTripDetails,
@@ -205,7 +204,7 @@ export default function TripDetail() {
   );
 
   // Delete destination
-  const handleDeleteDestination = async (destinationIndex) => {
+  const handleDeleteDestination = useCallback(async (destinationIndex) => {
     if (
       destinationIndex < 0 ||
       destinationIndex >= destinations.length ||
@@ -240,7 +239,7 @@ export default function TripDetail() {
         "Couldn't delete destination. Please try again later."
       );
     }
-  };
+  }, []);
 
   const handleOpenFlightModal = () => {
     setLoading(true);
@@ -343,7 +342,7 @@ export default function TripDetail() {
       </div>
       <div className="destinations">
         {destinations.map((destination, index) => (
-          <Destination
+          <MemoizedDestination
             key={index}
             destination={destination}
             destinationIndex={index}
