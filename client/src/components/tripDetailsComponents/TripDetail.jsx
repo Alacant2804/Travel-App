@@ -99,6 +99,10 @@ export default function TripDetail() {
     fetchTrip();
   }, [tripId, tripSlug, navigate]);
 
+  useEffect(() => {
+    console.log("Destinations in useEffect: ", destinations);
+  });
+
   // Add new destination in the trip
   const handleAddDestination = async () => {
     const startDate = new Date().toISOString().slice(0, 10);
@@ -128,6 +132,7 @@ export default function TripDetail() {
         ...prevDestinations,
         response.data.data,
       ]);
+      console.log("Destinations after adding: ", destinations);
     } catch (error) {
       errorHandler(
         error,
@@ -204,7 +209,7 @@ export default function TripDetail() {
   );
 
   // Delete destination
-  const handleDeleteDestination = useCallback(async (destinationIndex) => {
+  const handleDeleteDestination = async (destinationIndex) => {
     if (
       destinationIndex < 0 ||
       destinationIndex >= destinations.length ||
@@ -232,26 +237,27 @@ export default function TripDetail() {
           (destination) => destination._id !== destinationId
         )
       );
-      toast.success("Destination deleted successfully!", { theme: "colored" });
+      toast.success("Destination deleted successfully!", {
+        theme: "colored",
+      });
     } catch (error) {
       errorHandler(
         error,
         "Couldn't delete destination. Please try again later."
       );
     }
-  }, []);
+  };
 
-  const handleOpenFlightModal = () => {
+  const handleOpenFlightModal = async () => {
     setLoading(true);
     try {
-      fetchFlightData(tripId).then((flightData) => {
-        const outbound = flightData.find((f) => f.type === "outbound") || {};
-        const inbound = flightData.find((f) => f.type === "inbound") || {};
+      const flightData = await fetchFlightData(tripId);
+      const outbound = flightData.find((f) => f.type === "outbound") || {};
+      const inbound = flightData.find((f) => f.type === "inbound") || {};
 
-        setOutboundFlight(outbound);
-        setInboundFlight(inbound);
-        setShowFlightModal(true);
-      });
+      setOutboundFlight(outbound);
+      setInboundFlight(inbound);
+      setShowFlightModal(true);
     } catch (error) {
       errorHandler(
         error,
@@ -278,10 +284,11 @@ export default function TripDetail() {
     }
   };
 
-  const handleOpenBudgetModal = () => {
+  const handleOpenBudgetModal = async () => {
     setLoading(true);
     try {
-      fetchBudgetData(tripId).then((trip) => setBudgetItems(trip));
+      const budgetData = await fetchBudgetData(tripId);
+      setBudgetItems(budgetData);
       setShowBudgetModal(true);
     } catch (error) {
       errorHandler(
@@ -342,7 +349,7 @@ export default function TripDetail() {
       </div>
       <div className="destinations">
         {destinations.map((destination, index) => (
-          <MemoizedDestination
+          <Destination
             key={index}
             destination={destination}
             destinationIndex={index}
