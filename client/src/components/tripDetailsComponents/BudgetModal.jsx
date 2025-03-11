@@ -1,10 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
+import ModalLoading from "../../styles/loader/ModalLoading";
 import "react-toastify/dist/ReactToastify.css";
 import "./BudgetModal.css";
 import { getToken } from "../../utils/util";
-import { fetchBudgetData } from "../../services/tripService";
 import errorHandler from "../../utils/errorHandler";
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -14,6 +14,7 @@ export default function BudgetModal({
   budgetItems,
   setBudgetItems,
   onClose,
+  modalLoading,
 }) {
   const [editItemId, setEditItemId] = useState(null);
   const [editedItem, setEditedItem] = useState({
@@ -194,6 +195,13 @@ export default function BudgetModal({
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <h2>Budget Details</h2>
+
+        {modalLoading && (
+          <div className="modal-loading-overlay">
+            <ModalLoading />
+          </div>
+        )}
+
         <div className="modal-scroll">
           <table className="budget-info-table">
             <thead>

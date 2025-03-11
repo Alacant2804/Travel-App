@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import "./FlightModal.css";
 import FlightForm from "./FlightForm";
+import ModalLoading from "../../styles/loader/ModalLoading";
 import { getToken } from "../../utils/util";
 import { fetchFlightData } from "../../services/tripService";
 import errorHandler from "../../utils/errorHandler";
@@ -15,6 +16,7 @@ export default function FlightModal({
   setInboundFlight,
   inboundFlight,
   onClose,
+  modalLoading,
 }) {
   const [type, setType] = useState("outbound");
   const [isEditing, setIsEditing] = useState(false);
@@ -68,6 +70,13 @@ export default function FlightModal({
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <h2>Flight Details</h2>
+
+        {modalLoading && (
+          <div className="modal-loading-overlay">
+            <ModalLoading />
+          </div>
+        )}
+
         {isEditing ? (
           <FlightForm
             flight={editingType === "outbound" ? outboundFlight : inboundFlight}

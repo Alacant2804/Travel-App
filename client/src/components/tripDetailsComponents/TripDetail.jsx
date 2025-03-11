@@ -42,6 +42,7 @@ export default function TripDetail() {
   const [destinations, setDestinations] = useState([]);
   const [mapCenter, setMapCenter] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [modalLoading, setModalLoading] = useState(false);
   const [showFlightModal, setShowFlightModal] = useState(false);
   const [showTransportationModal, setShowTransportationModal] = useState(false);
   const [showBudgetModal, setShowBudgetModal] = useState(false);
@@ -249,7 +250,7 @@ export default function TripDetail() {
   };
 
   const handleOpenFlightModal = async () => {
-    setLoading(true);
+    setModalLoading(true);
     try {
       const flightData = await fetchFlightData(tripId);
       const outbound = flightData.find((f) => f.type === "outbound") || {};
@@ -264,12 +265,12 @@ export default function TripDetail() {
         "Couldn't fetch flight details. Please try again later"
       );
     } finally {
-      setLoading(false);
+      setModalLoading(false);
     }
   };
 
   const handleOpenTransportationModal = async () => {
-    setLoading(true);
+    setModalLoading(true);
     try {
       const transportationData = await fetchTransportationData(tripId);
       setTransportationDetails(transportationData);
@@ -280,12 +281,12 @@ export default function TripDetail() {
         "Couldn't fetch transportation details. Please try again later"
       );
     } finally {
-      setLoading(false);
+      setModalLoading(false);
     }
   };
 
   const handleOpenBudgetModal = async () => {
-    setLoading(true);
+    setModalLoading(true);
     try {
       const budgetData = await fetchBudgetData(tripId);
       setBudgetItems(budgetData);
@@ -296,7 +297,7 @@ export default function TripDetail() {
         "Couldn't fetch budget details. Please try again later"
       );
     } finally {
-      setLoading(false);
+      setModalLoading(false);
     }
   };
 
@@ -376,6 +377,7 @@ export default function TripDetail() {
           inboundFlight={inboundFlight}
           setInboundFlight={setInboundFlight}
           onClose={() => setShowFlightModal(false)}
+          modalLoading={modalLoading}
         />
       )}
       {showTransportationModal && (
@@ -384,6 +386,7 @@ export default function TripDetail() {
           transportationDetails={transportationDetails}
           setTransportationDetails={setTransportationDetails}
           onClose={() => setShowTransportationModal(false)}
+          modalLoading={modalLoading}
         />
       )}
       {showBudgetModal && (
@@ -392,6 +395,7 @@ export default function TripDetail() {
           budgetItems={budgetItems}
           setBudgetItems={setBudgetItems}
           onClose={() => setShowBudgetModal(false)}
+          modalLoading={modalLoading}
         />
       )}
     </div>
