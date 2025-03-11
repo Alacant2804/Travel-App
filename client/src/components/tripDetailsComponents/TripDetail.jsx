@@ -251,6 +251,7 @@ export default function TripDetail() {
 
   const handleOpenFlightModal = async () => {
     setModalLoading(true);
+    setShowFlightModal(true);
     try {
       const flightData = await fetchFlightData(tripId);
       const outbound = flightData.find((f) => f.type === "outbound") || {};
@@ -258,7 +259,6 @@ export default function TripDetail() {
 
       setOutboundFlight(outbound);
       setInboundFlight(inbound);
-      setShowFlightModal(true);
     } catch (error) {
       errorHandler(
         error,
@@ -271,10 +271,10 @@ export default function TripDetail() {
 
   const handleOpenTransportationModal = async () => {
     setModalLoading(true);
+    setShowTransportationModal(true);
     try {
       const transportationData = await fetchTransportationData(tripId);
       setTransportationDetails(transportationData);
-      setShowTransportationModal(true);
     } catch (error) {
       errorHandler(
         error,
@@ -287,10 +287,10 @@ export default function TripDetail() {
 
   const handleOpenBudgetModal = async () => {
     setModalLoading(true);
+    setShowBudgetModal(true);
     try {
       const budgetData = await fetchBudgetData(tripId);
       setBudgetItems(budgetData);
-      setShowBudgetModal(true);
     } catch (error) {
       errorHandler(
         error,
