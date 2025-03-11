@@ -51,7 +51,7 @@ While building Travel App, I gained valuable insights and improved my skills in 
 * ***Optimization & Performance:*** Improving app efficiency by reducing unnecessary re-renders, caching API responses, optimizing database queries, and implementing lazy loading.
 
 ## Demo
-...
+You can check the demo video [here](https://www.loom.com/share/14c95bb541ad4081a21f663cc885367a?sid=940583ee-0c6f-4c42-9ff2-733e508e0cc7)
 
 ## Improvements
 1. AI-Powered Trip Generator 🤖 <br>
