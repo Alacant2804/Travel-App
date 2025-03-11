@@ -4,6 +4,9 @@
 
 🌍 **Travel App** is an intuitive and comprehensive web application designed to assist users in planning their trips seamlessly. With Travel App, users can effortlessly create and manage trips, add multiple destinations, pinpoint places to visit, and organize accommodation details. The app features an interactive map for visualizing trip details, enabling users to plan every aspect of their journey, from flight details to local attractions. Additionally, users can set and track budgets for each trip, ensuring a well-organized and budget-friendly travel experience.
 
+## Demo
+You can check the demo video [here](https://www.loom.com/share/14c95bb541ad4081a21f663cc885367a?sid=940583ee-0c6f-4c42-9ff2-733e508e0cc7)
+
 ## ✨ Features
 
 - 📝 Create and edit trips
@@ -49,9 +52,6 @@ While building Travel App, I gained valuable insights and improved my skills in 
 * ***CSS Styling:*** Applying responsive design principles for a better user experience.
 * ***Debugging:*** Tackling issues with state management and component re-renders.
 * ***Optimization & Performance:*** Improving app efficiency by reducing unnecessary re-renders, caching API responses, optimizing database queries, and implementing lazy loading.
-
-## Demo
-You can check the demo video [here](https://www.loom.com/share/14c95bb541ad4081a21f663cc885367a?sid=940583ee-0c6f-4c42-9ff2-733e508e0cc7)
 
 ## Improvements
 1. AI-Powered Trip Generator 🤖 <br>
