@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+import ModalLoading from "../../styles/loader/ModalLoading";
 import { getToken, calculateDuration } from "../../utils/util";
 import errorHandler from "../../utils/errorHandler";
 import TransportationForm from "./TransportationForm";
@@ -12,6 +13,7 @@ export default function TransportationModal({
   transportationDetails,
   setTransportationDetails,
   onClose,
+  modalLoading,
 }) {
   const [isEditing, setIsEditing] = useState(false);
 
@@ -42,6 +44,13 @@ export default function TransportationModal({
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <h2>Transportation Details</h2>
+
+        {modalLoading && (
+          <div className="modal-loading-overlay">
+            <ModalLoading />
+          </div>
+        )}
+
         {isEditing ? (
           <TransportationForm
             details={transportationDetails}
