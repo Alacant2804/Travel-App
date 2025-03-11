@@ -48,10 +48,28 @@ While building Travel App, I gained valuable insights and improved my skills in 
 * ***API Integration:*** Fetching and handling data from external APIs using Axios.
 * ***CSS Styling:*** Applying responsive design principles for a better user experience.
 * ***Debugging:*** Tackling issues with state management and component re-renders.
+* ***Optimization & Performance:*** Improving app efficiency by reducing unnecessary re-renders, caching API responses, optimizing database queries, and implementing lazy loading.
 
 ## Demo
 ...
 
 ## Improvements
-1. Improve the logic for places placement so that the user can input the whole address with zip codes and it would be displayed on the map
-2. Optimize rendering performance 
+1. AI-Powered Trip Generator 🤖 <br>
+Implement an AI-based itinerary planner that suggests personalized trips based on user preferences, budget, and duration. <br>
+Use OpenAI or Google Places API to generate recommended attractions, restaurants, and activities dynamically.
+
+2. Offline Mode & Caching 📶 <br>
+Enable offline access by caching trip details and budget data using Service Workers or IndexedDB. <br>
+This allows users to view saved trips without an internet connection.
+
+3. Collaborative Trip Planning 👥 <br>
+Allow users to invite friends to plan trips together.
+Implement real-time updates using WebSockets or Firebase to sync changes made by multiple users. <br>
+
+4. Expense Tracking & Budget Insights 💰 <br>
+Add a budget breakdown feature with charts (using Chart.js or Recharts) to visualize spending by category. <br>
+Provide smart spending tips based on historical trip data.
+
+5. Interactive Map with Smart Recommendations 🗺️ <br>
+Integrate a map feature (Google Maps or Mapbox) to display nearby attractions, transport routes, and user-added trip locations. <br>
+Use geolocation to provide personalized recommendations based on current location.
