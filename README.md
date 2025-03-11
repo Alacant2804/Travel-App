@@ -38,7 +38,7 @@ You can access the deployed application [here](https://travel-app-client-tau.ver
 6. View the trip details on the interactive map.
 
 ## 🎥 Demo
-You can check the demo video [here](https://www.loom.com/share/14c95bb541ad4081a21f663cc885367a?sid=940583ee-0c6f-4c42-9ff2-733e508e0cc7)
+You can check the demo video [here](https://www.loom.com/share/14c95bb541ad4081a21f663cc885367a?sid=940583ee-0c6f-4c42-9ff2-733e508e0cc7).
 
 ## 🎓 What I Learned
 
